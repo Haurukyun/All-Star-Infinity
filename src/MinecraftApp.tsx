@@ -424,6 +424,7 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                       { id: Theme.KIRBY, label: 'POPSTAR', icon: '⭐' },
                       { id: Theme.POKEMON, label: 'KANTO', icon: '🔴' },
                       { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', icon: '🏝️' },
+                      { id: Theme.SKYRIM, label: 'SKYRIM', icon: '🐉' },
                     ].map(t => (
                       <button 
                         key={t.id}

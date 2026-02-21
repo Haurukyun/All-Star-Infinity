@@ -396,6 +396,14 @@ const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                 <span className="font-p5-display text-3xl italic">ANIMAL CROSSING</span>
                 <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">ISLAND PARADISE</span>
               </button>
+
+              <button 
+                onClick={() => setTheme(Theme.SKYRIM)}
+                className={`p-6 text-left transform -skew-x-6 transition-all shadow-[0_0_0_3px_black] ${theme === Theme.SKYRIM ? 'bg-white text-black' : 'bg-black text-white border-white/10 opacity-60'}`}
+              >
+                <span className="font-p5-display text-3xl italic">SKYRIM</span>
+                <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">THE ELDER SCROLLS</span>
+              </button>
             </div>
           </motion.div>
         )}

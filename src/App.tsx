@@ -7,6 +7,7 @@ import OmoriApp from './OmoriApp';
 import KirbyApp from './KirbyApp';
 import PokemonApp from './PokemonApp';
 import AnimalCrossingApp from './AnimalCrossingApp';
+import SkyrimApp from './SkyrimApp';
 import { useGameLogic } from './hooks/useGameLogic';
 import { Theme, Intensity } from './types';
 
@@ -41,6 +42,10 @@ const App: React.FC = () => {
 
   if (logic.theme === Theme.ANIMAL_CROSSING) {
     return <AnimalCrossingApp logic={logic} />;
+  }
+
+  if (logic.theme === Theme.SKYRIM) {
+    return <SkyrimApp logic={logic} />;
   }
 
   return <PersonaApp logic={logic} />;

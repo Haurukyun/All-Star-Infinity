@@ -422,6 +422,7 @@ const AnimalCrossingApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = 
                       { id: Theme.KIRBY, label: 'Popstar', color: '#EC407A' },
                       { id: Theme.POKEMON, label: 'Kanto', color: '#42A5F5' },
                       { id: Theme.ANIMAL_CROSSING, label: 'Island', color: '#9CCC65' },
+                      { id: Theme.SKYRIM, label: 'Skyrim', color: '#B0BEC5' },
                     ].map(t => (
                       <button 
                         key={t.id}

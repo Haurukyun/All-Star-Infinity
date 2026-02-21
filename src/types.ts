@@ -12,7 +12,8 @@ export enum Theme {
   OMORI = 'Omori',
   KIRBY = 'Kirby',
   POKEMON = 'Pokemon',
-  ANIMAL_CROSSING = 'Animal Crossing'
+  ANIMAL_CROSSING = 'Animal Crossing',
+  SKYRIM = 'Skyrim'
 }
 
 export type PromptType = 'Truth' | 'Dare';
