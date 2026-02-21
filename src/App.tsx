@@ -3,6 +3,7 @@ import React from 'react';
 import PersonaApp from './PersonaApp';
 import MinecraftApp from './MinecraftApp';
 import DanganronpaApp from './DanganronpaApp';
+import OmoriApp from './OmoriApp';
 import { useGameLogic } from './hooks/useGameLogic';
 import { Theme, Intensity } from './types';
 
@@ -21,6 +22,10 @@ const App: React.FC = () => {
 
   if (logic.theme === Theme.DANGANRONPA) {
     return <DanganronpaApp logic={logic} />;
+  }
+
+  if (logic.theme === Theme.OMORI) {
+    return <OmoriApp logic={logic} />;
   }
 
   return <PersonaApp logic={logic} />;

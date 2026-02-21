@@ -8,7 +8,8 @@ export enum Intensity {
 export enum Theme {
   PERSONA = 'Persona 5',
   MINECRAFT = 'Minecraft',
-  DANGANRONPA = 'Danganronpa'
+  DANGANRONPA = 'Danganronpa',
+  OMORI = 'Omori'
 }
 
 export type PromptType = 'Truth' | 'Dare';
