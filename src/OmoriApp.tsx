@@ -36,7 +36,7 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
   ];
 
   return (
-    <div className="omori-theme h-screen w-screen flex flex-col bg-white text-black overflow-hidden font-['Gloria_Hallelujah']">
+    <div className="omori-theme h-[100dvh] w-screen flex flex-col bg-white text-black overflow-hidden font-['Gloria_Hallelujah']">
       <style>{`
         @keyframes sketchy {
           0% { border-radius: 2px 4px 2px 8px; }
@@ -128,8 +128,8 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
       </header>
 
       {/* Content */}
-      <main className={`flex-1 overflow-y-auto px-6 pb-24 transition-colors duration-500 ${intensity === Intensity.HOT ? 'headspace-bg' : intensity === Intensity.VULGAR ? 'blackspace-bg' : ''}`}>
-        <div className="max-w-md mx-auto h-full pt-4">
+      <main className={`flex-1 overflow-y-auto px-6 transition-colors duration-500 ${intensity === Intensity.HOT ? 'headspace-bg' : intensity === Intensity.VULGAR ? 'blackspace-bg' : ''}`}>
+        <div className="max-w-md mx-auto pt-4">
           <AnimatePresence mode="wait">
             {activeTab === 'play' && (
               <motion.div key="play" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
@@ -236,7 +236,7 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                         <h3 className="text-xl">DRAWINGS ({editingDeck.prompts.length})</h3>
                         <button onClick={addNewPromptToEditingDeck} className="omori-button text-xs">+ ADD</button>
                       </div>
-                      <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+                      <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
                         {editingDeck.prompts.map(p => (
                           <div key={p.id} className="omori-panel p-4 space-y-3">
                             <div className="flex gap-2">
@@ -288,8 +288,6 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                   <button onClick={() => setTheme(Theme.DANGANRONPA)} className="omori-button py-6 text-xl">KILLING HARMONY</button>
                   <button onClick={() => setTheme(Theme.OMORI)} className="omori-button py-6 text-xl active">DREAM WORLD</button>
                   <button onClick={() => setTheme(Theme.KIRBY)} className="omori-button py-6 text-xl">DREAM LAND</button>
-                  <button onClick={() => setTheme(Theme.SANRIO)} className="omori-button py-6 text-xl">SWEET WORLD</button>
-                  <button onClick={() => setTheme(Theme.POKEMON)} className="omori-button py-6 text-xl">POKÉMON WORLD</button>
                 </div>
               </motion.div>
             )}
@@ -314,6 +312,7 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
               </motion.div>
             )}
           </AnimatePresence>
+          <div className="h-32"></div>
         </div>
       </main>
 
