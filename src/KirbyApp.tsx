@@ -1,14 +1,34 @@
-
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
 
 const STAGES = [
-  { id: Intensity.SOFT, title: 'DREAM LAND', desc: 'SWEET DREAMS', color: '#FFB7C5', text: '#D21F3C' },
-  { id: Intensity.HOT, title: 'STAR RIDE', desc: 'TWINKLE TWINKLE', color: '#FFF4BD', text: '#B8860B' },
-  { id: Intensity.VULGAR, title: 'VOID SOUL', desc: 'DEEP PINK', color: '#FF69B4', text: '#FFFFFF' },
+  { id: Intensity.SOFT, title: 'FRIEND GO!', desc: 'BREEZY', color: '#FF69B4', text: '#FFFFFF', icon: '⭐' },
+  { id: Intensity.HOT, title: 'ARENA', desc: 'SPICY', color: '#FF4500', text: '#FFFFFF', icon: '🔥' },
+  { id: Intensity.VULGAR, title: 'SOUL MELTER', desc: 'EX', color: '#800080', text: '#FFFFFF', icon: '💀' },
 ];
+
+const StarBackground = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 bg-[#1a237e]">
+    <div className="absolute inset-0 opacity-20" style={{ 
+      backgroundImage: 'radial-gradient(#4fc3f7 2px, transparent 2px)', 
+      backgroundSize: '20px 20px' 
+    }}></div>
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#1a237e]/50 to-[#1a237e]"></div>
+    {/* Floating shapes */}
+    <motion.div 
+      animate={{ rotate: 360 }} 
+      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+      className="absolute -top-20 -right-20 w-64 h-64 bg-yellow-300/10 rounded-full blur-3xl"
+    />
+    <motion.div 
+      animate={{ rotate: -360 }} 
+      transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+      className="absolute top-40 -left-20 w-48 h-48 bg-pink-500/10 rounded-full blur-3xl"
+    />
+  </div>
+);
 
 const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
   const {
@@ -30,202 +50,281 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
   const [emotes, setEmotes] = useState<{ id: number, x: number, y: number, type: string, size: number, duration: number }[]>([]);
 
   useEffect(() => {
-    const types = ['⭐', '💖', '☁️', '🍬', '🍭', '✨', '(>^_^)>', '<(^_^<)', 'v(^_^v)', '^(^_^)^', 'poyo!', 'POYO!'];
-    const newEmotes = Array.from({ length: 15 }).map((_, i) => ({
+    const types = ['⭐', '❤️', '🍭', '☁️', '✨'];
+    const newEmotes = Array.from({ length: 10 }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
       type: types[Math.floor(Math.random() * types.length)],
-      size: Math.random() * 20 + 20,
-      duration: Math.random() * 10 + 10
+      size: Math.random() * 15 + 10,
+      duration: Math.random() * 5 + 5
     }));
     setEmotes(newEmotes);
   }, []);
 
   const tabs = [
-    { id: 'play', label: 'PLAY' },
-    { id: 'decks', label: 'FORGE' },
-    { id: 'history', label: 'LOGS' },
-    { id: 'themes', label: 'THEME' },
-    { id: 'settings', label: 'META' },
+    { id: 'play', label: 'MODE', icon: '🎮' },
+    { id: 'decks', label: 'FILES', icon: '📁' },
+    { id: 'history', label: 'LOGS', icon: '📝' },
+    { id: 'themes', label: 'WORLD', icon: '🌍' },
+    { id: 'settings', label: 'OPTS', icon: '⚙️' },
   ];
 
   return (
-    <div className="kirby-theme h-[100dvh] w-screen flex flex-col bg-[#FFDEEF] text-[#D21F3C] overflow-hidden font-['Sniglet']">
+    <div className="kirby-theme h-[100dvh] w-screen flex flex-col bg-[#1a237e] text-white overflow-hidden font-['Fredoka_One'] relative">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Sniglet:wght@400;800&display=swap');
+        
         .kirby-theme {
-          background: linear-gradient(180deg, #FFDEEF 0%, #FFB7C5 100%);
-          position: relative;
+          font-family: 'Sniglet', cursive;
         }
-        .kirby-panel {
-          background: rgba(255, 255, 255, 0.8);
-          border: 4px solid #FF69B4;
-          border-radius: 30px;
-          box-shadow: 0 8px 0px #FF69B4;
-        }
-        .kirby-button {
-          background: #FFF;
-          border: 3px solid #FF69B4;
-          color: #FF69B4;
-          padding: 10px 20px;
-          border-radius: 20px;
-          cursor: pointer;
-          transition: all 0.2s;
-          font-weight: 800;
-          box-shadow: 0 4px 0px #FF69B4;
-        }
-        .kirby-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 0px #FF69B4;
-          background: #FF69B4;
-          color: #FFF;
-        }
-        .kirby-button.active {
-          background: #FF69B4;
-          color: #FFF;
-          box-shadow: inset 0 4px 0px rgba(0,0,0,0.1);
-          transform: translateY(2px);
-        }
-        .kirby-card {
-          background: #FFF;
-          border: 6px solid #FF69B4;
-          border-radius: 40px;
-          padding: 30px;
-          box-shadow: 0 12px 0px #FF69B4;
-          position: relative;
-        }
-        .kirby-header {
+        
+        .font-display {
           font-family: 'Fredoka One', cursive;
-          color: #FF69B4;
-          text-shadow: 3px 3px 0px #FFF;
-          letter-spacing: 2px;
         }
-        .kirby-nav-btn {
-          background: transparent;
-          border: none;
-          color: #FF69B4;
-          font-weight: 800;
-          font-size: 14px;
-          transition: all 0.2s;
+
+        .pop-card {
+          background: #fff;
+          border-radius: 24px;
+          box-shadow: 0 8px 0 rgba(0,0,0,0.1), 0 0 0 4px #fff;
+          position: relative;
+          overflow: hidden;
         }
-        .kirby-nav-btn.active {
-          color: #D21F3C;
-          transform: scale(1.2);
-          text-shadow: 0 0 10px #FFF;
+
+        .btn-story {
+          background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+          border: 4px solid #fff;
+          border-radius: 30px;
+          box-shadow: 0 6px 0 #c71585, 0 10px 10px rgba(0,0,0,0.2);
+          transition: transform 0.1s;
         }
-        .floating-emote {
+        .btn-story:active {
+          transform: translateY(4px);
+          box-shadow: 0 2px 0 #c71585, 0 4px 4px rgba(0,0,0,0.2);
+        }
+
+        .btn-cloud {
+          background: linear-gradient(180deg, #e0f7fa 0%, #81d4fa 100%);
+          border: 4px solid #fff;
+          border-radius: 50px;
+          box-shadow: 0 6px 0 #0288d1, 0 8px 10px rgba(0,0,0,0.2);
+          color: #01579b;
+        }
+        
+        .btn-fire {
+          background: linear-gradient(135deg, #ffeb3b 0%, #ff5722 100%);
+          border: 4px solid #fff;
+          border-radius: 20px 50px 20px 50px;
+          box-shadow: 0 6px 0 #bf360c, 0 8px 10px rgba(0,0,0,0.2);
+          color: #fff;
+          text-shadow: 2px 2px 0 #bf360c;
+        }
+
+        .btn-void {
+          background: linear-gradient(135deg, #7b1fa2 0%, #4a148c 100%);
+          border: 4px solid #fff;
+          border-radius: 20px;
+          box-shadow: 0 6px 0 #311b92, 0 8px 10px rgba(0,0,0,0.2);
+          color: #e1bee7;
+          position: relative;
+          overflow: hidden;
+        }
+        .btn-void::after {
+          content: '';
           position: absolute;
-          pointer-events: none;
-          z-index: 0;
-          opacity: 0.4;
+          top: -50%; left: -50%; width: 200%; height: 200%;
+          background: radial-gradient(circle, transparent 20%, rgba(255,255,255,0.1) 21%, transparent 22%);
+          background-size: 20px 20px;
+          transform: rotate(45deg);
+        }
+
+        .nav-wave {
+          background: #ff69b4;
+          border-top: 4px solid #fff;
+          border-radius: 50% 50% 0 0 / 20px 20px 0 0;
+          box-shadow: 0 -4px 10px rgba(0,0,0,0.2);
+        }
+
+        .bubble-icon {
+          background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.8), rgba(255,255,255,0.1));
+          box-shadow: inset 0 0 10px rgba(255,255,255,0.5), 0 4px 4px rgba(0,0,0,0.1);
+          backdrop-filter: blur(2px);
+        }
+
+        .text-stroke {
+          -webkit-text-stroke: 4px #fff;
+          paint-order: stroke fill;
+        }
+        
+        .text-stroke-sm {
+          -webkit-text-stroke: 2px #fff;
+          paint-order: stroke fill;
+        }
+
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
         @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(10deg); }
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #FFDEEF;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #FF69B4;
-          border-radius: 10px;
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
         }
       `}</style>
 
+      <StarBackground />
+
       {/* Floating Emotes */}
       {emotes.map(emote => (
-        <div
+        <motion.div
           key={emote.id}
-          className="floating-emote"
-          style={{
-            left: `${emote.x}%`,
-            top: `${emote.y}%`,
-            fontSize: `${emote.size}px`,
-            animation: `float ${emote.duration}s ease-in-out infinite`
+          className="absolute pointer-events-none opacity-40 z-0"
+          initial={{ x: `${emote.x}vw`, y: `${emote.y}vh` }}
+          animate={{ 
+            y: [`${emote.y}vh`, `${emote.y - 10}vh`, `${emote.y}vh`],
+            rotate: [0, 10, -10, 0]
           }}
+          transition={{ duration: emote.duration, repeat: Infinity }}
+          style={{ fontSize: emote.size }}
         >
           {emote.type}
-        </div>
+        </motion.div>
       ))}
 
       {/* Header */}
-      <header className="p-4 flex justify-center items-center shrink-0 relative z-10">
-        <h1 className="text-4xl sm:text-5xl kirby-header">KIRBY'S DREAM</h1>
+      <header className="p-4 flex justify-between items-center shrink-0 relative z-10">
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 bg-pink-400 rounded-full border-2 border-white flex items-center justify-center shadow-lg">
+            <span className="text-2xl">⭐</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="font-display text-2xl text-pink-400 text-stroke-sm drop-shadow-md leading-none">KIRBY</span>
+            <span className="text-xs font-bold text-blue-200 tracking-wider">STAR ALLIES</span>
+          </div>
+        </div>
+        <div className="bg-blue-900/50 rounded-full px-3 py-1 border border-blue-400/30 backdrop-blur-sm">
+          <span className="text-xs font-bold text-blue-200">FILE 1 <span className="text-yellow-400">100%</span></span>
+        </div>
       </header>
 
       {/* Content */}
-      <main className="flex-1 overflow-y-auto px-6 relative z-10">
-        <div className="max-w-md mx-auto pt-4">
+      <main className="flex-1 overflow-y-auto px-4 pb-32 relative z-10 no-scrollbar">
+        <div className="max-w-md mx-auto h-full pt-2">
           <AnimatePresence mode="wait">
             {activeTab === 'play' && (
               <motion.div key="play" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="space-y-6">
                 {!intensity && !prompt ? (
-                  <div className="space-y-8">
-                    <div className="kirby-panel p-6">
-                      <h2 className="text-2xl mb-4 text-[#FF69B4] border-b-4 border-[#FF69B4] pb-2 font-bold">SELECT WORLD</h2>
-                      <div className="grid grid-cols-1 gap-3">
-                        <button onClick={() => setActiveDeckId('default')} className={`kirby-button text-xl ${activeDeckId === 'default' ? 'active' : ''}`}>
-                          POPUPO LAND
-                        </button>
-                        {customDecks.map(deck => (
-                          <button key={deck.id} onClick={() => setActiveDeckId(deck.id)} className={`kirby-button text-xl ${activeDeckId === deck.id ? 'active' : ''}`}>
-                            {deck.name.toUpperCase()}
-                          </button>
-                        ))}
+                  <div className="space-y-6">
+                    {/* Deck Selector - Story Mode Style */}
+                    <div className="relative group cursor-pointer" onClick={() => setActiveDeckId(activeDeckId === 'default' ? customDecks[0]?.id || 'default' : 'default')}>
+                      <div className="absolute inset-0 bg-white rounded-[35px] transform rotate-1 group-hover:rotate-2 transition-transform"></div>
+                      <div className="btn-story p-6 relative overflow-hidden min-h-[160px] flex flex-col justify-center items-center text-center">
+                        <div className="absolute top-0 left-0 w-full h-full opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #fff 20%, transparent 20%)', backgroundSize: '10px 10px' }}></div>
+                        <span className="text-sm font-bold text-pink-200 uppercase tracking-widest mb-1 bg-black/10 px-2 rounded-full">Current Mode</span>
+                        <h2 className="font-display text-4xl text-white drop-shadow-md text-stroke-sm mb-2">
+                          {activeDeckId === 'default' ? 'STORY MODE' : (customDecks.find(d => d.id === activeDeckId)?.name || 'CUSTOM').toUpperCase()}
+                        </h2>
+                        <div className="bg-white/20 rounded-full px-4 py-1 backdrop-blur-sm">
+                          <span className="text-xs font-bold">Tap to Switch</span>
+                        </div>
+                        <div className="absolute -bottom-4 -right-4 text-6xl opacity-50 rotate-12">❤️</div>
+                        <div className="absolute -top-4 -left-4 text-6xl opacity-50 -rotate-12">⭐</div>
                       </div>
                     </div>
 
-                    <div className="kirby-panel p-6">
-                      <h2 className="text-2xl mb-4 text-[#FF69B4] border-b-4 border-[#FF69B4] pb-2 font-bold">ADVENTURE LEVEL</h2>
-                      <div className="grid grid-cols-1 gap-4">
-                        {STAGES.map((stage) => (
-                          <button 
-                            key={stage.id} 
-                            onClick={() => setIntensity(stage.id)}
-                            className="kirby-button flex flex-col items-center py-4"
-                            style={{ backgroundColor: stage.color, color: stage.text, borderColor: stage.text }}
-                          >
-                            <span className="text-3xl font-black">{stage.title}</span>
-                            <span className="text-xs font-bold opacity-80">{stage.desc}</span>
-                          </button>
-                        ))}
-                      </div>
+                    {/* Difficulty Selector - Side Games Style */}
+                    <div className="grid grid-cols-1 gap-4">
+                      {STAGES.map((stage) => (
+                        <button 
+                          key={stage.id} 
+                          onClick={() => setIntensity(stage.id)}
+                          className={`
+                            relative p-4 flex items-center justify-between transition-transform active:scale-95
+                            ${stage.id === Intensity.SOFT ? 'btn-cloud' : stage.id === Intensity.HOT ? 'btn-fire' : 'btn-void'}
+                          `}
+                        >
+                          <div className="flex items-center gap-4 relative z-10">
+                            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl shadow-inner">
+                              {stage.icon}
+                            </div>
+                            <div className="flex flex-col text-left">
+                              <span className={`font-display text-2xl leading-none ${stage.id === Intensity.SOFT ? 'text-blue-600' : 'text-white'} drop-shadow-sm`}>
+                                {stage.title}
+                              </span>
+                              <span className={`text-xs font-bold ${stage.id === Intensity.SOFT ? 'text-blue-400' : 'text-white/70'}`}>
+                                {stage.desc}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-2xl opacity-50 relative z-10">▶</div>
+                        </button>
+                      ))}
                     </div>
                   </div>
                 ) : !prompt ? (
-                  <div className="flex flex-col items-center gap-8 py-12">
+                  <div className="flex flex-col items-center justify-center h-[60vh] relative">
                     <motion.div 
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      className="text-center"
+                      initial={{ scale: 0 }} animate={{ scale: 1 }}
+                      className="relative z-10 mb-8"
                     >
-                      <p className="text-[#FF69B4] text-lg font-bold mb-2">CURRENT STAGE</p>
-                      <h2 className="text-6xl kirby-header italic">{intensity}</h2>
+                      <div className="w-40 h-40 rounded-full bg-gradient-to-tr from-pink-400 to-yellow-300 p-2 animate-spin-slow shadow-[0_0_30px_rgba(255,105,180,0.6)]">
+                        <div className="w-full h-full bg-white rounded-full flex items-center justify-center border-4 border-pink-500">
+                          <span className="text-6xl animate-bounce">
+                            {intensity === Intensity.SOFT ? '☁️' : intensity === Intensity.HOT ? '🔥' : '💀'}
+                          </span>
+                        </div>
+                      </div>
                     </motion.div>
-                    <div className="grid grid-cols-1 gap-6 w-full">
-                      <button onClick={() => handleDraw('Truth')} className="kirby-button text-4xl py-8 bg-[#FFF4BD] border-[#B8860B] text-[#B8860B]">TRUTH</button>
-                      <button onClick={() => handleDraw('Dare')} className="kirby-button text-4xl py-8 bg-[#FFB7C5] border-[#D21F3C] text-[#D21F3C]">DARE</button>
-                      <button onClick={() => setIntensity(null)} className="text-[#FF69B4] font-bold uppercase text-sm tracking-widest mt-4 hover:underline">Go Back</button>
+                    
+                    <h2 className="font-display text-4xl text-white text-stroke-sm drop-shadow-[0_4px_0_rgba(0,0,0,0.2)] mb-8 text-center">
+                      {intensity}
+                    </h2>
+
+                    <div className="flex gap-4 w-full px-4">
+                      <button onClick={() => handleDraw('Truth')} className="flex-1 btn-story py-4 text-xl font-display text-white">
+                        TRUTH
+                      </button>
+                      <button onClick={() => handleDraw('Dare')} className="flex-1 btn-fire py-4 text-xl font-display text-white">
+                        DARE
+                      </button>
                     </div>
+                    
+                    <button onClick={() => setIntensity(null)} className="mt-8 bg-white/10 hover:bg-white/20 px-6 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-colors">
+                      Return to Map
+                    </button>
                   </div>
                 ) : (
-                  <motion.div initial={{ scale: 0.5, opacity: 0, rotate: -10 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} className="kirby-card space-y-6">
-                    <div className="flex justify-between items-center">
-                      <span className="bg-[#FF69B4] text-white px-4 py-1 rounded-full text-xl font-bold">{prompt.type}</span>
-                      <span className="text-[#FF69B4] font-bold">#{history.length}</span>
+                  <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative mt-8">
+                    {/* Character Dialogue Box */}
+                    <div className="bg-white border-4 border-pink-400 rounded-[30px] p-6 shadow-[0_10px_0_rgba(0,0,0,0.1)] relative">
+                      <div className="absolute -top-10 left-1/2 transform -translate-x-1/2">
+                        <div className="w-20 h-20 bg-pink-400 rounded-full border-4 border-white flex items-center justify-center shadow-lg">
+                          <span className="text-4xl">
+                            {prompt.type === 'Truth' ? '🤔' : '✨'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-8 text-center space-y-4">
+                        <div className="bg-pink-50 inline-block px-3 py-1 rounded-full text-pink-500 text-xs font-bold uppercase tracking-widest mb-2">
+                          {prompt.type} Card #{history.length}
+                        </div>
+                        <p className="text-3xl font-display text-pink-500 leading-tight">
+                          "{prompt.text}"
+                        </p>
+                        
+                        <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-100">
+                          <p className="text-blue-400 text-xs font-bold uppercase mb-1">Penalty</p>
+                          <p className="text-blue-600 font-bold">{prompt.penalty}</p>
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-4xl font-bold leading-tight text-[#D21F3C]">"{prompt.text}"</p>
-                    <div className="pt-4 border-t-4 border-[#FF69B4] border-dotted">
-                      <p className="text-[#FF69B4] text-sm font-bold mb-1 uppercase tracking-widest">Penalty Time!</p>
-                      <p className="text-2xl font-bold italic text-[#FF69B4]">{prompt.penalty}</p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 pt-6">
-                      <button onClick={() => setPrompt(null)} className="kirby-button">DONE</button>
-                      <button onClick={() => handleDraw(prompt.type)} className="kirby-button active">AGAIN!</button>
+
+                    <div className="flex gap-3 mt-6">
+                      <button onClick={() => setPrompt(null)} className="flex-1 bg-gray-200 text-gray-600 font-bold py-3 rounded-2xl border-b-4 border-gray-300 active:border-b-0 active:translate-y-1">
+                        Done
+                      </button>
+                      <button onClick={() => handleDraw(prompt.type)} className="flex-1 bg-pink-400 text-white font-bold py-3 rounded-2xl border-b-4 border-pink-600 active:border-b-0 active:translate-y-1">
+                        Again!
+                      </button>
                     </div>
                   </motion.div>
                 )}
@@ -233,26 +332,31 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
             )}
 
             {activeTab === 'decks' && (
-              <motion.div key="decks" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
+              <motion.div key="decks" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
                 {!editingDeck ? (
                   <>
-                    <div className="flex justify-between items-end border-b-4 border-[#FF69B4] pb-2">
-                      <h2 className="text-4xl kirby-header">FORGE</h2>
-                      <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="kirby-button text-sm">+ NEW</button>
+                    <div className="flex justify-between items-center mb-4">
+                      <h2 className="font-display text-3xl text-white text-stroke-sm drop-shadow-md">FILE SELECT</h2>
+                      <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold border-2 border-white shadow-lg hover:scale-105 transition-transform">
+                        + New File
+                      </button>
                     </div>
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-3">
                       {customDecks.length === 0 ? (
-                        <div className="py-12 text-center text-[#FF69B4] italic text-2xl">NO CUSTOM DECKS YET!</div>
+                        <div className="text-center py-12 text-white/50 font-bold">No custom files yet!</div>
                       ) : (
                         customDecks.map(deck => (
-                          <div key={deck.id} className="kirby-panel p-4 flex justify-between items-center">
-                            <div>
-                              <h3 className="text-2xl font-bold text-[#FF69B4]">{deck.name || 'Untitled'}</h3>
-                              <p className="text-xs font-bold opacity-60">{deck.prompts.length} CARDS</p>
+                          <div key={deck.id} className="bg-white rounded-2xl p-1 flex items-center gap-3 shadow-lg group">
+                            <div className="w-20 h-20 bg-gradient-to-br from-blue-300 to-blue-500 rounded-xl flex items-center justify-center text-3xl text-white shadow-inner shrink-0">
+                              📁
                             </div>
-                            <div className="flex gap-2">
-                              <button onClick={() => setEditingDeck(deck)} className="kirby-button text-xs">EDIT</button>
-                              <button onClick={() => deleteDeck(deck.id)} className="kirby-button text-xs border-red-400 text-red-400">ERASE</button>
+                            <div className="flex-1 py-2">
+                              <h3 className="font-display text-xl text-blue-600 leading-none mb-1">{deck.name || 'Untitled'}</h3>
+                              <p className="text-xs text-blue-300 font-bold">{deck.prompts.length} Cards • {deck.description?.substring(0, 20) || 'No desc'}...</p>
+                            </div>
+                            <div className="flex flex-col gap-1 pr-2">
+                              <button onClick={() => setEditingDeck(deck)} className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-xs shadow-sm">✏️</button>
+                              <button onClick={() => deleteDeck(deck.id)} className="w-8 h-8 bg-red-400 rounded-full flex items-center justify-center text-xs shadow-sm">🗑️</button>
                             </div>
                           </div>
                         ))
@@ -260,36 +364,30 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                     </div>
                   </>
                 ) : (
-                  <div className="kirby-panel p-6 space-y-6">
-                    <div className="space-y-4">
-                      <input className="w-full bg-white border-4 border-[#FF69B4] rounded-2xl p-3 text-2xl focus:outline-none text-[#FF69B4] font-bold" value={editingDeck.name} onChange={e => setEditingDeck({...editingDeck, name: e.target.value})} placeholder="DECK NAME" />
-                      <textarea className="w-full bg-white border-4 border-[#FF69B4] rounded-2xl p-3 text-sm h-24 focus:outline-none text-[#FF69B4] font-bold" value={editingDeck.description} onChange={e => setEditingDeck({...editingDeck, description: e.target.value})} placeholder="DESCRIPTION" />
-                    </div>
-                    <div className="space-y-4">
+                  <div className="bg-white rounded-[30px] p-6 shadow-xl space-y-4 border-4 border-pink-300">
+                    <input className="w-full text-2xl font-display text-pink-500 border-b-4 border-pink-100 focus:border-pink-400 outline-none bg-transparent placeholder-pink-200" value={editingDeck.name} onChange={e => setEditingDeck({...editingDeck, name: e.target.value})} placeholder="File Name" />
+                    <textarea className="w-full bg-pink-50 rounded-xl p-3 text-pink-600 font-bold text-sm h-20 outline-none resize-none" value={editingDeck.description} onChange={e => setEditingDeck({...editingDeck, description: e.target.value})} placeholder="Description..." />
+                    
+                    <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <h3 className="text-2xl font-bold text-[#FF69B4]">CARDS ({editingDeck.prompts.length})</h3>
-                        <button onClick={addNewPromptToEditingDeck} className="kirby-button text-xs">+ ADD</button>
+                        <span className="font-display text-xl text-pink-400">Cards</span>
+                        <button onClick={addNewPromptToEditingDeck} className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs font-bold">+ Add</button>
                       </div>
-                      <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                      <div className="max-h-[40vh] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                         {editingDeck.prompts.map(p => (
-                          <div key={p.id} className="kirby-panel p-4 space-y-3 bg-white/50">
-                            <div className="flex gap-2">
-                              <select className="bg-white border-2 border-[#FF69B4] rounded-lg text-xs p-1 font-bold text-[#FF69B4]" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                <option>Truth</option><option>Dare</option>
-                              </select>
-                              <select className="bg-white border-2 border-[#FF69B4] rounded-lg text-xs p-1 font-bold text-[#FF69B4]" value={p.intensity} onChange={e => updatePromptInEditingDeck(p.id, 'intensity', e.target.value)}>
-                                <option value={Intensity.SOFT}>SOFT</option><option value={Intensity.HOT}>HOT</option><option value={Intensity.VULGAR}>VULGAR</option>
-                              </select>
-                              <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 ml-auto font-bold">REMOVE</button>
-                            </div>
-                            <input className="w-full bg-white border-b-2 border-[#FF69B4] text-sm p-1 focus:outline-none text-[#FF69B4] font-bold" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="PROMPT TEXT" />
+                          <div key={p.id} className="bg-white border-2 border-blue-100 rounded-xl p-2 flex gap-2 items-center shadow-sm">
+                            <select className="bg-blue-50 text-blue-500 text-xs font-bold rounded-lg p-1 outline-none" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
+                              <option>Truth</option><option>Dare</option>
+                            </select>
+                            <input className="flex-1 text-sm font-bold text-gray-600 outline-none" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="..." />
+                            <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-400 font-bold px-2">×</button>
                           </div>
                         ))}
                       </div>
                     </div>
-                    <div className="flex gap-3">
-                      <button onClick={() => setEditingDeck(null)} className="kirby-button flex-1">CANCEL</button>
-                      <button onClick={() => saveDeck(editingDeck)} className="kirby-button flex-1 active">SAVE</button>
+                    <div className="flex gap-2">
+                      <button onClick={() => setEditingDeck(null)} className="flex-1 bg-gray-200 text-gray-500 font-bold py-3 rounded-xl">Cancel</button>
+                      <button onClick={() => saveDeck(editingDeck)} className="flex-1 bg-pink-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200">Save File</button>
                     </div>
                   </div>
                 )}
@@ -297,73 +395,102 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
             )}
 
             {activeTab === 'history' && (
-              <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-                <h2 className="text-4xl kirby-header border-b-4 border-[#FF69B4] pb-2">ARCHIVES</h2>
+              <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                <h2 className="font-display text-3xl text-white text-stroke-sm drop-shadow-md text-center">BEST MOMENTS</h2>
                 <div className="space-y-3">
-                  {history.length === 0 ? (
-                    <div className="py-12 text-center text-[#FF69B4] italic text-2xl">NO LOGS YET!</div>
-                  ) : (
-                    history.map((item, i) => (
-                      <div key={i} className="kirby-panel p-4 border-l-8 border-[#FF69B4]">
-                        <div className="flex justify-between text-[#FF69B4] text-xs mb-2 font-bold tracking-widest">
-                          <span>{item.type.toUpperCase()}</span>
-                          <span>ENTRY {history.length-i}</span>
-                        </div>
-                        <p className="text-xl font-bold italic">"{item.text}"</p>
+                  {history.map((item, i) => (
+                    <div key={i} className="bg-white/90 backdrop-blur-sm rounded-2xl p-3 flex items-center gap-3 shadow-lg border-2 border-white">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center text-xl border-2 border-white shadow-md ${item.type === 'Truth' ? 'bg-blue-300' : 'bg-pink-300'}`}>
+                        {item.type === 'Truth' ? '🤔' : '✨'}
                       </div>
-                    ))
-                  )}
+                      <div>
+                        <p className="text-gray-600 font-bold leading-tight">"{item.text}"</p>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Record #{history.length - i}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </motion.div>
             )}
 
             {activeTab === 'themes' && (
-              <motion.div key="themes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-                <h2 className="text-4xl kirby-header border-b-4 border-[#FF69B4] pb-2">REALITY</h2>
-                <div className="grid grid-cols-1 gap-4">
-                  <button onClick={() => setTheme(Theme.PERSONA)} className="kirby-button py-6 text-2xl">PHANTOM THIEF</button>
-                  <button onClick={() => setTheme(Theme.MINECRAFT)} className="kirby-button py-6 text-2xl">BLOCKY WORLD</button>
-                  <button onClick={() => setTheme(Theme.DANGANRONPA)} className="kirby-button py-6 text-2xl">KILLING HARMONY</button>
-                  <button onClick={() => setTheme(Theme.OMORI)} className="kirby-button py-6 text-2xl">DREAM WORLD</button>
-                  <button onClick={() => setTheme(Theme.KIRBY)} className="kirby-button py-6 text-2xl active">KIRBY'S DREAM</button>
+              <motion.div key="themes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                <h2 className="font-display text-3xl text-white text-stroke-sm drop-shadow-md text-center">WORLD SELECT</h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { id: Theme.PERSONA, label: 'PHANTOM', color: 'from-red-500 to-red-700' },
+                    { id: Theme.MINECRAFT, label: 'BLOCKY', color: 'from-green-500 to-green-700' },
+                    { id: Theme.DANGANRONPA, label: 'DESPAIR', color: 'from-pink-500 to-purple-700' },
+                    { id: Theme.OMORI, label: 'DREAM', color: 'from-gray-700 to-black' },
+                    { id: Theme.KIRBY, label: 'POPSTAR', color: 'from-pink-400 to-pink-600' },
+                  ].map(t => (
+                    <button 
+                      key={t.id}
+                      onClick={() => setTheme(t.id as Theme)}
+                      className={`
+                        bg-gradient-to-br ${t.color} p-4 rounded-3xl shadow-lg border-4 border-white
+                        flex flex-col items-center justify-center gap-2
+                        transform transition-transform active:scale-95
+                        ${theme === t.id ? 'ring-4 ring-yellow-300 scale-105' : 'opacity-90'}
+                      `}
+                    >
+                      <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-xl">
+                        🌍
+                      </div>
+                      <span className="font-display text-white text-stroke-sm">{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             )}
 
             {activeTab === 'settings' && (
-              <motion.div key="settings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-                <h2 className="text-4xl kirby-header border-b-4 border-[#FF69B4] pb-2">SYSTEM</h2>
-                <div className="kirby-panel p-6 space-y-6">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">HAPPINESS</span><span className="text-[#FF69B4] font-black">100%</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">HUNGER</span><span className="text-[#FF69B4] font-black">ALWAYS</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold">POWER</span><span className="text-[#FF69B4] font-black animate-pulse">COPYING...</span>
-                  </div>
-                  <div className="pt-4 border-t-4 border-[#FF69B4] border-dotted">
-                    <p className="text-sm font-bold text-center text-[#FF69B4]">Poyo! Everything is super cute!</p>
+              <motion.div key="settings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
+                <div className="bg-white rounded-[30px] p-6 shadow-xl border-4 border-blue-300 space-y-6">
+                  <h2 className="font-display text-2xl text-blue-500 text-center">OPTIONS</h2>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center border-b-2 border-blue-50 pb-2">
+                      <span className="font-bold text-gray-500">Music Volume</span>
+                      <div className="flex gap-1">
+                        {[1,2,3,4,5].map(i => <div key={i} className="w-4 h-6 bg-blue-300 rounded-sm"></div>)}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center border-b-2 border-blue-50 pb-2">
+                      <span className="font-bold text-gray-500">Friend Hearts</span>
+                      <span className="font-display text-pink-500 text-xl">ON</span>
+                    </div>
+                    <div className="bg-yellow-100 p-4 rounded-xl text-center">
+                      <p className="text-yellow-700 font-bold text-sm">Thanks for playing!</p>
+                      <p className="text-yellow-600 text-xs mt-1">HAL Laboratory Inc.</p>
+                    </div>
                   </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="h-32"></div>
         </div>
       </main>
 
-      {/* Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full bg-white/90 border-t-4 border-[#FF69B4] h-20 z-50">
-        <div className="flex justify-around items-center h-full px-2">
+      {/* Navigation - Friend Select Wave Style */}
+      <nav className="fixed bottom-0 left-0 w-full h-24 z-50">
+        <div className="absolute inset-0 nav-wave"></div>
+        <div className="relative h-full flex justify-around items-center px-2 pb-2">
           {tabs.map((tab) => (
             <button 
               key={tab.id} 
               onClick={() => setActiveTab(tab.id)}
-              className={`kirby-nav-btn flex-1 h-full ${activeTab === tab.id ? 'active' : ''}`}
+              className={`
+                flex flex-col items-center justify-center gap-1 w-14 h-14 rounded-full transition-all
+                ${activeTab === tab.id ? 'transform -translate-y-4 scale-110' : 'opacity-70 hover:opacity-100'}
+              `}
             >
-              {tab.label}
+              <div className={`
+                w-10 h-10 rounded-full flex items-center justify-center text-lg bubble-icon border-2 border-white
+                ${activeTab === tab.id ? 'bg-yellow-300 text-yellow-800' : 'bg-white/20 text-white'}
+              `}>
+                {tab.icon}
+              </div>
+              <span className="text-[10px] font-bold text-white drop-shadow-md">{tab.label}</span>
             </button>
           ))}
         </div>
