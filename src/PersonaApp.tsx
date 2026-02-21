@@ -388,6 +388,14 @@ const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                 <span className="font-p5-display text-3xl italic">POKEMON</span>
                 <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">KANTO REGION</span>
               </button>
+
+              <button 
+                onClick={() => setTheme(Theme.ANIMAL_CROSSING)}
+                className={`p-6 text-left transform -skew-x-6 transition-all shadow-[0_0_0_3px_black] ${theme === Theme.ANIMAL_CROSSING ? 'bg-white text-black' : 'bg-black text-white border-white/10 opacity-60'}`}
+              >
+                <span className="font-p5-display text-3xl italic">ANIMAL CROSSING</span>
+                <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">ISLAND PARADISE</span>
+              </button>
             </div>
           </motion.div>
         )}

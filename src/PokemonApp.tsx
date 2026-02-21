@@ -429,6 +429,7 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                       { id: Theme.OMORI, label: 'HEADSPACE', color: '#A890F0' },
                       { id: Theme.KIRBY, label: 'DREAMLAND', color: '#F85888' },
                       { id: Theme.POKEMON, label: 'KANTO', color: '#6890F0' },
+                      { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', color: '#9CCC65' },
                     ].map(t => (
                       <button 
                         key={t.id}
