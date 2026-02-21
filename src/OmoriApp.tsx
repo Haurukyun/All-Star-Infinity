@@ -287,6 +287,7 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                   <button onClick={() => setTheme(Theme.MINECRAFT)} className="omori-button py-6 text-xl">BLOCKY WORLD</button>
                   <button onClick={() => setTheme(Theme.DANGANRONPA)} className="omori-button py-6 text-xl">KILLING HARMONY</button>
                   <button onClick={() => setTheme(Theme.OMORI)} className="omori-button py-6 text-xl active">DREAM WORLD</button>
+                  <button onClick={() => setTheme(Theme.KIRBY)} className="omori-button py-6 text-xl">DREAM LAND</button>
                 </div>
               </motion.div>
             )}
