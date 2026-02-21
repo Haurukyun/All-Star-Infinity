@@ -257,6 +257,8 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                   <button onClick={() => setTheme(Theme.DANGANRONPA)} className="mc-button py-8 text-3xl">DANGANRONPA</button>
                   <button onClick={() => setTheme(Theme.OMORI)} className="mc-button py-8 text-3xl">OMORI</button>
                   <button onClick={() => setTheme(Theme.KIRBY)} className="mc-button py-8 text-3xl">KIRBY</button>
+                  <button onClick={() => setTheme(Theme.SANRIO)} className="mc-button py-8 text-3xl">SANRIO</button>
+                  <button onClick={() => setTheme(Theme.POKEMON)} className="mc-button py-8 text-3xl">POKÉMON</button>
                 </div>
               </motion.div>
             )}

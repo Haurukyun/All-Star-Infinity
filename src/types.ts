@@ -10,7 +10,9 @@ export enum Theme {
   MINECRAFT = 'Minecraft',
   DANGANRONPA = 'Danganronpa',
   OMORI = 'Omori',
-  KIRBY = 'Kirby'
+  KIRBY = 'Kirby',
+  SANRIO = 'Sanrio',
+  POKEMON = 'Pokémon'
 }
 
 export type PromptType = 'Truth' | 'Dare';

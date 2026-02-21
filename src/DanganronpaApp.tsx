@@ -303,6 +303,8 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                   <button onClick={() => setTheme(Theme.DANGANRONPA)} className="dr-button py-6 text-xl active">KILLING HARMONY</button>
                   <button onClick={() => setTheme(Theme.OMORI)} className="dr-button py-6 text-xl">DREAM WORLD</button>
                   <button onClick={() => setTheme(Theme.KIRBY)} className="dr-button py-6 text-xl">DREAM LAND</button>
+                  <button onClick={() => setTheme(Theme.SANRIO)} className="dr-button py-6 text-xl">SWEET WORLD</button>
+                  <button onClick={() => setTheme(Theme.POKEMON)} className="dr-button py-6 text-xl">POKÉMON WORLD</button>
                 </div>
               </motion.div>
             )}

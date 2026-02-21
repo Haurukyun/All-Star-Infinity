@@ -326,6 +326,8 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                   <button onClick={() => setTheme(Theme.DANGANRONPA)} className="kirby-button py-6 text-2xl">KILLING HARMONY</button>
                   <button onClick={() => setTheme(Theme.OMORI)} className="kirby-button py-6 text-2xl">DREAM WORLD</button>
                   <button onClick={() => setTheme(Theme.KIRBY)} className="kirby-button py-6 text-2xl active">KIRBY'S DREAM</button>
+                  <button onClick={() => setTheme(Theme.SANRIO)} className="kirby-button py-6 text-2xl">SWEET WORLD</button>
+                  <button onClick={() => setTheme(Theme.POKEMON)} className="kirby-button py-6 text-2xl">POKÉMON WORLD</button>
                 </div>
               </motion.div>
             )}

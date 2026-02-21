@@ -380,6 +380,22 @@ const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                 <span className="font-p5-display text-3xl italic">KIRBY</span>
                 <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">DREAM LAND</span>
               </button>
+
+              <button 
+                onClick={() => setTheme(Theme.SANRIO)}
+                className={`p-6 text-left transform -skew-x-6 transition-all shadow-[0_0_0_3px_black] ${theme === Theme.SANRIO ? 'bg-white text-black' : 'bg-black text-white border-white/10 opacity-60'}`}
+              >
+                <span className="font-p5-display text-3xl italic">SANRIO</span>
+                <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">SWEET WORLD</span>
+              </button>
+
+              <button 
+                onClick={() => setTheme(Theme.POKEMON)}
+                className={`p-6 text-left transform -skew-x-6 transition-all shadow-[0_0_0_3px_black] ${theme === Theme.POKEMON ? 'bg-white text-black' : 'bg-black text-white border-white/10 opacity-60'}`}
+              >
+                <span className="font-p5-display text-3xl italic">POKÉMON</span>
+                <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">KANTO REGION</span>
+              </button>
             </div>
           </motion.div>
         )}
