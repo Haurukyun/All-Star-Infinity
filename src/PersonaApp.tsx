@@ -356,6 +356,14 @@ const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                 <span className="font-p5-display text-3xl italic">MINECRAFT</span>
                 <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">BLOCKY DIMENSION</span>
               </button>
+
+              <button 
+                onClick={() => setTheme(Theme.DANGANRONPA)}
+                className={`p-6 text-left transform -skew-x-6 transition-all shadow-[0_0_0_3px_black] ${theme === Theme.DANGANRONPA ? 'bg-white text-black' : 'bg-black text-white border-white/10 opacity-60'}`}
+              >
+                <span className="font-p5-display text-3xl italic">DANGANRONPA</span>
+                <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">KILLING HARMONY</span>
+              </button>
             </div>
           </motion.div>
         )}

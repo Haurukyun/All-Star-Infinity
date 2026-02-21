@@ -254,6 +254,7 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                 <div className="grid grid-cols-1 gap-4">
                   <button onClick={() => setTheme(Theme.PERSONA)} className="mc-button py-8 text-3xl">PERSONA 5</button>
                   <button onClick={() => setTheme(Theme.MINECRAFT)} className="mc-button py-8 text-3xl active">MINECRAFT</button>
+                  <button onClick={() => setTheme(Theme.DANGANRONPA)} className="mc-button py-8 text-3xl">DANGANRONPA</button>
                 </div>
               </motion.div>
             )}
