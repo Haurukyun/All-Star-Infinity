@@ -8,6 +8,7 @@ import KirbyApp from './KirbyApp';
 import PokemonApp from './PokemonApp';
 import AnimalCrossingApp from './AnimalCrossingApp';
 import SkyrimApp from './SkyrimApp';
+import MainMenu from './MainMenu';
 import { useGameLogic } from './hooks/useGameLogic';
 import { Theme, Intensity } from './types';
 
@@ -19,6 +20,10 @@ export const STAGES = [
 
 const App: React.FC = () => {
   const logic = useGameLogic();
+
+  if (logic.view === 'menu') {
+    return <MainMenu logic={logic} />;
+  }
 
   if (logic.theme === Theme.MINECRAFT) {
     return <MinecraftApp logic={logic} />;

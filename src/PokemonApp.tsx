@@ -475,6 +475,9 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                   <div className="mt-4 text-center text-[10px] text-gray-500">
                     GAME FREAK / NINTENDO
                   </div>
+                  <button onClick={() => logic.setView('menu')} className="w-full mt-4 bg-[#F8F8F8] border-2 border-[#808080] p-2 text-xs font-bold hover:bg-[#E0E0E0] active:translate-y-1">
+                    SAVE AND QUIT
+                  </button>
                 </div>
               </motion.div>
             )}

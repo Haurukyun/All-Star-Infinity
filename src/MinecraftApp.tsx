@@ -460,6 +460,9 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                     <div className="text-center text-xs text-gray-600 mt-4">
                       Modpack v1.0.0
                     </div>
+                    <button onClick={() => logic.setView('menu')} className="w-full mt-4 bg-[#7f7f7f] border-2 border-b-4 border-[#3f3f3f] border-t-[#bfbfbf] border-l-[#bfbfbf] p-2 text-white font-bold text-shadow active:border-t-[#3f3f3f] active:border-l-[#3f3f3f] active:border-b-[#bfbfbf] active:border-r-[#bfbfbf] active:translate-y-1">
+                      Save and Quit to Title
+                    </button>
                   </div>
                 </div>
               </motion.div>

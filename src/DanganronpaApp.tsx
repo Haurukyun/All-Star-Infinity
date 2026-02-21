@@ -468,6 +468,9 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                   <div className="text-center pt-8 opacity-50 text-[10px] tracking-[4px]">
                     TEAM DANGANRONPA
                   </div>
+                  <button onClick={() => logic.setView('menu')} className="w-full mt-4 bg-[#FF00FF]/20 border border-[#FF00FF] p-2 text-[#FF00FF] font-black text-xs hover:bg-[#FF00FF] hover:text-black transition-colors">
+                    RETURN TO TITLE
+                  </button>
                 </div>
               </motion.div>
             )}

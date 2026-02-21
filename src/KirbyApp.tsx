@@ -466,6 +466,9 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                       <p className="text-yellow-700 font-bold text-sm">Thanks for playing!</p>
                       <p className="text-yellow-600 text-xs mt-1">HAL Laboratory Inc.</p>
                     </div>
+                    <button onClick={() => logic.setView('menu')} className="w-full bg-pink-400 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200 active:scale-95 transition-transform">
+                      Return to Title Screen
+                    </button>
                   </div>
                 </div>
               </motion.div>

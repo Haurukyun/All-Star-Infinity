@@ -471,6 +471,9 @@ const AnimalCrossingApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = 
                       <span className="text-xs font-bold text-[#B0BEC5]">DAL</span>
                     </div>
                   </div>
+                  <button onClick={() => logic.setView('menu')} className="w-full mt-6 bg-[#FFAB91] text-white font-bold py-3 rounded-xl shadow-sm active:scale-95 transition-transform">
+                    End Session
+                  </button>
                 </div>
               </motion.div>
             )}

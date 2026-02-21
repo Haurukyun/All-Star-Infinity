@@ -12,6 +12,7 @@ export const useGameLogic = () => {
   const [history, setHistory] = useState<GamePrompt[]>([]);
   const [useEasyFont, setUseEasyFont] = useState(true);
   const [theme, setTheme] = useState<Theme>(Theme.PERSONA);
+  const [view, setView] = useState<'menu' | 'game'>('menu');
   
   // Custom Deck States
   const [customDecks, setCustomDecks] = useState<CustomDeck[]>([]);
@@ -116,6 +117,7 @@ export const useGameLogic = () => {
     history, setHistory,
     useEasyFont, setUseEasyFont,
     theme, setTheme,
+    view, setView,
     customDecks, setCustomDecks,
     activeDeckId, setActiveDeckId,
     editingDeck, setEditingDeck,

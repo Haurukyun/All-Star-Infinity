@@ -440,10 +440,10 @@ const SkyrimApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic
                       <span className="skyrim-font-title text-lg group-hover:text-yellow-100">SETTINGS</span>
                       <span className="text-xs uppercase tracking-widest opacity-50">Gameplay</span>
                     </div>
-                    <div className="flex justify-between items-center py-3 hover:bg-white/5 px-2 cursor-pointer group">
+                    <button onClick={() => logic.setView('menu')} className="w-full flex justify-between items-center py-3 hover:bg-white/5 px-2 cursor-pointer group text-left">
                       <span className="skyrim-font-title text-lg group-hover:text-yellow-100">QUIT</span>
-                      <span className="text-xs uppercase tracking-widest opacity-50">To Desktop</span>
-                    </div>
+                      <span className="text-xs uppercase tracking-widest opacity-50">To Main Menu</span>
+                    </button>
                   </div>
                   
                   <div className="mt-12 flex justify-center opacity-30">

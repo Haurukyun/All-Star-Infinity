@@ -430,6 +430,10 @@ const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                 <span className="font-p5-display text-lg transform skew-x-[12deg]">EASY READ FONT</span>
                 <span className="font-black text-[9px] transform skew-x-[12deg]">{useEasyFont ? 'ON' : 'OFF'}</span>
               </button>
+              <button onClick={() => logic.setView('menu')} className="w-full flex justify-between items-center p-3.5 bg-black border-2 border-white/10 transform skew-x-12 hover:border-[#D80000] hover:text-[#D80000] transition-colors">
+                <span className="font-p5-display text-lg text-white transform skew-x-[-12deg] group-hover:text-[#D80000]">RETURN TO MENU</span>
+                <span className="font-black text-[9px] text-[#D80000] transform skew-x-[-12deg]">EXIT</span>
+              </button>
             </div>
           </motion.div>
         )}

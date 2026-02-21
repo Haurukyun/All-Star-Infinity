@@ -311,6 +311,9 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                   <div className="pt-4 border-t border-black/10">
                     <p className="text-xs opacity-40 text-center">Everything is going to be okay.</p>
                   </div>
+                  <button onClick={() => logic.setView('menu')} className="w-full omori-button text-xs mt-4">
+                    WAKE UP
+                  </button>
                 </div>
               </motion.div>
             )}
