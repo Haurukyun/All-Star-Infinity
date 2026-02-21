@@ -43,6 +43,19 @@
 
         .font-p5-display { font-family: 'Bangers', cursive; }
 
+        /* Kinetic Text Vibration */
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            25% { transform: translate(1px, -1px); }
+            50% { transform: translate(-1px, 1px); }
+            75% { transform: translate(1px, 1px); }
+            100% { transform: translate(0); }
+        }
+
+        .vibrate-hover:hover {
+            animation: vibrate 0.1s linear infinite;
+        }
+
         /* Star Field Background */
         .star-field {
             position: fixed;
@@ -77,6 +90,12 @@
             inset: 0;
             pointer-events: none;
             z-index: 0;
+            animation: halftoneDrift 60s linear infinite;
+        }
+
+        @keyframes halftoneDrift {
+            from { background-position: 0 0; }
+            to { background-position: 100px 100px; }
         }
 
         /* P5 Menu Button Style */

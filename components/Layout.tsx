@@ -21,23 +21,28 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
       {/* P5 Header */}
       <header className="relative px-6 pt-6 pb-2 shrink-0 z-50">
         <motion.div 
-          initial={{ x: -100, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.5, type: 'spring' }}
+          initial={{ x: -200, skewX: -30, opacity: 0 }}
+          animate={{ x: 0, skewX: 0, opacity: 1 }}
+          transition={{ type: 'spring', damping: 10, stiffness: 200 }}
           className="flex items-center gap-0"
         >
-          <div className="bg-white text-black p-1.5 transform -skew-x-12 rotate-[-5deg] shadow-[0_0_0_3px_black] z-20">
+          <div className="bg-white text-black p-1.5 transform -skew-x-12 rotate-[-5deg] shadow-[0_0_0_3px_black] z-20 vibrate-hover cursor-default">
             <h1 className="font-p5-display text-2xl tracking-tighter leading-none px-2">PHANTOM</h1>
           </div>
-          <div className="bg-[#D80000] text-white p-1.5 transform -skew-x-12 rotate-[3deg] ml-[-12px] mt-2 shadow-[0_0_0_3px_black] z-10">
+          <div className="bg-[#D80000] text-white p-1.5 transform -skew-x-12 rotate-[3deg] ml-[-12px] mt-2 shadow-[0_0_0_3px_black] z-10 vibrate-hover cursor-default">
             <h1 className="font-p5-display text-lg tracking-tighter leading-none px-2">OBSIDIAN</h1>
           </div>
         </motion.div>
         
-        <div className="absolute top-8 right-8 flex gap-1 opacity-40">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.4, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="absolute top-8 right-8 flex gap-1"
+        >
           <div className="w-2 h-2 bg-white rotate-45"></div>
           <div className="w-2 h-2 bg-[#D80000] rotate-45"></div>
-        </div>
+        </motion.div>
       </header>
 
       {/* Main Content */}
@@ -57,10 +62,18 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
             return (
               <motion.button
                 key={tab.id}
+                initial={{ y: 10, opacity: 0, rotate: rotation + 5 }}
+                animate={{ y: 0, opacity: 1, rotate: rotation }}
+                transition={{ type: 'spring', damping: 15, stiffness: 400 }}
                 onClick={() => setActiveTab(tab.id)}
-                whileHover={{ scale: 1.05, y: -3 }}
-                whileTap={{ scale: 0.95 }}
-                className={`relative px-3 py-2.5 transform origin-bottom transition-all duration-300 shadow-[0_0_0_2px_black] ${
+                whileHover={{ 
+                  scale: 1.05, 
+                  y: -4,
+                  rotate: rotation - 1,
+                  transition: { type: 'spring', stiffness: 1000, damping: 30 }
+                }}
+                whileTap={{ scale: 0.95, y: 0 }}
+                className={`relative px-3 py-2.5 transform origin-bottom transition-colors shadow-[0_0_0_2px_black] ${
                   isActive 
                     ? 'bg-white text-black z-30 -translate-y-2' 
                     : 'bg-[#D80000] text-white opacity-80 z-20'
@@ -70,14 +83,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
                 }}
               >
                 <span className="font-p5-display text-sm tracking-widest">{tab.label}</span>
-                {isActive && (
-                  <motion.div 
-                    layoutId="p5-star"
-                    className="absolute -top-2 -right-2 text-sm text-[#D80000]"
-                  >
-                    ★
-                  </motion.div>
-                )}
               </motion.button>
             );
           })}

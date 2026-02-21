@@ -13,12 +13,35 @@ const STAGES = [
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
+const P5_VARIANTS = {
+  initial: { opacity: 0, x: -50, skewX: -10, scale: 1.05 },
+  animate: { 
+    opacity: 1, 
+    x: 0, 
+    skewX: 0, 
+    scale: 1,
+    transition: { 
+      type: 'spring',
+      damping: 15,
+      stiffness: 250,
+      mass: 0.6
+    }
+  },
+  exit: { 
+    opacity: 0, 
+    x: 50, 
+    skewX: 10, 
+    scale: 0.95,
+    transition: { duration: 0.15 }
+  }
+};
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('play');
   const [intensity, setIntensity] = useState<Intensity | null>(null);
   const [prompt, setPrompt] = useState<GamePrompt | null>(null);
   const [history, setHistory] = useState<GamePrompt[]>([]);
-  const [useEasyFont, setUseEasyFont] = useState(false);
+  const [useEasyFont, setUseEasyFont] = useState(true);
   
   // Custom Deck States
   const [customDecks, setCustomDecks] = useState<CustomDeck[]>([]);
@@ -121,11 +144,18 @@ const App: React.FC = () => {
       <AnimatePresence mode="wait">
         {/* STEAL (PLAY) TAB */}
         {activeTab === 'play' && (
-          <motion.div key="play" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col h-full">
+          <motion.div 
+            key="play" 
+            variants={P5_VARIANTS}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex flex-col h-full"
+          >
             {!intensity && !prompt ? (
               <div className="space-y-4 pt-2">
                 <div className="relative mb-4">
-                  <motion.h2 className="font-p5-display text-4xl text-white italic tracking-tighter">SELECT SOURCE</motion.h2>
+                  <motion.h2 className="font-p5-display text-4xl text-white italic tracking-tighter vibrate-hover cursor-default">SELECT SOURCE</motion.h2>
                   <div className="absolute -bottom-1 left-0 w-1/2 h-1 bg-white transform -skew-x-12"></div>
                 </div>
 
@@ -150,7 +180,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="relative mb-4 mt-8">
-                  <h2 className="font-p5-display text-4xl text-white italic tracking-tighter">SELECT TARGET</h2>
+                  <h2 className="font-p5-display text-4xl text-white italic tracking-tighter vibrate-hover cursor-default">SELECT TARGET</h2>
                   <div className="absolute -bottom-1 left-0 w-1/2 h-1 bg-[#D80000] transform -skew-x-12"></div>
                 </div>
 
@@ -158,7 +188,15 @@ const App: React.FC = () => {
                   {STAGES.map((stage, i) => (
                     <motion.button
                       key={stage.id}
-                      whileHover={{ x: 10 }}
+                      initial={{ x: -30, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: i * 0.05, type: 'spring', stiffness: 300, damping: 20 }}
+                      whileHover={{ 
+                        x: 10, 
+                        scale: 1.01,
+                        transition: { type: 'spring', stiffness: 600, damping: 20 }
+                      }}
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => setIntensity(stage.id)}
                       className="group relative flex items-center justify-between p-4 overflow-hidden transform -skew-x-12 shadow-[0_0_0_3px_black,4px_4px_0px_rgba(0,0,0,0.5)]"
                       style={{ backgroundColor: stage.color, color: stage.text }}
@@ -174,20 +212,45 @@ const App: React.FC = () => {
               </div>
             ) : !prompt ? (
               <div className="flex flex-col items-center gap-8 pt-6">
-                <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center">
+                <motion.div 
+                  initial={{ scale: 1.5, opacity: 0, rotate: -5 }} 
+                  animate={{ scale: 1, opacity: 1, rotate: 0 }} 
+                  transition={{ type: 'spring', damping: 12, stiffness: 300 }}
+                  className="text-center"
+                >
                   <p className="font-p5-display text-lg text-[#D80000] tracking-widest">MISSION_PARAMS</p>
                   <h2 className="font-p5-display text-5xl text-white italic tracking-tighter drop-shadow-[3px_3px_0px_#D80000]">
                     {intensity}
                   </h2>
                 </motion.div>
                 <div className="grid grid-cols-1 gap-4 w-full px-4">
-                  <button onClick={() => handleDraw('Truth')} className="bg-white text-black p-5 transform -skew-x-6 shadow-[0_0_0_3px_black,6px_6px_0px_rgba(0,0,0,1)] font-p5-display text-3xl italic">THE TRUTH</button>
-                  <button onClick={() => handleDraw('Dare')} className="bg-[#D80000] text-white p-5 transform skew-x-6 shadow-[0_0_0_3px_black,6px_6px_0px_rgba(0,0,0,1)] font-p5-display text-3xl italic">THE ACTION</button>
+                  <motion.button 
+                    whileHover={{ scale: 1.05, rotate: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleDraw('Truth')} 
+                    className="bg-white text-black p-5 transform -skew-x-6 shadow-[0_0_0_3px_black,6px_6px_0px_rgba(0,0,0,1)] font-p5-display text-3xl italic"
+                  >
+                    THE TRUTH
+                  </motion.button>
+                  <motion.button 
+                    whileHover={{ scale: 1.05, rotate: 2 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => handleDraw('Dare')} 
+                    className="bg-[#D80000] text-white p-5 transform skew-x-6 shadow-[0_0_0_3px_black,6px_6px_0px_rgba(0,0,0,1)] font-p5-display text-3xl italic"
+                  >
+                    THE ACTION
+                  </motion.button>
                   <button onClick={() => setIntensity(null)} className="mt-4 font-black text-white/30 uppercase tracking-[0.3em] text-[8px] hover:text-[#D80000] transition-colors">[ ABORT ]</button>
                 </div>
               </div>
             ) : (
-              <motion.div key="calling-card" initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="relative mt-4">
+              <motion.div 
+                key="calling-card" 
+                initial={{ opacity: 0, scale: 0.8, rotateY: 45, y: 50 }} 
+                animate={{ opacity: 1, scale: 1, rotateY: 0, y: 0 }} 
+                transition={{ type: 'spring', damping: 15, stiffness: 300 }}
+                className="relative mt-4"
+              >
                 <div className="bg-white text-black p-6 shadow-[0_0_0_6px_black,10px_10px_0px_rgba(216,0,0,1)] relative z-20 overflow-hidden">
                   <div className="flex justify-between items-center mb-6">
                     <span className="bg-[#D80000] text-white px-3 py-1 font-p5-display text-xl skew-x-[-12deg] shadow-[0_0_0_2px_black]">{prompt.type}</span>
@@ -210,11 +273,18 @@ const App: React.FC = () => {
 
         {/* DECKS (MANAGEMENT) TAB */}
         {activeTab === 'decks' && (
-          <motion.div key="decks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-2 space-y-6">
+          <motion.div 
+            key="decks" 
+            variants={P5_VARIANTS}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="pt-2 space-y-6"
+          >
             {!editingDeck ? (
               <>
                 <div className="flex justify-between items-end">
-                  <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000]">FORGE</h2>
+                  <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000] vibrate-hover cursor-default">FORGE</h2>
                   <button 
                     onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })}
                     className="p5-btn !bg-white !text-black border-black mb-1"
@@ -317,8 +387,15 @@ const App: React.FC = () => {
 
         {/* LOGS TAB */}
         {activeTab === 'history' && (
-          <motion.div key="history" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-2 space-y-4">
-            <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000]">ARCHIVES</h2>
+          <motion.div 
+            key="history" 
+            variants={P5_VARIANTS}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="pt-2 space-y-4"
+          >
+            <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000] vibrate-hover cursor-default">ARCHIVES</h2>
             <div className="flex flex-col gap-3 pb-8">
               {history.length === 0 ? <div className="py-16 text-center font-p5-display text-2xl opacity-10">EMPTY_LOG</div> : 
                 history.map((item, i) => (
@@ -337,8 +414,15 @@ const App: React.FC = () => {
 
         {/* META TAB */}
         {activeTab === 'settings' && (
-          <motion.div key="meta" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pt-2 space-y-6">
-            <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000]">SYSTEM</h2>
+          <motion.div 
+            key="meta" 
+            variants={P5_VARIANTS}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="pt-2 space-y-6"
+          >
+            <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000] vibrate-hover cursor-default">SYSTEM</h2>
             <div className="space-y-3">
               {[ { label: 'HEART_SYNC', val: 'STABLE' }, { label: 'COGNITION', val: 'ENHANCED' }, { label: 'MASK_ID', val: 'JOKER' }].map((s, i) => (
                 <div key={i} className="flex justify-between items-center p-3.5 bg-black border-2 border-white/10 transform skew-x-12">
