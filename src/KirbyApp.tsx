@@ -423,6 +423,7 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                     { id: Theme.DANGANRONPA, label: 'DESPAIR', color: 'from-pink-500 to-purple-700' },
                     { id: Theme.OMORI, label: 'DREAM', color: 'from-gray-700 to-black' },
                     { id: Theme.KIRBY, label: 'POPSTAR', color: 'from-pink-400 to-pink-600' },
+                    { id: Theme.POKEMON, label: 'KANTO', color: 'from-blue-400 to-blue-600' },
                   ].map(t => (
                     <button 
                       key={t.id}

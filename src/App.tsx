@@ -5,7 +5,6 @@ import MinecraftApp from './MinecraftApp';
 import DanganronpaApp from './DanganronpaApp';
 import OmoriApp from './OmoriApp';
 import KirbyApp from './KirbyApp';
-import SanrioApp from './SanrioApp';
 import PokemonApp from './PokemonApp';
 import { useGameLogic } from './hooks/useGameLogic';
 import { Theme, Intensity } from './types';
@@ -33,10 +32,6 @@ const App: React.FC = () => {
 
   if (logic.theme === Theme.KIRBY) {
     return <KirbyApp logic={logic} />;
-  }
-
-  if (logic.theme === Theme.SANRIO) {
-    return <SanrioApp logic={logic} />;
   }
 
   if (logic.theme === Theme.POKEMON) {

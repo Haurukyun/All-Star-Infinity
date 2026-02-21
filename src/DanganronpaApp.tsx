@@ -431,6 +431,7 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                     { id: Theme.DANGANRONPA, label: 'KILLING HARMONY', color: '#FF00FF' },
                     { id: Theme.OMORI, label: 'DREAM WORLD', color: '#FFFFFF' },
                     { id: Theme.KIRBY, label: 'DREAM LAND', color: '#FFB7C5' },
+                    { id: Theme.POKEMON, label: 'KANTO REGION', color: '#6890F0' },
                   ].map(t => (
                     <button 
                       key={t.id}
