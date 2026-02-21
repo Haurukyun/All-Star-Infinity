@@ -5,6 +5,11 @@ export enum Intensity {
   VULGAR = 'VULGAR'
 }
 
+export enum Theme {
+  PERSONA = 'Persona 5',
+  MINECRAFT = 'Minecraft'
+}
+
 export type PromptType = 'Truth' | 'Dare';
 
 export interface GamePrompt {

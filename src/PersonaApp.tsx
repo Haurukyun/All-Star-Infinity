@@ -1,69 +1,51 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from './components/Layout';
-import { Intensity, PromptType, GamePrompt, CustomDeck } from './types';
-import { getRandomPrompt, DEFAULT_PROMPTS } from './services/localPrompts';
+import { Intensity, Theme } from './types';
+import { STAGES } from './App'; // We'll move STAGES to a better place if needed, but for now let's keep it simple
+import { useGameLogic } from './hooks/useGameLogic';
 
-const STAGES = [
-  { id: Intensity.SOFT, title: 'TEASE', desc: 'STOLEN GLANCES', color: '#FFFFFF', text: '#000000' },
-  { id: Intensity.HOT, title: 'REVEAL', desc: 'DEEP DESIRE', color: '#D80000', text: '#FFFFFF' },
-  { id: Intensity.VULGAR, title: 'SURRENDER', desc: 'ZERO LIMITS', color: '#000000', text: '#FFFFFF' },
-];
+const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
+  const {
+    activeTab, setActiveTab,
+    intensity, setIntensity,
+    prompt, setPrompt,
+    history,
+    useEasyFont, setUseEasyFont,
+    theme, setTheme,
+    customDecks,
+    activeDeckId, setActiveDeckId,
+    editingDeck, setEditingDeck,
+    handleDraw, saveDeck, deleteDeck,
+    addNewPromptToEditingDeck,
+    updatePromptInEditingDeck,
+    removePromptFromEditingDeck,
+    generateId
+  } = logic;
 
-const generateId = () => Math.random().toString(36).substring(2, 11);
-
-const P5_VARIANTS = {
-  initial: { opacity: 0, x: -50, skewX: -10, scale: 1.05 },
-  animate: { 
-    opacity: 1, 
-    x: 0, 
-    skewX: 0, 
-    scale: 1,
-    transition: { 
-      type: 'spring',
-      damping: 15,
-      stiffness: 250,
-      mass: 0.6
-    }
-  },
-  exit: { 
-    opacity: 0, 
-    x: 50, 
-    skewX: 10, 
-    scale: 0.95,
-    transition: { duration: 0.15 }
-  }
-};
-
-const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('play');
-  const [intensity, setIntensity] = useState<Intensity | null>(null);
-  const [prompt, setPrompt] = useState<GamePrompt | null>(null);
-  const [history, setHistory] = useState<GamePrompt[]>([]);
-  const [useEasyFont, setUseEasyFont] = useState(true);
-  
-  // Custom Deck States
-  const [customDecks, setCustomDecks] = useState<CustomDeck[]>([]);
-  const [activeDeckId, setActiveDeckId] = useState<string>('default');
-  const [editingDeck, setEditingDeck] = useState<CustomDeck | null>(null);
-
-  // Load Decks from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('phantom_custom_decks');
-    if (saved) {
-      try {
-        setCustomDecks(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load custom decks", e);
+  const P5_VARIANTS = {
+    initial: { opacity: 0, x: -50, skewX: -10, scale: 1.05 },
+    animate: { 
+      opacity: 1, 
+      x: 0, 
+      skewX: 0, 
+      scale: 1,
+      transition: { 
+        type: 'spring',
+        damping: 15,
+        stiffness: 250,
+        mass: 0.6
       }
+    },
+    exit: { 
+      opacity: 0, 
+      x: 50, 
+      skewX: 10, 
+      scale: 0.95,
+      transition: { duration: 0.15 }
     }
-  }, []);
-
-  // Save Decks to localStorage
-  useEffect(() => {
-    localStorage.setItem('phantom_custom_decks', JSON.stringify(customDecks));
-  }, [customDecks]);
+  };
 
   // Sync font class to body
   useEffect(() => {
@@ -74,73 +56,8 @@ const App: React.FC = () => {
     }
   }, [useEasyFont]);
 
-  const handleDraw = (type: PromptType) => {
-    let sourcePool = DEFAULT_PROMPTS;
-    if (activeDeckId !== 'default') {
-      const selected = customDecks.find(d => d.id === activeDeckId);
-      if (selected && selected.prompts.length > 0) {
-        sourcePool = selected.prompts;
-      }
-    }
-
-    const filtered = sourcePool.filter(p => p.type === type && p.intensity === (intensity || Intensity.SOFT));
-    
-    if (filtered.length === 0) {
-      // Fallback if the custom deck doesn't have prompts for this level/type
-      const next = getRandomPrompt(type, intensity || Intensity.SOFT);
-      setPrompt(next);
-      setHistory(prev => [next, ...prev]);
-    } else {
-      const next = filtered[Math.floor(Math.random() * filtered.length)];
-      setPrompt(next);
-      setHistory(prev => [next, ...prev]);
-    }
-  };
-
-  const saveDeck = (deck: CustomDeck) => {
-    setCustomDecks(prev => {
-      const exists = prev.find(d => d.id === deck.id);
-      if (exists) return prev.map(d => d.id === deck.id ? deck : d);
-      return [...prev, deck];
-    });
-    setEditingDeck(null);
-  };
-
-  const deleteDeck = (id: string) => {
-    if (activeDeckId === id) setActiveDeckId('default');
-    setCustomDecks(prev => prev.filter(d => d.id !== id));
-  };
-
-  const addNewPromptToEditingDeck = () => {
-    if (!editingDeck) return;
-    const newPrompt: GamePrompt = {
-      id: generateId(),
-      type: 'Truth',
-      intensity: Intensity.SOFT,
-      text: '',
-      penalty: ''
-    };
-    setEditingDeck({ ...editingDeck, prompts: [...editingDeck.prompts, newPrompt] });
-  };
-
-  const updatePromptInEditingDeck = (id: string, field: keyof GamePrompt, value: any) => {
-    if (!editingDeck) return;
-    setEditingDeck({
-      ...editingDeck,
-      prompts: editingDeck.prompts.map(p => p.id === id ? { ...p, [field]: value } : p)
-    });
-  };
-
-  const removePromptFromEditingDeck = (id: string) => {
-    if (!editingDeck) return;
-    setEditingDeck({
-      ...editingDeck,
-      prompts: editingDeck.prompts.filter(p => p.id !== id)
-    });
-  };
-
   return (
-    <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
+    <Layout activeTab={activeTab} setActiveTab={setActiveTab} theme={theme} setTheme={setTheme}>
       <AnimatePresence mode="wait">
         {/* STEAL (PLAY) TAB */}
         {activeTab === 'play' && (
@@ -412,6 +329,37 @@ const App: React.FC = () => {
           </motion.div>
         )}
 
+        {/* THEMES TAB */}
+        {activeTab === 'themes' && (
+          <motion.div 
+            key="themes" 
+            variants={P5_VARIANTS}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="pt-2 space-y-6"
+          >
+            <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0_#D80000] vibrate-hover cursor-default">THEMES</h2>
+            <div className="grid grid-cols-1 gap-4">
+              <button 
+                onClick={() => setTheme(Theme.PERSONA)}
+                className={`p-6 text-left transform -skew-x-6 transition-all shadow-[0_0_0_3px_black] ${theme === Theme.PERSONA ? 'bg-white text-black' : 'bg-black text-white border-white/10 opacity-60'}`}
+              >
+                <span className="font-p5-display text-3xl italic">PERSONA 5</span>
+                <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">THE PHANTOM THIEF</span>
+              </button>
+              
+              <button 
+                onClick={() => setTheme(Theme.MINECRAFT)}
+                className={`p-6 text-left transform -skew-x-6 transition-all shadow-[0_0_0_3px_black] ${theme === Theme.MINECRAFT ? 'bg-white text-black' : 'bg-black text-white border-white/10 opacity-60'}`}
+              >
+                <span className="font-p5-display text-3xl italic">MINECRAFT</span>
+                <span className="block text-[10px] font-black opacity-60 mt-1 uppercase tracking-widest">BLOCKY DIMENSION</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+
         {/* META TAB */}
         {activeTab === 'settings' && (
           <motion.div 
@@ -424,14 +372,14 @@ const App: React.FC = () => {
           >
             <h2 className="font-p5-display text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000] vibrate-hover cursor-default">SYSTEM</h2>
             <div className="space-y-3">
-              {[ { label: 'HEART_SYNC', val: 'STABLE' }, { label: 'COGNITION', val: 'ENHANCED' }, { label: 'MASK_ID', val: 'JOKER' }].map((s, i) => (
+              {[ { label: 'HEART SYNC', val: 'STABLE' }, { label: 'COGNITION', val: 'ENHANCED' }, { label: 'MASK ID', val: 'JOKER' }].map((s, i) => (
                 <div key={i} className="flex justify-between items-center p-3.5 bg-black border-2 border-white/10 transform skew-x-12">
                   <span className="font-p5-display text-lg text-white transform skew-x-[-12deg]">{s.label}</span>
                   <span className="font-black text-[9px] text-[#D80000] transform skew-x-[-12deg]">{s.val}</span>
                 </div>
               ))}
               <button onClick={() => setUseEasyFont(!useEasyFont)} className="w-full flex justify-between items-center p-3.5 bg-white text-black shadow-[0_0_0_2px_black] transform -skew-x-12 hover:bg-[#D80000] hover:text-white transition-colors">
-                <span className="font-p5-display text-lg transform skew-x-[12deg]">EASY_READ_FONT</span>
+                <span className="font-p5-display text-lg transform skew-x-[12deg]">EASY READ FONT</span>
                 <span className="font-black text-[9px] transform skew-x-[12deg]">{useEasyFont ? 'ON' : 'OFF'}</span>
               </button>
             </div>
@@ -442,4 +390,4 @@ const App: React.FC = () => {
   );
 };
 
-export default App;
+export default PersonaApp;
