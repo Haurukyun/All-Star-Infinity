@@ -505,4 +505,32 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
   );
 };
 
+export const KirbyMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
+  const { setView, setTheme } = logic;
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
+  const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
+
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-pink-100 font-sans text-pink-600 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'radial-gradient(circle, #fce4ec 0%, #f8bbd0 100%)' }}></div>
+      <div className="z-10 flex flex-col items-center gap-12">
+        <motion.h1 animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 2 }} className="text-8xl font-black tracking-tight drop-shadow-xl text-white stroke-pink-600 stroke-2">KIRBY</motion.h1>
+        <div className="flex flex-col gap-6 w-72">
+          <button onClick={() => setView('game')} className="bg-white text-pink-500 rounded-full p-6 text-4xl font-black shadow-lg hover:scale-110 transition-all border-4 border-pink-200">START!</button>
+          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-pink-300 text-white rounded-full p-4 text-2xl font-black shadow-md hover:rotate-3 transition-all border-4 border-white">THEMES</button>
+        </div>
+        <AnimatePresence>
+          {activeSection === 'themes' && (
+            <motion.div initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} className="grid grid-cols-2 gap-3 bg-white/80 backdrop-blur-md p-6 rounded-[40px] border-4 border-pink-200 shadow-xl">
+              {themes.map(t => (
+                <button key={t} onClick={() => setTheme(t)} className="bg-pink-100 text-pink-500 rounded-full px-4 py-2 text-xs font-bold hover:bg-pink-500 hover:text-white transition-colors">{t}</button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
 export default KirbyApp;

@@ -19,21 +19,52 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
   ];
 
   return (
-    <div className="h-[100dvh] w-screen bg-[#111] text-white overflow-hidden font-sans flex flex-col relative">
+    <div className="h-[100dvh] w-screen bg-black text-white overflow-hidden font-sans flex flex-col relative">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
         
         .font-p5-display {
           font-family: 'Anton', sans-serif;
-          letter-spacing: -0.05em;
+          letter-spacing: -0.02em;
         }
 
-        .p5-bg {
+        .p5-dots-bg {
+          background-color: #050505;
           background-image: 
-            linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a),
-            linear-gradient(45deg, #1a1a1a 25%, transparent 25%, transparent 75%, #1a1a1a 75%, #1a1a1a);
-          background-size: 20px 20px;
-          background-position: 0 0, 10px 10px;
+            radial-gradient(circle at 2px 2px, #300 1px, transparent 0),
+            linear-gradient(45deg, #100 25%, transparent 25%, transparent 75%, #100 75%, #100),
+            linear-gradient(-45deg, #100 25%, transparent 25%, transparent 75%, #100 75%, #100);
+          background-size: 12px 12px, 100px 100px, 100px 100px;
+          animation: bgMove 40s linear infinite;
+        }
+
+        @keyframes bgMove {
+          0% { background-position: 0 0, 0 0, 0 0; }
+          100% { background-position: 0 0, 1000px 1000px, -1000px 1000px; }
+        }
+
+        .p5-shards {
+          position: absolute;
+          inset: 0;
+          background-image: 
+            linear-gradient(115deg, transparent 20%, rgba(216,0,0,0.05) 21%, rgba(216,0,0,0.05) 24%, transparent 25%),
+            linear-gradient(115deg, transparent 40%, rgba(216,0,0,0.03) 41%, rgba(216,0,0,0.03) 46%, transparent 47%),
+            linear-gradient(115deg, transparent 70%, rgba(216,0,0,0.08) 71%, rgba(216,0,0,0.08) 78%, transparent 79%);
+          background-size: 200% 100%;
+          animation: shardMove 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes shardMove {
+          0% { background-position: 0% 0%; }
+          100% { background-position: 100% 0%; }
+        }
+
+        /* Fix white edges on skewed elements by using box-shadow instead of border */
+        .p5-border {
+          box-shadow: 0 0 0 3px #000;
+        }
+        .p5-border-sm {
+          box-shadow: 0 0 0 2px #000;
         }
 
         .vibrate-hover:hover {
@@ -51,47 +82,64 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
       `}</style>
 
       {/* Background Pattern */}
-      <div className="absolute inset-0 p5-bg opacity-10 pointer-events-none z-0"></div>
+      <div className="absolute inset-0 p5-dots-bg z-0 opacity-100"></div>
+      <div className="absolute inset-0 p5-shards z-0"></div>
       
       {/* Red Slash Background */}
-      <div className="absolute top-0 right-0 w-2/3 h-full bg-[#D80000] transform skew-x-[-20deg] translate-x-1/2 opacity-80 z-0"></div>
+      <div className="absolute top-0 right-0 w-full h-full bg-[#D80000] transform skew-x-[-35deg] translate-x-1/2 opacity-30 z-0 mix-blend-multiply"></div>
 
       {/* Header */}
-      <header className="relative z-10 p-4 flex justify-between items-center transform -skew-x-6 border-b-4 border-white">
-        <div className="flex items-center gap-2">
-          <h1 className="font-p5-display text-4xl italic text-white drop-shadow-[4px_4px_0_#000] transform -skew-x-6">PHANTOM</h1>
-          <div className="bg-[#D80000] px-2 py-0.5 transform -skew-x-12 shadow-[2px_2px_0_black]">
-            <span className="font-p5-display text-xl text-white italic transform skew-x-6 block pt-1">OBSIDIAN</span>
+      <header className="relative z-10 p-4 pt-10 flex justify-start items-center overflow-visible">
+        <div className="relative flex flex-col items-start scale-90 sm:scale-100 origin-left">
+          {/* PHANTOM Box */}
+          <div className="bg-white text-black px-8 py-3 transform -rotate-3 -skew-x-12 relative z-20 shadow-[6px_6px_0_black] p5-border">
+            <h1 className="font-p5-display text-5xl sm:text-7xl tracking-tighter uppercase leading-none italic">PHANTOM</h1>
+          </div>
+          {/* OBSIDIAN Box */}
+          <div className="bg-[#D80000] text-white px-6 py-2 transform rotate-2 -skew-x-12 relative -mt-4 ml-12 z-10 whitespace-nowrap shadow-[6px_6px_0_black] p5-border">
+            <h1 className="font-p5-display text-3xl sm:text-4xl tracking-widest uppercase leading-none italic">OBSIDIAN</h1>
           </div>
         </div>
-        <div className="flex gap-1">
-          <div className="w-3 h-3 bg-[#D80000] transform rotate-45"></div>
-          <div className="w-3 h-3 bg-[#333] transform rotate-45"></div>
+        <div className="absolute top-10 right-6 flex gap-2">
+          <div className="w-4 h-4 bg-white transform rotate-45 shadow-[0_0_0_3px_#000]"></div>
+          <div className="w-4 h-4 bg-[#D80000] transform rotate-45 shadow-[0_0_0_3px_#000]"></div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 relative z-10 overflow-y-auto p-4 pb-24 custom-scrollbar">
-        <div className="max-w-md mx-auto h-full">
+      <main className="flex-1 relative z-10 overflow-y-auto p-4 pb-32 custom-scrollbar">
+        <div className="max-w-md mx-auto h-full flex flex-col">
           {children}
         </div>
       </main>
 
       {/* Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full h-20 bg-black z-50 transform skew-y-[-2deg] origin-bottom-left border-t-4 border-white">
-        <div className="flex justify-around items-center h-full px-2 transform skew-y-[2deg]">
-          {tabs.map((tab) => (
-            <button 
-              key={tab.id} 
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center w-16 h-16 transition-transform ${activeTab === tab.id ? 'scale-110 -translate-y-4' : 'opacity-50 hover:opacity-100'}`}
-            >
-              <div className={`w-12 h-12 flex items-center justify-center border-2 border-white transform rotate-45 bg-black ${activeTab === tab.id ? 'bg-[#D80000]' : ''}`}>
-                <span className="transform -rotate-45 font-p5-display text-xl italic">{tab.label[0]}</span>
-              </div>
-              <span className={`text-[10px] font-black mt-1 px-1 transform -skew-x-12 ${activeTab === tab.id ? 'bg-[#D80000] text-white' : 'bg-white text-black'}`}>{tab.label}</span>
-            </button>
-          ))}
+      <nav className="fixed bottom-6 left-0 w-full z-50 px-2 pointer-events-none">
+        <div className="flex justify-center items-end -space-x-1 sm:-space-x-2 max-w-xl mx-auto pointer-events-auto">
+          {tabs.map((tab, index) => {
+            const isActive = activeTab === tab.id;
+            const rotations = ['-rotate-8', 'rotate-4', '-rotate-3', 'rotate-6', 'rotate-9'];
+            const rotation = rotations[index % rotations.length];
+            
+            return (
+              <button 
+                key={tab.id} 
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  flex items-center justify-center 
+                  transition-all duration-300 ease-[0.22,1,0.36,1]
+                  ${rotation}
+                  ${isActive 
+                    ? 'bg-white text-black w-24 h-20 sm:w-36 sm:h-28 z-20 -translate-y-6 shadow-[8px_8px_0_black] p5-border' 
+                    : 'bg-[#D80000] text-white w-20 h-16 sm:w-28 sm:h-22 hover:-translate-y-3 hover:z-10 shadow-[4px_4px_0_black] p5-border'}
+                `}
+              >
+                <span className={`font-p5-display uppercase tracking-wider ${isActive ? 'text-xl sm:text-3xl' : 'text-[10px] sm:text-sm'}`}>
+                  {tab.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </nav>
     </div>

@@ -11,13 +11,14 @@ export const useGameLogic = () => {
   const [prompt, setPrompt] = useState<GamePrompt | null>(null);
   const [history, setHistory] = useState<GamePrompt[]>([]);
   const [useEasyFont, setUseEasyFont] = useState(true);
-  const [theme, setTheme] = useState<Theme>(Theme.PERSONA);
+  const [theme, setTheme] = useState<Theme>(Theme.NONE);
   const [view, setView] = useState<'menu' | 'game'>('menu');
   
   // Custom Deck States
   const [customDecks, setCustomDecks] = useState<CustomDeck[]>([]);
   const [activeDeckId, setActiveDeckId] = useState<string>('default');
   const [editingDeck, setEditingDeck] = useState<CustomDeck | null>(null);
+  const [hasExplicitlySelectedTheme, setHasExplicitlySelectedTheme] = useState(false);
 
   // Load Decks and Theme from localStorage
   useEffect(() => {
@@ -31,8 +32,9 @@ export const useGameLogic = () => {
     }
 
     const savedTheme = localStorage.getItem('phantom_theme');
-    if (savedTheme && Object.values(Theme).includes(savedTheme as Theme)) {
+    if (savedTheme && Object.values(Theme).includes(savedTheme as Theme) && savedTheme !== Theme.NONE) {
       setTheme(savedTheme as Theme);
+      // Don't set hasExplicitlySelectedTheme to true here so showcase can run on menu
     }
   }, []);
 
@@ -110,13 +112,25 @@ export const useGameLogic = () => {
     });
   };
 
+  const handleSetTheme = (newTheme: Theme, isExplicit: boolean = true) => {
+    setTheme(newTheme);
+    if (isExplicit) {
+      if (newTheme !== Theme.NONE) {
+        setHasExplicitlySelectedTheme(true);
+      } else {
+        setHasExplicitlySelectedTheme(false);
+      }
+    }
+  };
+
   return {
     activeTab, setActiveTab,
     intensity, setIntensity,
     prompt, setPrompt,
     history, setHistory,
     useEasyFont, setUseEasyFont,
-    theme, setTheme,
+    theme, setTheme: handleSetTheme,
+    hasExplicitlySelectedTheme,
     view, setView,
     customDecks, setCustomDecks,
     activeDeckId, setActiveDeckId,

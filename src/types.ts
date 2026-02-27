@@ -6,6 +6,7 @@ export enum Intensity {
 }
 
 export enum Theme {
+  NONE = 'None',
   PERSONA = 'Persona 5',
   MINECRAFT = 'Minecraft',
   DANGANRONPA = 'Danganronpa',

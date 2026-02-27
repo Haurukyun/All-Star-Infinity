@@ -503,4 +503,32 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
   );
 };
 
+export const DanganronpaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
+  const { setView, setTheme } = logic;
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
+  const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
+
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#2b002b] font-sans text-white relative overflow-hidden">
+      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #2b002b 0, #2b002b 20px, #3b003b 20px, #3b003b 40px)' }}></div>
+      <div className="z-10 flex flex-col items-center gap-12">
+        <motion.h1 animate={{ rotate: [0, -2, 2, 0] }} transition={{ repeat: Infinity, duration: 4 }} className="text-7xl font-black tracking-widest text-[#ff00ff] drop-shadow-[6px_6px_0_#000] italic">DANGANRONPA</motion.h1>
+        <div className="flex flex-col gap-6 w-72">
+          <button onClick={() => setView('game')} className="bg-black border-4 border-[#ff00ff] p-4 hover:rotate-2 hover:scale-105 transition-all text-2xl font-black italic shadow-[8px_8px_0_#ff00ff]">START TRIAL</button>
+          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-black border-4 border-[#ff00ff] p-4 hover:-rotate-2 hover:scale-105 transition-all text-2xl font-black italic shadow-[8px_8px_0_#ff00ff]">SELECT THEME</button>
+        </div>
+        <AnimatePresence>
+          {activeSection === 'themes' && (
+            <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="grid grid-cols-2 gap-3 bg-black/90 p-6 border-4 border-[#ff00ff] shadow-[12px_12px_0_#000]">
+              {themes.map(t => (
+                <button key={t} onClick={() => setTheme(t)} className="text-[#ff00ff] hover:text-white font-bold text-xs uppercase tracking-widest">{t}</button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
 export default DanganronpaApp;

@@ -490,4 +490,33 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
   );
 };
 
+export const MinecraftMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
+  const { setView, setTheme } = logic;
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
+
+  const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
+
+  return (
+    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#1a1a1a] font-mono text-white relative overflow-hidden">
+      <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/dirt.png")' }}></div>
+      <div className="z-10 flex flex-col items-center gap-8">
+        <h1 className="text-6xl font-bold tracking-widest text-shadow-[4px_4px_0_#000] mb-8">MINECRAFT</h1>
+        <div className="flex flex-col gap-4 w-64">
+          <button onClick={() => setView('game')} className="bg-[#555] border-4 border-black p-3 hover:bg-[#777] active:translate-y-1 shadow-[4px_4px_0_#000] text-xl">PLAY GAME</button>
+          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-[#555] border-4 border-black p-3 hover:bg-[#777] active:translate-y-1 shadow-[4px_4px_0_#000] text-xl">THEMES</button>
+        </div>
+        <AnimatePresence>
+          {activeSection === 'themes' && (
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="grid grid-cols-2 gap-2 bg-[#333] p-4 border-4 border-black shadow-[8px_8px_0_#000]">
+              {themes.map(t => (
+                <button key={t} onClick={() => setTheme(t)} className="bg-[#555] border-2 border-black p-2 text-[10px] hover:bg-[#777]">{t.toUpperCase()}</button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+};
+
 export default MinecraftApp;

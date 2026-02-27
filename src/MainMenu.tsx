@@ -1,246 +1,102 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Theme } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
+import { PersonaMenu } from './PersonaApp';
+import { MinecraftMenu } from './MinecraftApp';
+import { DanganronpaMenu } from './DanganronpaApp';
+import { OmoriMenu } from './OmoriApp';
+import { KirbyMenu } from './KirbyApp';
+import { PokemonMenu } from './PokemonApp';
+import { AnimalCrossingMenu } from './AnimalCrossingApp';
+import { SkyrimMenu } from './SkyrimApp';
 
 const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
-  const { setView, theme, setTheme } = logic;
-  const [activeSection, setActiveSection] = useState<'gamemodes' | 'themes' | 'options' | null>(null);
+  const { theme, setTheme, hasExplicitlySelectedTheme } = logic;
+  const [showcaseIndex, setShowcaseIndex] = useState(0);
 
-  const menuItems = [
-    { id: 'gamemodes', label: 'GAMEMODES' },
-    { id: 'themes', label: 'THEMES' },
-    { id: 'options', label: 'OPTIONS' },
-  ];
+  const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const themes = [
-    { id: Theme.PERSONA, label: 'PERSONA 5' },
-    { id: Theme.MINECRAFT, label: 'MINECRAFT' },
-    { id: Theme.DANGANRONPA, label: 'DANGANRONPA' },
-    { id: Theme.OMORI, label: 'OMORI' },
-    { id: Theme.KIRBY, label: 'KIRBY' },
-    { id: Theme.POKEMON, label: 'POKEMON' },
-    { id: Theme.ANIMAL_CROSSING, label: 'ANIMAL CROSSING' },
-    { id: Theme.SKYRIM, label: 'SKYRIM' },
-  ];
+  // Showcase Mode: Cycle through themes if none selected
+  useEffect(() => {
+    if (!hasExplicitlySelectedTheme) {
+      const interval = setInterval(() => {
+        setShowcaseIndex((prev) => (prev + 1) % themes.length);
+      }, 5000); // Cycle every 5 seconds
+      return () => clearInterval(interval);
+    }
+  }, [hasExplicitlySelectedTheme, themes.length]);
 
-  const getThemeStyles = () => {
+  // Apply the showcase theme if in showcase mode
+  useEffect(() => {
+    if (!hasExplicitlySelectedTheme) {
+      setTheme(themes[showcaseIndex], false);
+    }
+  }, [showcaseIndex, hasExplicitlySelectedTheme]);
+
+  const renderThemedMenu = () => {
     switch (theme) {
       case Theme.PERSONA:
-        return {
-          wrapper: "bg-[#111] font-sans",
-          bg: "radial-gradient(circle at 50% 50%, #222 0%, #000 100%)",
-          text: "font-black tracking-tighter uppercase italic transform -skew-x-6",
-          button: "hover:text-[#D80000] hover:translate-x-2 transition-all duration-100",
-          active: "text-[#D80000] text-shadow-[2px_2px_0_#fff]",
-          submenu: "border-2 border-white/20 bg-black/80 transform -skew-x-6",
-          font: "'Inter', sans-serif"
-        };
+        return <PersonaMenu logic={logic} />;
       case Theme.MINECRAFT:
-        return {
-          wrapper: "bg-[#1a1a1a] font-mono",
-          bg: "url('https://www.transparenttextures.com/patterns/dirt.png'), linear-gradient(#333, #111)",
-          text: "font-bold tracking-normal text-shadow-[2px_2px_0_#000]",
-          button: "hover:text-[#55FF55] hover:scale-105 transition-transform duration-75",
-          active: "text-[#55FF55] underline decoration-4 underline-offset-8",
-          submenu: "border-4 border-[#555] bg-[#222]",
-          font: "'VT323', monospace"
-        };
+        return <MinecraftMenu logic={logic} />;
       case Theme.DANGANRONPA:
-        return {
-          wrapper: "bg-[#2b002b] font-sans",
-          bg: "repeating-linear-gradient(45deg, #2b002b 0, #2b002b 20px, #3b003b 20px, #3b003b 40px)",
-          text: "font-black tracking-widest text-[#ff00ff] drop-shadow-[4px_4px_0_rgba(0,0,0,1)]",
-          button: "hover:rotate-2 hover:scale-110 transition-transform duration-100",
-          active: "text-white rotate-[-2deg]",
-          submenu: "border-4 border-[#ff00ff] bg-black/90",
-          font: "'Arial Black', sans-serif"
-        };
+        return <DanganronpaMenu logic={logic} />;
       case Theme.OMORI:
-        return {
-          wrapper: "bg-white text-black font-mono",
-          bg: "#fff",
-          text: "font-normal tracking-wide",
-          button: "hover:underline decoration-wavy decoration-black underline-offset-4",
-          active: "font-bold underline decoration-wavy",
-          submenu: "border border-black bg-white",
-          font: "'Courier New', monospace"
-        };
+        return <OmoriMenu logic={logic} />;
       case Theme.KIRBY:
-        return {
-          wrapper: "bg-pink-100 text-pink-600 font-sans",
-          bg: "radial-gradient(circle, #fce4ec 0%, #f8bbd0 100%)",
-          text: "font-black tracking-tight drop-shadow-md text-white stroke-pink-600 stroke-2",
-          button: "hover:scale-110 hover:rotate-3 transition-all duration-200",
-          active: "text-yellow-400 scale-110",
-          submenu: "rounded-3xl border-4 border-white bg-pink-300/50 backdrop-blur-sm",
-          font: "'Fredoka One', cursive"
-        };
+        return <KirbyMenu logic={logic} />;
       case Theme.POKEMON:
-        return {
-          wrapper: "bg-[#384858] text-white font-mono",
-          bg: "linear-gradient(to bottom, #384858, #202830)",
-          text: "font-bold tracking-wide drop-shadow-md",
-          button: "hover:text-yellow-300 hover:translate-x-2 transition-transform",
-          active: "text-yellow-300",
-          submenu: "rounded-lg border-4 border-white/20 bg-[#202830] shadow-xl",
-          font: "'Press Start 2P', cursive"
-        };
+        return <PokemonMenu logic={logic} />;
       case Theme.ANIMAL_CROSSING:
-        return {
-          wrapper: "bg-[#F0F4C3] text-[#5D4037] font-sans",
-          bg: "radial-gradient(#C5E1A5 15%, transparent 16%) 0 0 / 60px 60px, #F0F4C3",
-          text: "font-bold tracking-normal",
-          button: "hover:text-[#00BCD4] hover:scale-105 transition-transform",
-          active: "text-[#00BCD4] bg-white/50 rounded-full px-4",
-          submenu: "rounded-[30px] border-4 border-white bg-[#FFF9C4] shadow-lg",
-          font: "'Varela Round', sans-serif"
-        };
+        return <AnimalCrossingMenu logic={logic} />;
       case Theme.SKYRIM:
-        return {
-          wrapper: "bg-[#0a0a0a] text-[#c0c0c0] font-serif",
-          bg: "radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%)",
-          text: "font-light tracking-[0.2em] uppercase",
-          button: "hover:text-white hover:text-shadow-[0_0_10px_rgba(255,255,255,0.5)] transition-all duration-300",
-          active: "text-white font-normal",
-          submenu: "border-y border-white/20 bg-black/80 backdrop-blur-md",
-          font: "'Cinzel', serif"
-        };
+        return <SkyrimMenu logic={logic} />;
       default:
-        return {
-          wrapper: "bg-[#111] font-sans",
-          bg: "#111",
-          text: "font-bold",
-          button: "hover:opacity-80",
-          active: "opacity-100",
-          submenu: "bg-gray-800",
-          font: "sans-serif"
-        };
+        return <PersonaMenu logic={logic} />;
     }
   };
 
-  const styles = getThemeStyles();
-
   return (
-    <div className={`h-[100dvh] w-screen overflow-y-auto overflow-x-hidden flex flex-col items-center justify-center relative transition-colors duration-500 ${styles.wrapper}`}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&family=VT323&family=Press+Start+2P&family=Fredoka+One&family=Varela+Round&family=Cinzel:wght@400;700&display=swap');
-        
-        .menu-bg-custom {
-          background: ${styles.bg};
-          transition: background 0.5s ease;
-        }
-        
-        .theme-text {
-          font-family: ${styles.font};
-        }
-      `}</style>
+    <div className="h-[100dvh] w-screen overflow-hidden flex flex-col items-center justify-center relative bg-black">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={theme}
+          initial={{ opacity: 0, scale: 1.2, rotate: -2, filter: 'blur(20px)' }}
+          animate={{ opacity: 1, scale: 1, rotate: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, scale: 0.8, rotate: 2, filter: 'blur(20px)' }}
+          transition={{ 
+            duration: 1.5, 
+            ease: [0.22, 1, 0.36, 1],
+            opacity: { duration: 1 },
+            filter: { duration: 1 }
+          }}
+          className="absolute inset-0 w-full h-full"
+        >
+          {renderThemedMenu()}
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="absolute inset-0 menu-bg-custom z-0"></div>
-      
-      {/* Background Particles/Noise - Only for some themes */}
-      {(theme === Theme.PERSONA || theme === Theme.SKYRIM || theme === Theme.DANGANRONPA) && (
-        <div className="absolute inset-0 opacity-10 pointer-events-none z-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\' opacity=\'1\'/%3E%3C/svg%3E")' }}></div>
+      {!hasExplicitlySelectedTheme && (
+        <div className="absolute bottom-12 left-0 w-full z-[100] flex flex-col items-center gap-3 pointer-events-none">
+          <div className="flex gap-2 mb-2">
+            {themes.map((_, i) => (
+              <motion.div
+                key={i}
+                className={`h-1 rounded-full transition-all duration-500 ${i === showcaseIndex ? 'w-8 bg-white' : 'w-2 bg-white/20'}`}
+              />
+            ))}
+          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-black/40 backdrop-blur-xl border border-white/10 px-8 py-3 rounded-xl text-[10px] font-black tracking-[0.5em] text-white uppercase shadow-2xl"
+          >
+            SHOWCASE: {theme.replace('_', ' ')}
+          </motion.div>
+          <p className="text-white/30 text-[8px] uppercase tracking-[0.3em] font-medium">TAP ANY THEME TO EXPLORE</p>
+        </div>
       )}
-
-      <div className="z-10 w-full max-w-4xl flex flex-col items-center justify-center h-full gap-8 md:gap-12 p-4">
-        
-        {/* Main Menu Items */}
-        <div className="flex flex-col items-center gap-4 md:gap-6 w-full">
-          {menuItems.map((item) => (
-            <motion.button
-              key={item.id}
-              onClick={() => setActiveSection(activeSection === item.id ? null : item.id as any)}
-              className={`
-                theme-text text-4xl sm:text-5xl md:text-7xl lg:text-8xl cursor-pointer relative py-2 px-4 w-full text-center
-                ${styles.text}
-                ${styles.button}
-                ${activeSection === item.id ? styles.active : ''}
-                ${activeSection && activeSection !== item.id ? 'opacity-30 scale-95' : 'opacity-100'}
-              `}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
-            >
-              {item.label}
-            </motion.button>
-          ))}
-        </div>
-
-        {/* Submenu Area */}
-        <div className="h-48 w-full flex justify-center items-start relative">
-          <AnimatePresence mode="wait">
-            {activeSection === 'gamemodes' && (
-              <motion.div 
-                key="gamemodes"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className={`flex flex-col gap-3 items-center w-full max-w-md p-6 ${styles.submenu}`}
-              >
-                <button 
-                  onClick={() => setView('game')}
-                  className={`theme-text w-full text-center py-3 text-lg md:text-xl uppercase transition-colors ${theme === Theme.SKYRIM ? 'hover:text-white hover:bg-white/10' : 'hover:bg-black/10'}`}
-                >
-                  Truth or Dare
-                </button>
-                <button 
-                  className="theme-text w-full text-center py-3 text-lg md:text-xl uppercase opacity-40 cursor-not-allowed"
-                  disabled
-                >
-                  Never Have I Ever <span className="text-xs block mt-1">(Coming Soon)</span>
-                </button>
-              </motion.div>
-            )}
-
-            {activeSection === 'themes' && (
-              <motion.div 
-                key="themes"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full max-w-4xl p-6 overflow-y-auto max-h-[40vh] custom-scrollbar ${styles.submenu}`}
-              >
-                {themes.map((t) => (
-                  <button 
-                    key={t.id}
-                    onClick={() => setTheme(t.id)}
-                    className={`
-                      theme-text text-center py-3 px-2 text-xs sm:text-sm uppercase transition-all rounded
-                      ${theme === t.id ? 'bg-current text-white invert font-bold shadow-md' : 'hover:bg-black/10 hover:scale-105'}
-                    `}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-
-            {activeSection === 'options' && (
-              <motion.div 
-                key="options"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className={`flex flex-col gap-3 items-center w-full max-w-md p-6 ${styles.submenu}`}
-              >
-                <div className="w-full flex justify-between items-center p-2 border-b border-current/20">
-                  <span className="theme-text uppercase tracking-widest text-sm">Sound</span>
-                  <span className="opacity-50 text-sm">OFF</span>
-                </div>
-                <div className="w-full flex justify-between items-center p-2 border-b border-current/20">
-                  <span className="theme-text uppercase tracking-widest text-sm">Version</span>
-                  <span className="opacity-50 text-sm">1.0.0</span>
-                </div>
-                <div className="text-[10px] opacity-30 mt-4 uppercase tracking-[4px] text-center w-full">
-                  Created by AntiGravity
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-      </div>
     </div>
   );
 };
