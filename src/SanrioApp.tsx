@@ -16,7 +16,7 @@ const SanrioApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic
     intensity, setIntensity,
     prompt, setPrompt,
     history,
-    theme, setTheme,
+    setTheme,
     customDecks,
     activeDeckId, setActiveDeckId,
     editingDeck, setEditingDeck,

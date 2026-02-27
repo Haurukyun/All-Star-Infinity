@@ -15,26 +15,22 @@ export const useGameLogic = () => {
   const [view, setView] = useState<'menu' | 'game'>('menu');
   
   // Custom Deck States
-  const [customDecks, setCustomDecks] = useState<CustomDeck[]>([]);
+  const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => {
+    const saved = localStorage.getItem('phantom_custom_decks');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [];
+  });
   const [activeDeckId, setActiveDeckId] = useState<string>('default');
   const [editingDeck, setEditingDeck] = useState<CustomDeck | null>(null);
   const [hasExplicitlySelectedTheme, setHasExplicitlySelectedTheme] = useState(false);
 
-  // Load Decks and Theme from localStorage
+  // Load Theme from localStorage
   useEffect(() => {
-    const savedDecks = localStorage.getItem('phantom_custom_decks');
-    if (savedDecks) {
-      try {
-        setCustomDecks(JSON.parse(savedDecks));
-      } catch (e) {
-        console.error("Failed to load custom decks", e);
-      }
-    }
-
     const savedTheme = localStorage.getItem('phantom_theme');
     if (savedTheme && Object.values(Theme).includes(savedTheme as Theme) && savedTheme !== Theme.NONE) {
       setTheme(savedTheme as Theme);
-      // Don't set hasExplicitlySelectedTheme to true here so showcase can run on menu
     }
   }, []);
 

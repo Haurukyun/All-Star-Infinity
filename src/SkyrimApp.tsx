@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
@@ -482,20 +482,62 @@ export const SkyrimMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = 
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
+  const fogElements = React.useMemo(() => [...Array(5)].map((_, i) => ({
+    id: i,
+    width: 300 + Math.random() * 300,
+    height: 200 + Math.random() * 200,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+    duration: 15 + i * 5
+  })), []);
+
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#0a0a0a] font-serif text-[#c0c0c0] relative overflow-hidden">
       <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%)' }}></div>
+      
+      {/* Floating Fog/Smoke */}
+      <div className="absolute inset-0 pointer-events-none">
+        {fogElements.map((fog) => (
+          <motion.div
+            key={fog.id}
+            className="absolute bg-white/5 blur-3xl rounded-full"
+            style={{
+              width: fog.width,
+              height: fog.height,
+              left: fog.left,
+              top: fog.top,
+            }}
+            animate={{
+              x: [0, 100, -100, 0],
+              y: [0, 50, -50, 0],
+              opacity: [0.05, 0.1, 0.05],
+            }}
+            transition={{
+              duration: fog.duration,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          />
+        ))}
+      </div>
+
       <div className="z-10 flex flex-col items-center gap-16">
-        <h1 className="text-8xl font-light tracking-[0.3em] uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">SKYRIM</h1>
+        <motion.h1 
+          className="text-8xl font-light tracking-[0.3em] uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] skyrim-font-title"
+          animate={{ opacity: [0.8, 1, 0.8] }}
+          transition={{ duration: 5, repeat: Infinity }}
+        >
+          SKYRIM
+        </motion.h1>
         <div className="flex flex-col gap-8 w-80">
-          <button onClick={() => setView('game')} className="border-y border-white/20 py-4 text-3xl tracking-[0.2em] hover:text-white hover:bg-white/5 transition-all uppercase">NEW GAME</button>
-          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="border-y border-white/20 py-4 text-3xl tracking-[0.2em] hover:text-white hover:bg-white/5 transition-all uppercase">THEMES</button>
+          <button onClick={() => setView('game')} className="border-y border-white/20 py-4 text-3xl tracking-[0.2em] hover:text-white hover:bg-white/5 transition-all uppercase skyrim-font-title">NEW GAME</button>
+          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="border-y border-white/20 py-4 text-3xl tracking-[0.2em] hover:text-white hover:bg-white/5 transition-all uppercase skyrim-font-title">THEMES</button>
         </div>
         <AnimatePresence>
           {activeSection === 'themes' && (
-            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="grid grid-cols-2 gap-4 bg-black/90 backdrop-blur-md p-8 border-y border-white/20 w-full max-w-2xl">
+            <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="grid grid-cols-2 gap-4 bg-black/90 backdrop-blur-md p-8 border-y border-white/20 w-full max-w-2xl max-h-48 overflow-y-auto custom-scrollbar">
               {themes.map(t => (
-                <button key={t} onClick={() => setTheme(t)} className="text-sm tracking-widest hover:text-white uppercase transition-colors">{t}</button>
+                <button key={t} onClick={() => setTheme(t)} className="text-sm tracking-widest hover:text-white uppercase transition-colors skyrim-font-title">{t}</button>
               ))}
             </motion.div>
           )}

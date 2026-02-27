@@ -92,11 +92,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
       <header className="relative z-10 p-4 pt-10 flex justify-start items-center overflow-visible">
         <div className="relative flex flex-col items-start scale-90 sm:scale-100 origin-left">
           {/* PHANTOM Box */}
-          <div className="bg-white text-black px-8 py-3 transform -rotate-3 -skew-x-12 relative z-20 shadow-[6px_6px_0_black] p5-border">
+          <div className="bg-white text-black px-10 py-4 transform -rotate-3 -skew-x-12 relative z-20 shadow-[8px_8px_0_black] p5-border">
             <h1 className="font-p5-display text-5xl sm:text-7xl tracking-tighter uppercase leading-none italic">PHANTOM</h1>
           </div>
           {/* OBSIDIAN Box */}
-          <div className="bg-[#D80000] text-white px-6 py-2 transform rotate-2 -skew-x-12 relative -mt-4 ml-12 z-10 whitespace-nowrap shadow-[6px_6px_0_black] p5-border">
+          <div className="bg-[#D80000] text-white px-8 py-2 transform rotate-2 -skew-x-12 relative -mt-6 ml-20 sm:ml-32 z-10 whitespace-nowrap shadow-[8px_8px_0_black] p5-border">
             <h1 className="font-p5-display text-3xl sm:text-4xl tracking-widest uppercase leading-none italic">OBSIDIAN</h1>
           </div>
         </div>

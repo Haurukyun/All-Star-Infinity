@@ -504,20 +504,59 @@ export const AnimalCrossingMenu: React.FC<{ logic: ReturnType<typeof useGameLogi
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
+  const leaves = React.useMemo(() => [...Array(10)].map((_, i) => ({
+    id: i,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+  })), []);
+
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#F0F4C3] font-sans text-[#5D4037] relative overflow-hidden">
       <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#C5E1A5 15%, transparent 16%)', backgroundSize: '60px 60px' }}></div>
+      
+      {/* Floating Leaves */}
+      <div className="absolute inset-0 pointer-events-none">
+        {leaves.map((leaf, i) => (
+          <motion.div
+            key={leaf.id}
+            className="absolute text-4xl opacity-20"
+            style={{
+              left: leaf.left,
+              top: leaf.top,
+            }}
+            animate={{
+              y: [0, 100, 0],
+              x: [0, 50, 0],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 10 + i * 2,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            🍃
+          </motion.div>
+        ))}
+      </div>
+
       <div className="z-10 flex flex-col items-center gap-12">
-        <h1 className="text-6xl font-black tracking-tight text-[#795548] drop-shadow-sm">ANIMAL CROSSING</h1>
+        <motion.h1 
+          className="text-6xl font-black tracking-tight text-[#795548] drop-shadow-sm"
+          animate={{ rotate: [0, 1, -1, 0] }}
+          transition={{ duration: 4, repeat: Infinity }}
+        >
+          ANIMAL CROSSING
+        </motion.h1>
         <div className="flex flex-col gap-6 w-72">
           <button onClick={() => setView('game')} className="bg-[#8BC34A] text-white rounded-[30px] p-6 text-3xl font-bold shadow-md hover:scale-105 transition-all border-4 border-white">GO TO ISLAND</button>
           <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-[#FFEB3B] text-[#5D4037] rounded-[30px] p-4 text-xl font-bold shadow-sm hover:rotate-2 transition-all border-4 border-white">CHANGE THEME</button>
         </div>
         <AnimatePresence>
           {activeSection === 'themes' && (
-            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="grid grid-cols-2 gap-3 bg-[#FFF9C4] p-6 rounded-[40px] border-4 border-white shadow-lg">
+            <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="grid grid-cols-2 gap-3 bg-[#FFF9C4] p-6 rounded-[40px] border-4 border-white shadow-lg max-h-48 overflow-y-auto custom-scrollbar">
               {themes.map(t => (
-                <button key={t} onClick={() => setTheme(t)} className="bg-white/50 rounded-full px-4 py-2 text-xs font-bold hover:bg-[#8BC34A] hover:text-white transition-all">{t}</button>
+                <button key={t} onClick={() => setTheme(t)} className="bg-white/50 rounded-full px-4 py-2 text-[10px] font-bold hover:bg-[#8BC34A] hover:text-white transition-all">{t.toUpperCase()}</button>
               ))}
             </motion.div>
           )}

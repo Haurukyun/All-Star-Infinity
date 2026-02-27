@@ -14,25 +14,53 @@ import { SkyrimMenu } from './SkyrimApp';
 const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
   const { theme, setTheme, hasExplicitlySelectedTheme } = logic;
   const [showcaseIndex, setShowcaseIndex] = useState(0);
+  const [isIdle, setIsIdle] = useState(true);
+  const idleTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  // Showcase Mode: Cycle through themes if none selected
+  const resetIdleTimer = React.useCallback(() => {
+    setIsIdle(false);
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = setTimeout(() => {
+      setIsIdle(true);
+    }, 5000); // 5 seconds of no input before resuming showcase
+  }, []);
+
   useEffect(() => {
-    if (!hasExplicitlySelectedTheme) {
+    window.addEventListener('mousedown', resetIdleTimer);
+    window.addEventListener('touchstart', resetIdleTimer);
+    window.addEventListener('keydown', resetIdleTimer);
+
+    // Initial timer
+    idleTimerRef.current = setTimeout(() => {
+      setIsIdle(true);
+    }, 5000);
+
+    return () => {
+      window.removeEventListener('mousedown', resetIdleTimer);
+      window.removeEventListener('touchstart', resetIdleTimer);
+      window.removeEventListener('keydown', resetIdleTimer);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [resetIdleTimer]);
+
+  // Showcase Mode: Cycle through themes if none selected and idle
+  useEffect(() => {
+    if (!hasExplicitlySelectedTheme && isIdle) {
       const interval = setInterval(() => {
         setShowcaseIndex((prev) => (prev + 1) % themes.length);
       }, 5000); // Cycle every 5 seconds
       return () => clearInterval(interval);
     }
-  }, [hasExplicitlySelectedTheme, themes.length]);
+  }, [hasExplicitlySelectedTheme, themes.length, isIdle]);
 
   // Apply the showcase theme if in showcase mode
   useEffect(() => {
     if (!hasExplicitlySelectedTheme) {
       setTheme(themes[showcaseIndex], false);
     }
-  }, [showcaseIndex, hasExplicitlySelectedTheme]);
+  }, [showcaseIndex, hasExplicitlySelectedTheme, setTheme, themes]);
 
   const renderThemedMenu = () => {
     switch (theme) {

@@ -509,18 +509,60 @@ export const PokemonMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
+  const pokeballs = React.useMemo(() => [...Array(10)].map((_, i) => ({
+    id: i,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+  })), []);
+
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#384858] font-mono text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(to bottom, #384858, #202830)' }}></div>
+      
+      {/* Floating Pokéballs/Particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        {pokeballs.map((ball, i) => (
+          <motion.div
+            key={ball.id}
+            className="absolute w-8 h-8 opacity-20"
+            style={{
+              left: ball.left,
+              top: ball.top,
+            }}
+            animate={{
+              y: [0, -100, 0],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 8 + i,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+          >
+            <div className="w-full h-full bg-white rounded-full border-2 border-black relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1/2 bg-red-500"></div>
+              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-black -translate-y-1/2"></div>
+              <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-white border border-black rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
       <div className="z-10 flex flex-col items-center gap-12">
-        <h1 className="text-7xl font-bold tracking-widest text-yellow-400 drop-shadow-[4px_4px_0_#3b4cca] uppercase">POKEMON</h1>
+        <motion.h1 
+          className="text-7xl font-bold tracking-widest text-yellow-400 drop-shadow-[4px_4px_0_#3b4cca] uppercase"
+          animate={{ scale: [1, 1.05, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          POKEMON
+        </motion.h1>
         <div className="flex flex-col gap-4 w-72">
           <button onClick={() => setView('game')} className="bg-white text-[#384858] border-4 border-[#3b4cca] p-4 text-2xl font-bold hover:bg-yellow-400 transition-colors shadow-lg">NEW GAME</button>
           <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-white text-[#384858] border-4 border-[#3b4cca] p-4 text-2xl font-bold hover:bg-yellow-400 transition-colors shadow-lg">THEMES</button>
         </div>
         <AnimatePresence>
           {activeSection === 'themes' && (
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-2 gap-2 bg-[#202830] p-6 border-4 border-white rounded-lg shadow-2xl">
+            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-2 gap-2 bg-[#202830] p-6 border-4 border-white rounded-lg shadow-2xl max-h-48 overflow-y-auto custom-scrollbar">
               {themes.map(t => (
                 <button key={t} onClick={() => setTheme(t)} className="text-yellow-400 hover:text-white text-[10px] uppercase font-bold">{t}</button>
               ))}

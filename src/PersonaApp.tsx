@@ -259,7 +259,7 @@ placeholder="WHAT IS THE PURPOSE OF THIS DECK?"
 </div>
 
 <div className="space-y-3 sm:space-y-4">
-{editingDeck.prompts.map((p, idx) => (
+{editingDeck.prompts.map((p) => (
 <div key={p.id} className="bg-white/10 p-3 sm:p-4 border-l-4 border-[#D80000] space-y-2 sm:space-y-3">
 <div className="flex gap-2">
 <select 
@@ -411,23 +411,58 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
 
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
+  const shards = React.useMemo(() => [...Array(6)].map((_, i) => ({
+    id: i,
+    width: Math.random() * 100 + 50,
+    height: Math.random() * 100 + 50,
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+  })), []);
+
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-black">
       <div className="absolute inset-0 p5-dots-bg opacity-40"></div>
       <div className="absolute top-0 right-0 w-full sm:w-2/3 h-full bg-[#D80000] transform skew-x-[-25deg] translate-x-1/2 opacity-30 z-0 mix-blend-multiply"></div>
       
+      {/* Floating Shards for Menu */}
+      <div className="absolute inset-0 pointer-events-none">
+        {shards.map((shard, i) => (
+          <motion.div
+            key={shard.id}
+            className="absolute bg-white/5 border border-white/10"
+            style={{
+              width: shard.width,
+              height: shard.height,
+              left: shard.left,
+              top: shard.top,
+              skewX: -20,
+            }}
+            animate={{
+              y: [0, -20, 0],
+              rotate: [0, 5, 0],
+              opacity: [0.1, 0.3, 0.1],
+            }}
+            transition={{
+              duration: 5 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
+      </div>
+
       <div className="z-10 w-full max-w-lg flex flex-col gap-8 sm:gap-12">
         <div className="relative flex flex-col items-center gap-4 sm:gap-6">
           {menuItems.map((item) => (
             <motion.button
               key={item.id}
-              onClick={() => setActiveSection(activeSection === item.id ? null : item.id as any)}
+              onClick={() => setActiveSection(activeSection === item.id ? null : item.id as 'gamemodes' | 'themes' | 'options')}
               className={`
                 font-p5-display text-5xl sm:text-7xl tracking-tighter uppercase italic transform -skew-x-12 transition-all duration-300 w-full text-center py-2
                 ${activeSection === item.id ? 'bg-white text-black shadow-[4px_4px_0_black] sm:shadow-[8px_8px_0_black] scale-105' : 'text-white hover:text-[#D80000] hover:translate-x-2'}
               `}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.05, x: 10 }}
+              whileTap={{ scale: 0.95 }}
             >
               <span className="transform skew-x-12 block">{item.label}</span>
             </motion.button>
@@ -439,9 +474,9 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
             {activeSection === 'gamemodes' && (
               <motion.div 
                 key="gamemodes"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, x: -50, skewX: -10 }}
+                animate={{ opacity: 1, x: 0, skewX: 0 }}
+                exit={{ opacity: 0, x: 50, skewX: 10 }}
                 className="flex flex-col gap-4"
               >
                 <button 
@@ -456,9 +491,9 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
             {activeSection === 'themes' && (
               <motion.div 
                 key="themes"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+                initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.8, rotate: 5 }}
                 className="grid grid-cols-2 gap-2 sm:gap-3"
               >
                 {themes.map((t) => (
