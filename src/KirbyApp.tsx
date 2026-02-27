@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
@@ -47,7 +47,7 @@ const KirbyApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
     generateId
   } = logic;
 
-  const [emotes] = useState<{ id: number, x: number, y: number, type: string, size: number, duration: number }[]>(() => {
+  const [emotes] = React.useState<{ id: number, x: number, y: number, type: string, size: number, duration: number }[]>(() => {
     const types = ['⭐', '❤️', '🍭', '☁️', '✨'];
     return Array.from({ length: 10 }).map((_, i) => ({
       id: i,
@@ -507,12 +507,16 @@ export const KirbyMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = (
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const sparkles = React.useMemo(() => [...Array(12)].map((_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    x: [0, Math.random() * 20 - 10, 0],
-  })), []);
+  const [sparkles, setSparkles] = React.useState<{ id: number, left: string, top: string, x: number[] }[]>([]);
+
+  React.useEffect(() => {
+    setSparkles([...Array(12)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      x: [0, Math.random() * 20 - 10, 0],
+    })));
+  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-pink-100 font-sans text-pink-600 relative overflow-hidden">

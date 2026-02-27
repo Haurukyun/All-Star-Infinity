@@ -11,7 +11,13 @@ export const useGameLogic = () => {
   const [prompt, setPrompt] = useState<GamePrompt | null>(null);
   const [history, setHistory] = useState<GamePrompt[]>([]);
   const [useEasyFont, setUseEasyFont] = useState(true);
-  const [theme, setTheme] = useState<Theme>(Theme.NONE);
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem('phantom_theme');
+    if (savedTheme && Object.values(Theme).includes(savedTheme as Theme) && savedTheme !== Theme.NONE) {
+      return savedTheme as Theme;
+    }
+    return Theme.NONE;
+  });
   const [view, setView] = useState<'menu' | 'game'>('menu');
   
   // Custom Deck States
@@ -25,14 +31,6 @@ export const useGameLogic = () => {
   const [activeDeckId, setActiveDeckId] = useState<string>('default');
   const [editingDeck, setEditingDeck] = useState<CustomDeck | null>(null);
   const [hasExplicitlySelectedTheme, setHasExplicitlySelectedTheme] = useState(false);
-
-  // Load Theme from localStorage
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('phantom_theme');
-    if (savedTheme && Object.values(Theme).includes(savedTheme as Theme) && savedTheme !== Theme.NONE) {
-      setTheme(savedTheme as Theme);
-    }
-  }, []);
 
   // Save Decks to localStorage
   useEffect(() => {
@@ -92,7 +90,7 @@ export const useGameLogic = () => {
     setEditingDeck({ ...editingDeck, prompts: [...editingDeck.prompts, newPrompt] });
   };
 
-  const updatePromptInEditingDeck = (id: string, field: keyof GamePrompt, value: any) => {
+  const updatePromptInEditingDeck = (id: string, field: keyof GamePrompt, value: string | Intensity | PromptType) => {
     if (!editingDeck) return;
     setEditingDeck({
       ...editingDeck,

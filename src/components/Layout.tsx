@@ -1,12 +1,9 @@
 import React from 'react';
-import { Theme } from '../types';
 
 interface LayoutProps {
   children: React.ReactNode;
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) => {

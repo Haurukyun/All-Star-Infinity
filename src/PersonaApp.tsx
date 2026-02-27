@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from './components/Layout';
 import { Intensity, Theme } from './types';
-import { STAGES } from './App'; // We'll move STAGES to a better place if needed, but for now let's keep it simple
+import { STAGES } from './constants';
 import { useGameLogic } from './hooks/useGameLogic';
 
 const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
@@ -411,13 +411,17 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
 
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const shards = React.useMemo(() => [...Array(6)].map((_, i) => ({
-    id: i,
-    width: Math.random() * 100 + 50,
-    height: Math.random() * 100 + 50,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-  })), []);
+  const [shards, setShards] = React.useState<{ id: number, width: number, height: number, left: string, top: string }[]>([]);
+
+  React.useEffect(() => {
+    setShards([...Array(6)].map((_, i) => ({
+      id: i,
+      width: Math.random() * 100 + 50,
+      height: Math.random() * 100 + 50,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    })));
+  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-4 sm:p-6 relative overflow-hidden bg-black">

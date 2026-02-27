@@ -482,14 +482,18 @@ export const SkyrimMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = 
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const fogElements = React.useMemo(() => [...Array(5)].map((_, i) => ({
-    id: i,
-    width: 300 + Math.random() * 300,
-    height: 200 + Math.random() * 200,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    duration: 15 + i * 5
-  })), []);
+  const [fogElements, setFogElements] = React.useState<{ id: number, width: number, height: number, left: string, top: string, duration: number }[]>([]);
+
+  React.useEffect(() => {
+    setFogElements([...Array(5)].map((_, i) => ({
+      id: i,
+      width: 300 + Math.random() * 300,
+      height: 200 + Math.random() * 200,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      duration: 15 + i * 5
+    })));
+  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#0a0a0a] font-serif text-[#c0c0c0] relative overflow-hidden">

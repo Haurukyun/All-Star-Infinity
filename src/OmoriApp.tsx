@@ -345,13 +345,17 @@ export const OmoriMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = (
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const floatingElements = React.useMemo(() => [...Array(8)].map((_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-    x: [0, Math.random() * 20 - 10, 0],
-    y: [0, Math.random() * 20 - 10, 0],
-  })), []);
+  const [floatingElements, setFloatingElements] = React.useState<{ id: number, left: string, top: string, x: number[], y: number[] }[]>([]);
+
+  React.useEffect(() => {
+    setFloatingElements([...Array(8)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      x: [0, Math.random() * 20 - 10, 0],
+      y: [0, Math.random() * 20 - 10, 0],
+    })));
+  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-white font-['Gloria_Hallelujah'] text-black relative overflow-hidden">

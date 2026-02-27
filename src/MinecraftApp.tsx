@@ -495,13 +495,17 @@ export const MinecraftMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }>
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const pixels = React.useMemo(() => [...Array(10)].map((_, i) => ({
-    id: i,
-    width: 20 + Math.random() * 40,
-    height: 20 + Math.random() * 20,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-  })), []);
+  const [pixels, setPixels] = React.useState<{ id: number, width: number, height: number, left: string, top: string }[]>([]);
+
+  React.useEffect(() => {
+    setPixels([...Array(10)].map((_, i) => ({
+      id: i,
+      width: 20 + Math.random() * 40,
+      height: 20 + Math.random() * 20,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    })));
+  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#1a1a1a] font-mono text-white relative overflow-hidden">

@@ -504,11 +504,15 @@ export const AnimalCrossingMenu: React.FC<{ logic: ReturnType<typeof useGameLogi
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const leaves = React.useMemo(() => [...Array(10)].map((_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-  })), []);
+  const [leaves, setLeaves] = React.useState<{ id: number, left: string, top: string }[]>([]);
+
+  React.useEffect(() => {
+    setLeaves([...Array(10)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    })));
+  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#F0F4C3] font-sans text-[#5D4037] relative overflow-hidden">

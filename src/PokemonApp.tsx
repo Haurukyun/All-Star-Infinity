@@ -509,11 +509,15 @@ export const PokemonMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const pokeballs = React.useMemo(() => [...Array(10)].map((_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    top: `${Math.random() * 100}%`,
-  })), []);
+  const [pokeballs, setPokeballs] = React.useState<{ id: number, left: string, top: string }[]>([]);
+
+  React.useEffect(() => {
+    setPokeballs([...Array(10)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+    })));
+  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#384858] font-mono text-white relative overflow-hidden">
