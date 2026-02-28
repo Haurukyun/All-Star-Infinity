@@ -82,8 +82,10 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
       <div className="absolute inset-0 p5-dots-bg z-0 opacity-100"></div>
       <div className="absolute inset-0 p5-shards z-0"></div>
       
-      {/* Red Slash Background */}
-      <div className="absolute top-0 right-0 w-full h-full bg-[#D80000] transform skew-x-[-35deg] translate-x-1/2 opacity-30 z-0 mix-blend-multiply"></div>
+      {/* Red Diagonal Half Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-[200%] h-[200%] bg-[#D80000] opacity-20 transform -rotate-45 -translate-x-1/2 -translate-y-1/2 mix-blend-multiply"></div>
+      </div>
 
       {/* Header */}
       <header className="relative z-10 p-3 pt-4 sm:pt-6 flex justify-start items-center overflow-visible">
@@ -93,7 +95,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
             <h1 className="font-p5-display text-3xl sm:text-6xl tracking-tighter uppercase leading-none italic">PHANTOM</h1>
           </div>
           {/* OBSIDIAN Box */}
-          <div className="bg-[#D80000] text-white px-3 sm:px-6 py-1 sm:py-1.5 transform rotate-2 -skew-x-12 relative -mt-3 sm:-mt-5 ml-8 sm:ml-24 z-10 whitespace-nowrap shadow-[4px_4px_0_black] sm:shadow-[6px_6px_0_black] p5-border">
+          <div className="bg-[#D80000] text-white px-3 sm:px-6 py-1 sm:py-1.5 transform rotate-2 -skew-x-12 relative mt-1 sm:mt-2 ml-4 sm:ml-8 z-10 whitespace-nowrap shadow-[4px_4px_0_black] sm:shadow-[6px_6px_0_black] p5-border">
             <h1 className="font-p5-display text-xl sm:text-3xl tracking-widest uppercase leading-none italic">OBSIDIAN</h1>
           </div>
         </div>

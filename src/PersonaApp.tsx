@@ -459,49 +459,57 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
         ))}
       </div>
 
-      <div className="z-10 w-full max-w-2xl flex flex-col sm:flex-row items-center sm:items-start justify-center gap-8 sm:gap-12">
+      <div className="z-10 w-full max-w-3xl flex flex-col sm:flex-row items-center sm:items-start justify-center gap-6 sm:gap-10">
         {/* Main Menu Items */}
-        <div className="relative flex flex-col items-center sm:items-start gap-4 sm:gap-6 w-full sm:w-1/2">
+        <div className="relative flex flex-col items-center sm:items-start gap-3 sm:gap-5 w-full sm:w-1/2">
           {menuItems.map((item, idx) => (
             <motion.div
               key={item.id}
-              initial={{ x: -100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: idx * 0.1, type: 'spring', stiffness: 200 }}
+              initial={{ x: -150, opacity: 0, rotate: -10 }}
+              animate={{ x: 0, opacity: 1, rotate: 0 }}
+              transition={{ delay: idx * 0.1, type: 'spring', stiffness: 150, damping: 15 }}
               className="w-full"
             >
               <button
                 onClick={() => setActiveSection(activeSection === item.id ? null : item.id as 'gamemodes' | 'themes' | 'options')}
                 className={`
-                  relative group w-full text-left transition-all duration-300
-                  ${activeSection === item.id ? 'scale-105 z-30' : 'hover:scale-102 z-10'}
+                  relative group w-full text-left transition-all duration-500
+                  ${activeSection === item.id ? 'scale-105 z-30 translate-x-4' : 'hover:scale-102 z-10 hover:translate-x-2'}
                 `}
               >
+                {/* Background Box with shadow */}
                 <div 
                   className={`
-                    absolute inset-0 bg-black border-[3px] border-black transform transition-colors
-                    ${activeSection === item.id ? 'bg-white' : 'group-hover:bg-[#D80000]'}
+                    absolute inset-0 bg-black border-[3px] border-black transform transition-all duration-300
+                    ${activeSection === item.id ? 'bg-white shadow-[8px_8px_0_#D80000]' : 'group-hover:bg-[#D80000] shadow-[4px_4px_0_black]'}
                   `}
-                  style={{ transform: `skewX(-15deg) rotate(${item.rotation}deg)` }}
+                  style={{ transform: `skewX(-18deg) rotate(${item.rotation}deg)` }}
                 ></div>
                 
-                <div className="relative px-6 py-3 sm:py-5 flex flex-col">
+                {/* Content */}
+                <div className="relative px-6 py-3 sm:py-5 flex flex-col overflow-hidden">
+                  {/* Decorative stripe */}
+                  <div className={`absolute top-0 left-0 w-1 h-full bg-[#D80000] transition-transform duration-300 ${activeSection === item.id ? 'scale-y-100' : 'scale-y-0'}`}></div>
+                  
                   <span 
                     className={`
-                      font-p5-display text-4xl sm:text-6xl tracking-tighter uppercase italic leading-none transition-colors
+                      font-p5-display text-4xl sm:text-7xl tracking-tighter uppercase italic leading-none transition-colors duration-300
                       ${activeSection === item.id ? 'text-black' : 'text-white'}
                     `}
                   >
                     {item.label}
                   </span>
-                  <span 
-                    className={`
-                      font-black text-[8px] sm:text-[10px] tracking-[0.3em] uppercase italic mt-0.5 transition-colors
-                      ${activeSection === item.id ? 'text-[#D80000]' : 'text-white/40'}
-                    `}
-                  >
-                    {item.sub}
-                  </span>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <div className={`h-[2px] bg-[#D80000] transition-all duration-300 ${activeSection === item.id ? 'w-8' : 'w-0'}`}></div>
+                    <span 
+                      className={`
+                        font-black text-[8px] sm:text-[11px] tracking-[0.4em] uppercase italic transition-colors duration-300
+                        ${activeSection === item.id ? 'text-[#D80000]' : 'text-white/50'}
+                      `}
+                    >
+                      {item.sub}
+                    </span>
+                  </div>
                 </div>
               </button>
             </motion.div>
@@ -509,36 +517,45 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
         </div>
 
         {/* Sub-menu Content */}
-        <div className="w-full sm:w-1/2 h-48 sm:h-80 relative flex items-center justify-center">
+        <div className="w-full sm:w-1/2 h-56 sm:h-96 relative flex items-center justify-center">
           <AnimatePresence mode="wait">
             {!activeSection && (
               <motion.div
                 key="idle"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.2 }}
-                className="text-center"
+                initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 1.2, rotate: 5 }}
+                className="text-center relative"
               >
-                <div className="font-p5-display text-white/10 text-8xl italic tracking-tighter select-none">P5</div>
-                <p className="text-white/20 font-black tracking-[1em] uppercase text-[10px] mt-[-1.5rem]">WAITING_FOR_INPUT</p>
+                <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full"></div>
+                <div className="font-p5-display text-white/10 text-[10rem] sm:text-[14rem] italic tracking-tighter select-none relative z-0">P5</div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+                  <p className="text-white/40 font-black tracking-[1.2em] uppercase text-[10px] sm:text-xs bg-black/40 px-4 py-1 backdrop-blur-sm">WAITING_FOR_INPUT</p>
+                  <div className="w-12 h-1 bg-[#D80000] mt-2 animate-pulse"></div>
+                </div>
               </motion.div>
             )}
 
             {activeSection === 'gamemodes' && (
               <motion.div 
                 key="gamemodes"
-                initial={{ opacity: 0, x: 50, rotate: 5 }}
-                animate={{ opacity: 1, x: 0, rotate: 0 }}
-                exit={{ opacity: 0, x: -50, rotate: -5 }}
-                className="w-full flex flex-col gap-3"
+                initial={{ opacity: 0, x: 100, skewX: 20 }}
+                animate={{ opacity: 1, x: 0, skewX: 0 }}
+                exit={{ opacity: 0, x: -100, skewX: -20 }}
+                className="w-full flex flex-col gap-4"
               >
                 <button 
                   onClick={() => setView('game')}
-                  className="group relative bg-white text-black p-4 sm:p-6 transform -skew-x-6 shadow-[8px_8px_0_black] p5-border transition-all hover:-translate-y-1 active:translate-y-0.5 active:shadow-none"
+                  className="group relative bg-white text-black p-6 sm:p-10 transform -skew-x-12 shadow-[12px_12px_0_black] p5-border transition-all hover:-translate-y-2 hover:shadow-[16px_16px_0_#D80000] active:translate-y-1 active:shadow-none"
                 >
-                  <div className="absolute inset-0 bg-[#D80000] opacity-0 group-hover:opacity-10 transition-opacity"></div>
-                  <span className="font-p5-display text-2xl sm:text-4xl italic block leading-none">★ START MISSION</span>
-                  <span className="block text-[8px] font-black tracking-widest mt-1.5 opacity-60">EXECUTE_COGNITIVE_HEIST</span>
+                  <div className="absolute top-0 left-0 w-full h-1 bg-[#D80000]"></div>
+                  <span className="font-p5-display text-3xl sm:text-5xl italic block leading-none">★ START MISSION</span>
+                  <div className="flex items-center gap-3 mt-3">
+                    <div className="w-6 h-6 bg-black flex items-center justify-center transform rotate-45">
+                      <div className="w-3 h-3 bg-[#D80000]"></div>
+                    </div>
+                    <span className="block text-[10px] sm:text-xs font-black tracking-widest opacity-70 uppercase italic">EXECUTE_COGNITIVE_HEIST</span>
+                  </div>
                 </button>
               </motion.div>
             )}
@@ -546,21 +563,21 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
             {activeSection === 'themes' && (
               <motion.div 
                 key="themes"
-                initial={{ opacity: 0, scale: 0.9, skewX: 10 }}
-                animate={{ opacity: 1, scale: 1, skewX: 0 }}
-                exit={{ opacity: 0, scale: 1.1, skewX: -10 }}
-                className="w-full grid grid-cols-2 gap-2"
+                initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 1.2, rotate: -10 }}
+                className="w-full grid grid-cols-2 gap-3 sm:gap-4"
               >
                 {themes.map((t, i) => (
                   <motion.button 
                     key={t}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
                     onClick={() => setTheme(t)}
                     className={`
-                      p-2 sm:p-3 transform -skew-x-12 font-p5-display text-[10px] sm:text-xs italic transition-all border-[2px] border-black shadow-[3px_3px_0_black]
-                      ${theme === t ? 'bg-white text-black scale-105 z-10' : 'bg-black text-white border-white/20 hover:bg-[#D80000]'}
+                      p-3 sm:p-5 transform -skew-x-12 font-p5-display text-xs sm:text-base italic transition-all border-[3px] border-black shadow-[5px_5px_0_black]
+                      ${theme === t ? 'bg-white text-black scale-110 z-10 shadow-[8px_8px_0_#D80000]' : 'bg-black text-white border-white/20 hover:bg-[#D80000] hover:-translate-y-1'}
                     `}
                   >
                     <span className="transform skew-x-12 block">{t.toUpperCase()}</span>
@@ -572,18 +589,23 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
             {activeSection === 'options' && (
               <motion.div 
                 key="options"
-                initial={{ opacity: 0, y: 30, rotate: -3 }}
-                animate={{ opacity: 1, y: 0, rotate: 0 }}
-                exit={{ opacity: 0, y: -30, rotate: 3 }}
-                className="w-full bg-white text-black p-4 sm:p-6 transform -skew-x-3 shadow-[12px_12px_0_black] p5-border space-y-3"
+                initial={{ opacity: 0, y: 50, skewY: 5 }}
+                animate={{ opacity: 1, y: 0, skewY: 0 }}
+                exit={{ opacity: 0, y: -50, skewY: -5 }}
+                className="w-full bg-white text-black p-6 sm:p-10 transform -skew-x-6 shadow-[16px_16px_0_black] p5-border space-y-5"
               >
-                <div className="flex justify-between items-end border-b-2 border-black pb-1">
-                  <span className="font-p5-display text-xl sm:text-2xl italic">HEART_SYNC</span>
-                  <span className="font-black text-[10px] text-[#D80000]">STABLE</span>
+                <div className="flex justify-between items-end border-b-4 border-black pb-2 group">
+                  <span className="font-p5-display text-2xl sm:text-4xl italic group-hover:text-[#D80000] transition-colors">HEART_SYNC</span>
+                  <span className="font-black text-xs sm:text-sm text-[#D80000] animate-pulse">STABLE</span>
                 </div>
-                <div className="flex justify-between items-end border-b-2 border-black pb-1">
-                  <span className="font-p5-display text-xl sm:text-2xl italic">COGNITION</span>
-                  <span className="font-black text-[10px] text-[#D80000]">ENHANCED</span>
+                <div className="flex justify-between items-end border-b-4 border-black pb-2 group">
+                  <span className="font-p5-display text-2xl sm:text-4xl italic group-hover:text-[#D80000] transition-colors">COGNITION</span>
+                  <span className="font-black text-xs sm:text-sm text-[#D80000]">ENHANCED</span>
+                </div>
+                <div className="pt-4 flex justify-center">
+                  <div className="w-16 h-16 bg-black transform rotate-45 flex items-center justify-center animate-spin-slow">
+                    <div className="w-10 h-10 bg-[#D80000] transform rotate-0"></div>
+                  </div>
                 </div>
               </motion.div>
             )}
