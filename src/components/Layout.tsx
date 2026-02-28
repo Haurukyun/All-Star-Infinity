@@ -35,6 +35,12 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
           animation: bgMove 40s linear infinite;
         }
 
+        .p5-stars-bg {
+          background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L53 47L100 50L53 53L50 100L47 53L0 50L47 47L50 0Z' fill='rgba(216,0,0,0.1)'/%3E%3C/svg%3E");
+          background-size: 50px 50px;
+          opacity: 0.3;
+        }
+
         @keyframes bgMove {
           0% { background-position: 0 0, 0 0, 0 0; }
           100% { background-position: 0 0, 1000px 1000px, -1000px 1000px; }
@@ -80,11 +86,17 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab }) =>
 
       {/* Background Pattern */}
       <div className="absolute inset-0 p5-dots-bg z-0 opacity-100"></div>
+      <div className="absolute inset-0 p5-stars-bg z-0"></div>
       <div className="absolute inset-0 p5-shards z-0"></div>
       
       {/* Red Diagonal Half Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-[200%] h-[200%] bg-[#D80000] opacity-20 transform -rotate-45 -translate-x-1/2 -translate-y-1/2 mix-blend-multiply"></div>
+      </div>
+
+      {/* Silhouette Decoration */}
+      <div className="absolute bottom-0 right-0 w-full h-full pointer-events-none z-0 opacity-10 overflow-hidden">
+        <div className="absolute bottom-[-10%] right-[-5%] w-[60%] h-[80%] bg-black transform skew-x-[-10deg]"></div>
       </div>
 
       {/* Header */}
