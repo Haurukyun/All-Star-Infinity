@@ -186,103 +186,117 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     animate={{ opacity: 1, y: 0 }}
                     className="pt-4 space-y-6 pb-32"
                 >
-                    {themeDef.DecksScreen ? (
-                        <themeDef.DecksScreen logic={logic} />
-                    ) : (
-                        !editingDeck ? (
-                            <>
-                                <div className="flex justify-between items-end mb-6">
-                                    <h2 className="theme-text-header text-4xl font-bold italic">DECKS</h2>
-                                    <button
-                                        onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })}
-                                        className="theme-button px-4 py-1 text-sm italic"
-                                    >
-                                        + NEW
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-1 gap-4">
-                                    {customDecks.length === 0 ? (
-                                        <div className="py-20 text-center opacity-20 italic">No custom decks forged yet.</div>
-                                    ) : (
-                                        customDecks.map(deck => (
-                                            <div key={deck.id} className="theme-panel p-4 flex justify-between items-center group">
-                                                <div>
-                                                    <h3 className="theme-text-header text-xl group-hover:text-[var(--theme-accent)] transition-colors">{deck.name || 'UNTITLED'}</h3>
-                                                    <p className="text-[10px] opacity-60 uppercase tracking-widest">{deck.prompts.length} CARDS</p>
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    <button onClick={() => setEditingDeck(deck)} className="theme-button px-3 py-1 text-[10px]">EDIT</button>
-                                                    <button onClick={() => deleteDeck(deck.id)} className="theme-button theme-button-alt px-3 py-1 text-[10px]">DEL</button>
-                                                </div>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                            </>
-                        ) : (
-                            <div className="theme-panel p-6 space-y-6">
-                                <div className="space-y-4">
-                                    <label className="theme-text-header text-[10px] block opacity-60">DECK TITLE</label>
-                                    <input
-                                        className="w-full bg-transparent border-b-2 border-black/20 font-bold text-2xl focus:outline-none focus:border-[var(--theme-accent)] py-2"
-                                        value={editingDeck.name}
-                                        onChange={(e) => setEditingDeck({ ...editingDeck, name: e.target.value })}
-                                        placeholder="DECK NAME..."
-                                    />
-                                    <label className="theme-text-header text-[10px] block opacity-60">DESCRIPTION</label>
-                                    <textarea
-                                        className="w-full bg-black/5 p-3 text-xs focus:outline-none border-2 border-transparent focus:border-[var(--theme-accent)] h-20"
-                                        value={editingDeck.description}
-                                        onChange={(e) => setEditingDeck({ ...editingDeck, description: e.target.value })}
-                                        placeholder="WHAT IS THIS DECK'S PURPOSE?"
-                                    />
-                                </div>
+                    {editingDeck ? (
+                        <div className="theme-panel p-6 space-y-6">
+                            <div className="space-y-4">
+                                <label className="theme-text-header text-[10px] block opacity-60">DECK TITLE</label>
+                                <input
+                                    className="w-full bg-transparent border-b-2 border-black/20 font-bold text-2xl focus:outline-none focus:border-[var(--theme-accent)] py-2"
+                                    value={editingDeck.name}
+                                    onChange={(e) => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                    placeholder="DECK NAME..."
+                                />
+                                <label className="theme-text-header text-[10px] block opacity-60">DESCRIPTION</label>
+                                <textarea
+                                    className="w-full bg-black/5 p-3 text-xs focus:outline-none border-2 border-transparent focus:border-[var(--theme-accent)] h-20"
+                                    value={editingDeck.description}
+                                    onChange={(e) => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                    placeholder="WHAT IS THIS DECK'S PURPOSE?"
+                                />
+                            </div>
 
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center">
-                                        <h3 className="theme-text-header text-xl">PROMPTS ({editingDeck.prompts.length})</h3>
-                                        <button onClick={addNewPromptToEditingDeck} className="theme-button px-3 py-1 text-xs">+ ADD</button>
-                                    </div>
-                                    <div className="space-y-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
-                                        {editingDeck.prompts.map((p) => (
-                                            <div key={p.id} className="p-3 bg-black/5 border-l-4 border-[var(--theme-accent)] space-y-2">
-                                                <div className="flex gap-2">
-                                                    <select
-                                                        className="bg-black text-white text-[10px] p-1 uppercase"
-                                                        value={p.type}
-                                                        onChange={(e) => updatePromptInEditingDeck(p.id, 'type', e.target.value)}
-                                                    >
-                                                        <option>Truth</option>
-                                                        <option>Dare</option>
-                                                    </select>
-                                                    <select
-                                                        className="bg-black text-white text-[10px] p-1 uppercase"
-                                                        value={p.intensity}
-                                                        onChange={(e) => updatePromptInEditingDeck(p.id, 'intensity', e.target.value)}
-                                                    >
-                                                        <option value={Intensity.SOFT}>SOFT</option>
-                                                        <option value={Intensity.HOT}>HOT</option>
-                                                        <option value={Intensity.VULGAR}>VULGAR</option>
-                                                    </select>
-                                                    <button onClick={() => removePromptFromEditingDeck(p.id)} className="ml-auto text-red-500 font-bold">×</button>
-                                                </div>
-                                                <input
-                                                    className="w-full bg-transparent text-sm border-b border-black/10 focus:outline-none"
-                                                    value={p.text}
-                                                    onChange={(e) => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
-                                                    placeholder="PROMPT TEXT..."
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="theme-text-header text-xl">PROMPTS ({editingDeck.prompts.length})</h3>
+                                    <button onClick={addNewPromptToEditingDeck} className="theme-button px-3 py-1 text-xs">+ ADD</button>
                                 </div>
-
-                                <div className="flex gap-3 pt-4">
-                                    <button onClick={() => setEditingDeck(null)} className="theme-button flex-1 p-3">CANCEL</button>
-                                    <button onClick={() => saveDeck(editingDeck)} className="theme-button flex-1 p-3 bg-black text-white">SAVE</button>
+                                <div className="space-y-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                                    {editingDeck.prompts.map((p) => (
+                                        <div key={p.id} className="p-3 bg-black/5 border-l-4 border-[var(--theme-accent)] space-y-2">
+                                            <div className="flex gap-2">
+                                                <select
+                                                    className="bg-black text-white text-[10px] p-1 uppercase"
+                                                    value={p.type}
+                                                    onChange={(e) => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                                >
+                                                    <option value="Truth">Truth</option>
+                                                    <option value="Dare">Dare</option>
+                                                    <option value="NeverHaveIEver">Never</option>
+                                                </select>
+                                                <select
+                                                    className="bg-black text-white text-[10px] p-1 uppercase"
+                                                    value={p.intensity}
+                                                    onChange={(e) => updatePromptInEditingDeck(p.id, 'intensity', e.target.value as any)}
+                                                >
+                                                    {Object.values(Intensity).map(i => <option key={i} value={i}>{i}</option>)}
+                                                </select>
+                                                <div className="flex-1" />
+                                                <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 font-bold text-[10px]">REMOVE</button>
+                                            </div>
+                                            <textarea
+                                                className="w-full bg-white/10 p-2 text-xs focus:outline-none"
+                                                value={p.text}
+                                                onChange={(e) => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                                placeholder="PROMPT TEXT..."
+                                            />
+                                            <input
+                                                className="w-full bg-white/5 p-1 text-[10px] italic border-b border-black/10 focus:outline-none"
+                                                value={p.penalty || ''}
+                                                onChange={(e) => updatePromptInEditingDeck(p.id, 'penalty', e.target.value)}
+                                                placeholder="PENALTY (OPTIONAL)..."
+                                            />
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
-                        )
+
+                            <div className="flex gap-3 pt-4 border-t border-black/10">
+                                <button
+                                    onClick={() => saveDeck(editingDeck)}
+                                    className="flex-1 theme-button py-3 font-bold"
+                                >
+                                    SAVE ARCHIVE
+                                </button>
+                                <button
+                                    onClick={() => setEditingDeck(null)}
+                                    className="flex-1 theme-button theme-button-alt py-3 font-bold opacity-60"
+                                >
+                                    CANCEL
+                                </button>
+                            </div>
+                        </div>
+                    ) : themeDef.DecksScreen ? (
+                        <themeDef.DecksScreen logic={logic} />
+                    ) : (
+                        <>
+                            <div className="flex justify-between items-end mb-6">
+                                <h2 className="theme-text-header text-4xl font-bold italic">DECKS</h2>
+                                <button
+                                    onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })}
+                                    className="theme-button px-4 py-1 text-sm italic"
+                                >
+                                    + NEW
+                                </button>
+                            </div>
+                            <div className="grid grid-cols-1 gap-4">
+                                {customDecks.length === 0 ? (
+                                    <div className="py-20 text-center opacity-20 italic">No custom decks forged yet.</div>
+                                ) : (
+                                    customDecks.map(deck => (
+                                        <div key={deck.id} className="theme-panel p-4 flex justify-between items-center group">
+                                            <div>
+                                                <h3 className="theme-text-header text-xl group-hover:text-[var(--theme-accent)] transition-colors">{deck.name || 'UNTITLED'}</h3>
+                                                <p className="text-[10px] opacity-60 uppercase tracking-widest">{deck.prompts.length} CARDS</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => setEditingDeck(deck)} className="theme-button px-3 py-1 text-[10px]">EDIT</button>
+                                                <button onClick={() => deleteDeck(deck.id)} className="theme-button theme-button-alt px-3 py-1 text-[10px]">DEL</button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </>
                     )}
                 </motion.div>
             )}

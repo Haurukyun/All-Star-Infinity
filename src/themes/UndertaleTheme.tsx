@@ -306,8 +306,12 @@ export const UndertaleThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         [Theme.SANRIO]: 'Sanrio',
         [Theme.CYBERPUNK]: 'Cyberpunk',
         [Theme.UNDERTALE]: 'Undertale',
-            [Theme.FALLOUT]: 'FALLOUT',
-            [Theme.HAZBIN]: 'HAZBIN HOTEL',
+        [Theme.FALLOUT]: 'Fallout',
+        [Theme.HAZBIN]: 'Hazbin Hotel',
+        [Theme.VOCALOID]: 'Vocaloid',
+        [Theme.FNAF]: 'FNAF',
+        [Theme.IRUMA]: 'Iruma-kun',
+        [Theme.ARCANE]: 'Arcane',
     };
     return (
         <div className="space-y-6 h-full flex flex-col">

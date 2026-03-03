@@ -344,6 +344,10 @@ export const HazbinThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         [Theme.UNDERTALE]: 'The Underground',
         [Theme.FALLOUT]: 'The Wasteland',
         [Theme.HAZBIN]: 'Pentagram City',
+        [Theme.VOCALOID]: 'Virtual Singer',
+        [Theme.FNAF]: 'Freddy Fazbear',
+        [Theme.IRUMA]: 'Babyls Academy',
+        [Theme.ARCANE]: 'Piltover & Zaun',
     };
     return (
         <div className="space-y-8 h-full flex flex-col items-center">

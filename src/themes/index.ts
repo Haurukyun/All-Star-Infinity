@@ -13,6 +13,10 @@ import { CyberpunkTheme } from './CyberpunkTheme';
 import { UndertaleTheme } from './UndertaleTheme';
 import { FalloutTheme } from './FalloutTheme';
 import { HazbinTheme } from './HazbinTheme';
+import { VocaloidTheme } from './VocaloidTheme';
+import { FnafTheme } from './FnafTheme';
+import { IrumaTheme } from './IrumaTheme';
+import { ArcaneTheme } from './ArcaneTheme';
 
 export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.SONIC]: SonicTheme,
@@ -29,6 +33,10 @@ export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.UNDERTALE]: UndertaleTheme,
     [Theme.FALLOUT]: FalloutTheme,
     [Theme.HAZBIN]: HazbinTheme,
+    [Theme.VOCALOID]: VocaloidTheme,
+    [Theme.FNAF]: FnafTheme,
+    [Theme.IRUMA]: IrumaTheme,
+    [Theme.ARCANE]: ArcaneTheme,
 };
 
 export const getThemeDefinition = (theme: Theme): ThemeDefinition => {

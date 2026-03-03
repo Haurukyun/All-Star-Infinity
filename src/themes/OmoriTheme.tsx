@@ -288,6 +288,10 @@ export const OmoriThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 <button onClick={() => setTheme(Theme.UNDERTALE)} className="omori-button py-6 text-xl">THE UNDERGROUND</button>
                 <button onClick={() => setTheme(Theme.FALLOUT)} className="omori-button py-6 text-xl">THE WASTELAND</button>
                 <button onClick={() => setTheme(Theme.HAZBIN)} className="omori-button py-6 text-xl">PENTAGRAM CITY</button>
+                <button onClick={() => setTheme(Theme.VOCALOID)} className="omori-button py-6 text-xl">VIRTUAL SINGER</button>
+                <button onClick={() => setTheme(Theme.FNAF)} className="omori-button py-6 text-xl">FREDDY FAZBEAR</button>
+                <button onClick={() => setTheme(Theme.IRUMA)} className="omori-button py-6 text-xl">BABYLS ACADEMY</button>
+                <button onClick={() => setTheme(Theme.ARCANE)} className="omori-button py-6 text-xl">PILTOVER & ZAUN</button>
             </div>
         </motion.div>
     );

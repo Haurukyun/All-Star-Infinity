@@ -436,7 +436,15 @@ export const PersonaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         { id: Theme.ANIMAL_CROSSING, label: 'ANIMAL CROSSING', sub: 'ISLAND PARADISE' },
         { id: Theme.SKYRIM, label: 'SKYRIM', sub: 'THE ELDER SCROLLS' },
         { id: Theme.SONIC, label: 'SONIC', sub: 'MANIA INFINITY' },
-        { id: Theme.SANRIO, label: 'SANRIO', sub: 'SWEET WORLD' }
+        { id: Theme.SANRIO, label: 'SANRIO', sub: 'SWEET WORLD' },
+        { id: Theme.CYBERPUNK, label: 'CYBERPUNK', sub: 'NIGHT CITY' },
+        { id: Theme.UNDERTALE, label: 'UNDERTALE', sub: 'THE UNDERGROUND' },
+        { id: Theme.FALLOUT, label: 'FALLOUT', sub: 'THE WASTELAND' },
+        { id: Theme.HAZBIN, label: 'HAZBIN HOTEL', sub: 'PENTAGRAM CITY' },
+        { id: Theme.VOCALOID, label: 'VOCALOID', sub: 'VIRTUAL SINGER' },
+        { id: Theme.FNAF, label: 'FNAF', sub: 'FREDDY FAZBEAR' },
+        { id: Theme.IRUMA, label: 'IRUMA-KUN', sub: 'BABYLS ACADEMY' },
+        { id: Theme.ARCANE, label: 'ARCANE', sub: 'PILTOVER & ZAUN' }
     ];
 
     return (

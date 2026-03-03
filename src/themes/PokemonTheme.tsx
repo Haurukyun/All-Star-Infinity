@@ -207,6 +207,14 @@ export const PokemonThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
                     { id: Theme.SONIC, label: 'SONIC', color: '#1E90FF' },
                     { id: Theme.SANRIO, label: 'SANRIO', color: '#FF69B4' },
+                    { id: Theme.CYBERPUNK, label: 'NIGHT CITY', color: '#00FFFF' },
+                    { id: Theme.UNDERTALE, label: 'UNDERGROUND', color: '#FFFFFF' },
+                    { id: Theme.FALLOUT, label: 'WASTELAND', color: '#00FF00' },
+                    { id: Theme.HAZBIN, label: 'HELL', color: '#FF0000' },
+                    { id: Theme.VOCALOID, label: 'VOCALOID', color: '#00FFFF' },
+                    { id: Theme.FNAF, label: 'FAZBEAR', color: '#555555' },
+                    { id: Theme.IRUMA, label: 'BABYLS', color: '#800080' },
+                    { id: Theme.ARCANE, label: 'PILTOVER', color: '#000080' },
                 ].map(t => (
                     <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`poke-btn flex flex-col items-center justify-center gap-2 h-24 ${theme === t.id ? 'bg-[#F8D030] active' : ''}`}>
                         <div className="w-8 h-8 rounded-full border-2 border-gray-400" style={{ background: t.color }}></div>

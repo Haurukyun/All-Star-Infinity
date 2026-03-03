@@ -376,6 +376,14 @@ export const MinecraftThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         { id: Theme.SKYRIM, label: 'SKYRIM', icon: '🐉' },
                         { id: Theme.SONIC, label: 'SONIC', icon: '💨' },
                         { id: Theme.SANRIO, label: 'SANRIO', icon: '🎀' },
+                        { id: Theme.CYBERPUNK, label: 'NEON', icon: '🌆' },
+                        { id: Theme.UNDERTALE, label: 'SOUL', icon: '❤️' },
+                        { id: Theme.FALLOUT, label: 'VAULT', icon: '☢️' },
+                        { id: Theme.HAZBIN, label: 'HELL', icon: '😈' },
+                        { id: Theme.VOCALOID, label: 'SINGER', icon: '🎤' },
+                        { id: Theme.FNAF, label: 'BEAR', icon: '🐻' },
+                        { id: Theme.IRUMA, label: 'DEMON', icon: '🦇' },
+                        { id: Theme.ARCANE, label: 'HEX', icon: '⚙️' },
                     ].map(t => (
                         <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`rpg-slot flex-col p-4 gap-2 hover:bg-[#333] ${theme === t.id ? 'active' : ''}`}>
                             <span className="text-3xl">{t.icon}</span>

@@ -48,6 +48,10 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                   case Theme.UNDERTALE: return "'DotGothic16', monospace";
                   case Theme.FALLOUT: return "'Share Tech Mono', monospace";
                   case Theme.HAZBIN: return "'Fascinate Inline', cursive";
+                  case Theme.VOCALOID: return "'Orbitron', sans-serif";
+                  case Theme.FNAF: return "'VT323', monospace";
+                  case Theme.IRUMA: return "'Sniglet', cursive";
+                  case Theme.ARCANE: return "'Cinzel', serif";
                   default: return "'Bangers', cursive";
                 }
               };

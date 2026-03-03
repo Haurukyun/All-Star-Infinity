@@ -321,6 +321,14 @@ export const AnimalCrossingThemesScreen: React.FC<{ logic: any }> = ({ logic }) 
         { id: Theme.SKYRIM, label: 'Skyrim', color: '#B0BEC5' },
         { id: Theme.SONIC, label: 'Sonic', color: '#1E90FF' },
         { id: Theme.SANRIO, label: 'Sanrio', color: '#FF69B4' },
+        { id: Theme.CYBERPUNK, label: 'Night City', color: '#4DD0E1' },
+        { id: Theme.UNDERTALE, label: 'Underground', color: '#9E9E9E' },
+        { id: Theme.FALLOUT, label: 'Wasteland', color: '#81C784' },
+        { id: Theme.HAZBIN, label: 'Pentagram', color: '#E57373' },
+        { id: Theme.VOCALOID, label: 'Stage', color: '#4DD0E1' },
+        { id: Theme.FNAF, label: 'Pizzeria', color: '#795548' },
+        { id: Theme.IRUMA, label: 'Babyls', color: '#BA68C8' },
+        { id: Theme.ARCANE, label: 'Piltover', color: '#7986CB' },
     ];
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">

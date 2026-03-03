@@ -393,6 +393,10 @@ export const SanrioThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         <button onClick={() => setTheme(Theme.UNDERTALE)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F5F5F5] hover:scale-[1.02] transition-all text-center">THE UNDERGROUND</button>
         <button onClick={() => setTheme(Theme.FALLOUT)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E8F5E9] hover:scale-[1.02] transition-all text-center">THE WASTELAND</button>
         <button onClick={() => setTheme(Theme.HAZBIN)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#FFEBEE] hover:scale-[1.02] transition-all text-center">PENTAGRAM CITY</button>
+        <button onClick={() => setTheme(Theme.VOCALOID)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E0F7FA] hover:scale-[1.02] transition-all text-center">VIRTUAL SINGER</button>
+        <button onClick={() => setTheme(Theme.FNAF)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#EFEBE9] hover:scale-[1.02] transition-all text-center">FREDDY FAZBEAR</button>
+        <button onClick={() => setTheme(Theme.IRUMA)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F3E5F5] hover:scale-[1.02] transition-all text-center">BABYLS ACADEMY</button>
+        <button onClick={() => setTheme(Theme.ARCANE)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E8EAF6] hover:scale-[1.02] transition-all text-center">PILTOVER & ZAUN</button>
       </div>
     </div>
   );

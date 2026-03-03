@@ -144,9 +144,7 @@ export const FalloutMenuLayout: React.FC<{ children: React.ReactNode; logic: any
                     background: #051505;
                     position: relative;
                     overflow: hidden;
-                    width: 100%;
-                    max-width: 800px;
-                    min-height: 400px;
+                    height: 100%;
                 }
             `}</style>
 
@@ -379,6 +377,10 @@ export const FalloutThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         [Theme.UNDERTALE]: 'MTT_OS',
         [Theme.FALLOUT]: 'ROBCO_OS',
         [Theme.HAZBIN]: 'HELL_OS',
+        [Theme.VOCALOID]: 'MIKU_OS',
+        [Theme.FNAF]: 'FAZBEAR_OS',
+        [Theme.IRUMA]: 'BABYLS_OS',
+        [Theme.ARCANE]: 'HEX_OS',
     };
     return (
         <div className="space-y-6 h-full flex flex-col">

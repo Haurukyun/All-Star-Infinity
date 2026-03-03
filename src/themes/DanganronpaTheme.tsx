@@ -358,6 +358,14 @@ export const DanganronpaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => 
                     { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
                     { id: Theme.SONIC, label: 'SONIC MANIA', color: '#1E90FF' },
                     { id: Theme.SANRIO, label: 'SWEET WORLD', color: '#FF69B4' },
+                    { id: Theme.CYBERPUNK, label: 'NIGHT CITY', color: '#00FFFF' },
+                    { id: Theme.UNDERTALE, label: 'THE UNDERGROUND', color: '#FFFFFF' },
+                    { id: Theme.FALLOUT, label: 'THE WASTELAND', color: '#00FF00' },
+                    { id: Theme.HAZBIN, label: 'PENTAGRAM CITY', color: '#FF0000' },
+                    { id: Theme.VOCALOID, label: 'VIRTUAL SINGER', color: '#00FFFF' },
+                    { id: Theme.FNAF, label: 'FREDDY FAZBEAR', color: '#555555' },
+                    { id: Theme.IRUMA, label: 'BABYLS ACADEMY', color: '#800080' },
+                    { id: Theme.ARCANE, label: 'PILTOVER & ZAUN', color: '#000080' },
                 ].map(t => (
                     <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`p-4 text-left border border-white/10 hover:border-white transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}>
                         <span className="font-black text-lg" style={{ color: theme === t.id ? '#fff' : t.color }}>{t.label}</span>

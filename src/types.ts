@@ -22,7 +22,11 @@ export enum Theme {
   CYBERPUNK = 'Cyberpunk',
   UNDERTALE = 'Undertale',
   FALLOUT = 'Fallout',
-  HAZBIN = 'Hazbin'
+  HAZBIN = 'Hazbin',
+  VOCALOID = 'Vocaloid',
+  FNAF = 'Fnaf',
+  IRUMA = 'Iruma',
+  ARCANE = 'Arcane'
 }
 
 export enum GameMode {
