@@ -3,312 +3,351 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
 
 const STAGES = [
-  { id: Intensity.SOFT, title: 'HELLO KITTY', desc: 'SWEET GARDEN', color: '#FFB7C5', secondary: '#FF1493', icon: '🎀' },
-  { id: Intensity.HOT, title: 'MY MELODY', desc: 'BERRY FOREST', color: '#FFC0CB', secondary: '#FF69B4', icon: '🍓' },
-  { id: Intensity.VULGAR, title: 'KUROMI', desc: 'GOTHIC PARTY', color: '#E6E6FA', secondary: '#9370DB', icon: '💀' },
+  { id: Intensity.SOFT, title: 'HELLO KITTY', desc: 'SWEET GARDEN', color: '#B3E5FC', secondary: '#29B6F6', icon: '🎀' },
+  { id: Intensity.HOT, title: 'MY MELODY', desc: 'BERRY FOREST', color: '#F8BBD0', secondary: '#EC407A', icon: '🍓' },
+  { id: Intensity.VULGAR, title: 'KUROMI', desc: 'GOTHIC PARTY', color: '#E1BEE7', secondary: '#AB47BC', icon: '💀' },
 ];
 
 export const SanrioLayout: React.FC<{ children: React.ReactNode; activeTab: string; setActiveTab: (tab: string) => void; logic: any }> = ({ children, activeTab, setActiveTab }) => {
-  const [sparkles, setSparkles] = useState<{ id: number, x: number, y: number, size: number }[]>([]);
+  const [sparkles, setSparkles] = useState<{ id: number, x: number, y: number, size: number, delay: number }[]>([]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setSparkles(prev => [
-        ...prev.slice(-15),
-        { id: Date.now(), x: Math.random() * 100, y: Math.random() * 100, size: Math.random() * 15 + 10 }
-      ]);
-    }, 800);
-    return () => clearInterval(interval);
+    // Generate initial static sparkles and clouds for the background
+    const items = [];
+    for (let i = 0; i < 20; i++) {
+      items.push({
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 20 + 10,
+        delay: Math.random() * 2
+      });
+    }
+    setSparkles(items);
   }, []);
 
   const tabs = [
-    { id: 'play', label: 'SWEET' },
-    { id: 'decks', label: 'GIFT' },
+    { id: 'play', label: 'ADVENTURE' },
+    { id: 'decks', label: 'OUTFITS' },
     { id: 'history', label: 'MEMO' },
     { id: 'themes', label: 'WORLD' },
-    { id: 'settings', label: 'LOVE' },
+    { id: 'settings', label: 'PROFILE' },
   ];
 
   return (
-    <div className="sanrio-theme h-[100dvh] w-screen flex flex-col bg-[#FFF0F5] text-[#FF1493] overflow-hidden font-['Cherry_Bomb_One'] relative">
+    <div className="sanrio-theme h-[100dvh] w-screen flex flex-col bg-gradient-to-b from-[#FFB3D9] via-[#E6C3F8] to-[#FFD8B1] text-[#7B4B94] overflow-hidden font-['Nunito'] relative">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap');
         .sanrio-theme {
-          font-family: 'Cherry Bomb One', cursive;
-          background: radial-gradient(#FFB7C5 10%, transparent 11%), radial-gradient(#FFB7C5 10%, transparent 11%), #FFF0F5;
-          background-size: 40px 40px;
-          background-position: 0 0, 20px 20px;
+          font-family: 'Nunito', sans-serif;
           position: relative;
         }
+        
+        /* Fluffy cloud overlay */
+        .sanrio-theme::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 15vh;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,40 C150,120 350,0 500,40 C650,80 850,0 1000,40 C1150,80 1200,60 1200,60 L1200,120 L0,120 Z" fill="%23FFFFFF" opacity="0.4"></path></svg>') no-repeat bottom;
+            background-size: cover;
+            pointer-events: none;
+            z-index: 1;
+        }
+
         .sanrio-panel {
-          background: #FFF;
-          border: 4px solid #FF69B4;
-          border-radius: 30px;
-          box-shadow: 0 8px 0px #FFB7C5;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-radius: 40px;
+          box-shadow: 0 10px 25px rgba(255, 105, 180, 0.15), inset 0 0 0 4px white;
           position: relative;
+          padding: 24px;
         }
-        .sanrio-panel::before {
-          content: "";
-          position: absolute;
-          top: -10px; left: -10px; right: -10px; bottom: -10px;
-          border: 2px dashed #FF69B4;
-          border-radius: 35px;
-          pointer-events: none;
-          opacity: 0.3;
+
+        .sanrio-title {
+            color: white;
+            font-weight: 900;
+            text-transform: uppercase;
+            -webkit-text-stroke: 1.5px #7B4B94;
+            text-shadow: 0 4px 0px #FF94D1, 0 6px 12px rgba(255,105,180,0.5);
+            letter-spacing: 1px;
         }
+
         .sanrio-button {
-          background: #FFF;
-          border: 3px solid #FF69B4;
-          color: #FF69B4;
-          padding: 12px 24px;
-          border-radius: 25px;
+          background: #4DD0E1; /* Cyan Base */
+          color: white;
+          padding: 16px 28px;
+          border-radius: 9999px; /* Pill shape */
           cursor: pointer;
-          transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          font-weight: 800;
-          box-shadow: 0 5px 0px #FFB7C5;
+          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          font-weight: 900;
+          font-size: 1.1rem;
+          border: 4px solid white;
+          box-shadow: 0 6px 0px #00ACC1, 0 10px 15px rgba(0, 172, 193, 0.3);
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 10px;
+          gap: 12px;
+          text-transform: uppercase;
+          text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
         }
+        
+        .sanrio-button.pink {
+            background: #FF69B4;
+            box-shadow: 0 6px 0px #D81B60, 0 10px 15px rgba(216, 27, 96, 0.3);
+        }
+        
+        .sanrio-button.yellow {
+            background: #FFCA28;
+            box-shadow: 0 6px 0px #FF8F00, 0 10px 15px rgba(255, 143, 0, 0.3);
+            color: #7B4B94;
+            text-shadow: none;
+        }
+
         .sanrio-button:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 8px 0px #FFB7C5;
-          background: #FFF0F5;
+          transform: translateY(-4px) scale(1.02);
+          box-shadow: 0 10px 0px #00ACC1, 0 15px 20px rgba(0, 172, 193, 0.4);
         }
+        .sanrio-button.pink:hover { box-shadow: 0 10px 0px #D81B60, 0 15px 20px rgba(216, 27, 96, 0.4); }
+        .sanrio-button.yellow:hover { box-shadow: 0 10px 0px #FF8F00, 0 15px 20px rgba(255, 143, 0, 0.4); }
+
         .sanrio-button:active {
-          transform: translateY(2px);
-          box-shadow: 0 2px 0px #FFB7C5;
+          transform: translateY(4px);
+          box-shadow: 0 2px 0px #00ACC1;
         }
+        .sanrio-button.pink:active { box-shadow: 0 2px 0px #D81B60; }
+        .sanrio-button.yellow:active { box-shadow: 0 2px 0px #FF8F00; }
+
         .sanrio-button.active {
-          background: #FF69B4;
-          color: #FFF;
-          box-shadow: inset 0 5px 0px rgba(0,0,0,0.1);
+          background: #26C6DA;
+          box-shadow: inset 0 4px 8px rgba(0,0,0,0.2);
+          transform: translateY(4px);
         }
-        .sanrio-card {
-          background: #FFF;
-          border: 6px solid #FF69B4;
-          border-radius: 40px;
-          padding: 40px;
-          box-shadow: 0 12px 0px #FFB7C5;
-          position: relative;
-          text-align: center;
-        }
-        .sanrio-header {
-          color: #FF1493;
-          text-shadow: 3px 3px 0px #FFF;
-          letter-spacing: 2px;
-        }
+
         .sanrio-nav-btn {
-          background: transparent;
-          border: none;
-          color: #FF69B4;
-          font-size: 14px;
-          transition: all 0.3s;
+          background: white;
+          border: 3px solid #E1BEE7;
+          border-radius: 24px;
+          color: #AB47BC;
+          font-weight: 800;
+          font-size: 11px;
+          transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
           display: flex;
           flex-direction: column;
           align-items: center;
+          justify-content: center;
           gap: 4px;
+          padding: 8px 0;
+          box-shadow: 0 4px 0px #E1BEE7;
         }
+        
         .sanrio-nav-btn.active {
-          color: #FF1493;
-          transform: scale(1.1);
+          background: #FF69B4;
+          border-color: white;
+          color: white;
+          transform: scale(1.15) translateY(-5px);
+          box-shadow: 0 6px 0px rgba(216,27,96,0.8), 0 10px 15px rgba(255,105,180,0.4);
         }
-        .sparkle {
+
+        .star-sparkle {
           position: absolute;
-          pointer-events: none;
-          z-index: 5;
-          color: #FFD700;
-          text-shadow: 0 0 10px #FFF;
+          z-index: 0;
+          color: white;
+          opacity: 0.6;
+          animation: float 6s ease-in-out infinite alternate;
         }
-        @keyframes sparkle-anim {
-          0% { transform: scale(0) rotate(0deg); opacity: 0; }
-          50% { transform: scale(1) rotate(180deg); opacity: 1; }
-          100% { transform: scale(0) rotate(360deg); opacity: 0; }
+
+        @keyframes float {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+          100% { transform: translateY(-30px) rotate(15deg); opacity: 0.9; }
         }
-        .scalloped-border {
-          background-image: radial-gradient(circle at 10px 0, transparent 10px, #FFF 11px);
-          background-size: 20px 10px;
-          background-repeat: repeat-x;
-          height: 10px;
-          width: 100%;
-          position: absolute;
-          bottom: -10px;
-          left: 0;
-        }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
 
+      {/* Background Decorative Sparkles */}
       {sparkles.map(s => (
-        <div key={s.id} className="sparkle" style={{ left: `${s.x}%`, top: `${s.y}%`, fontSize: `${s.size}px`, animation: 'sparkle-anim 1.5s ease-in-out forwards' }}>✨</div>
+        <div key={s.id} className="star-sparkle font-black text-white drop-shadow-md" style={{ left: `${s.x}%`, top: `${s.y}%`, fontSize: `${s.size}px`, animationDelay: `${s.delay}s` }}>
+          {s.id % 3 === 0 ? '✨' : s.id % 2 === 0 ? '☁️' : '🌸'}
+        </div>
       ))}
 
-      <header className="p-8 flex justify-center items-center shrink-0 relative z-10">
-        <h1 className="text-5xl sanrio-header italic">SWEET ADVENTURE</h1>
+      <header className="pt-10 pb-4 flex justify-center items-center shrink-0 relative z-20">
+        <h1 className="text-4xl sanrio-title tracking-widest text-center px-4 leading-tight">
+          ISLAND<br />ADVENTURE
+        </h1>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-6 pb-24 relative z-10 no-scrollbar">
-        <div className="max-w-md mx-auto h-full pt-4">{children}</div>
+      <main className="flex-1 overflow-y-auto px-6 pb-28 relative z-20 no-scrollbar">
+        {children}
       </main>
 
-      <nav className="fixed bottom-0 left-0 w-full bg-white/95 border-t-4 border-[#FF69B4] h-24 z-50 shadow-[0_-10px_30px_rgba(255,105,180,0.2)]">
-        <div className="flex justify-around items-center h-full px-4 gap-2">
-          {tabs.map((tab) => (
+      {/* Dock Navigation */}
+      <div className="absolute bottom-6 left-6 right-6 z-30">
+        <div className="bg-white/90 backdrop-blur-md rounded-[40px] p-3 shadow-[0_10px_25px_rgba(123,75,148,0.2)] border-4 border-white flex justify-between gap-2">
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`sanrio-nav-btn flex-1 h-full ${activeTab === tab.id ? 'active' : ''}`}
+              className={`sanrio-nav-btn flex-1 ${activeTab === tab.id ? 'active' : ''}`}
             >
-              <span className="text-xl">{tab.id === 'play' ? '🎀' : tab.id === 'decks' ? '🎁' : tab.id === 'history' ? '📝' : tab.id === 'themes' ? '🌍' : '💖'}</span>
-              <span className="text-[10px] font-black tracking-widest uppercase">{tab.label}</span>
+              <div className="text-2xl mb-1 drop-shadow-sm">
+                {tab.id === 'play' ? '🎀' : tab.id === 'decks' ? '👗' : tab.id === 'history' ? '📝' : tab.id === 'themes' ? '✈️' : '💌'}
+              </div>
+              <span className="truncate w-full text-center px-1 tracking-wider">{tab.label}</span>
             </button>
           ))}
         </div>
-      </nav>
+      </div>
     </div>
   );
 };
 
 export const SanrioPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
-  const { intensity, setIntensity, prompt, setPrompt, history, activeDeckId, setActiveDeckId, customDecks, handleDraw } = logic;
-  return (
-    <AnimatePresence mode="wait">
-      {!intensity && !prompt ? (
-        <motion.div key="play" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-10">
-          <div className="sanrio-panel p-8">
-            <h2 className="text-2xl mb-6 text-[#FF69B4] border-b-4 border-dashed border-[#FF69B4]/30 pb-3">SELECT GARDEN</h2>
-            <div className="grid grid-cols-1 gap-4">
-              <button onClick={() => setActiveDeckId('default')} className={`sanrio-button text-xl py-4 ${activeDeckId === 'default' ? 'active' : ''}`}>🎀 HELLO WORLD</button>
-              {customDecks.map((deck: any) => (
-                <button key={deck.id} onClick={() => setActiveDeckId(deck.id)} className={`sanrio-button text-xl py-4 ${activeDeckId === deck.id ? 'active' : ''}`}>🎁 {deck.name.toUpperCase()}</button>
-              ))}
-            </div>
-          </div>
-          <div className="sanrio-panel p-8">
-            <h2 className="text-2xl mb-6 text-[#FF69B4] border-b-4 border-dashed border-[#FF69B4]/30 pb-3">SWEETNESS LEVEL</h2>
-            <div className="grid grid-cols-1 gap-5">
-              {STAGES.map((stage) => (
-                <button key={stage.id} onClick={() => setIntensity(stage.id)} className="sanrio-button flex flex-col items-center py-6" style={{ borderColor: stage.secondary, color: stage.secondary }}>
-                  <span className="text-3xl flex items-center gap-3">{stage.icon} {stage.title} {stage.icon}</span>
-                  <span className="text-xs opacity-60 mt-1 tracking-widest">{stage.desc}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+  const { intensity, setIntensity, prompt, handleDraw } = logic;
+
+  if (prompt) {
+    return (
+      <div className="h-full flex flex-col justify-center space-y-6">
+        <motion.div initial={{ scale: 0.8, y: 50, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="sanrio-panel text-center flex flex-col items-center p-8">
+          <div className="text-5xl mb-4 bg-white w-20 h-20 rounded-full flex items-center justify-center border-4 border-[#FF69B4] shadow-sm">{prompt.type === 'Truth' ? '🌸' : '🔥'}</div>
+          <h2 className="text-3xl font-black text-[#FF69B4] mb-6 uppercase tracking-wider">{prompt.type}</h2>
+          <p className="text-2xl text-[#7B4B94] font-black leading-snug">"{prompt.text}"</p>
         </motion.div>
-      ) : !prompt ? (
-        <div className="flex flex-col items-center gap-12 py-16">
-          <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center relative">
-            <div className="absolute -top-10 -left-10 text-6xl opacity-20">🎀</div>
-            <div className="absolute -bottom-10 -right-10 text-6xl opacity-20">💖</div>
-            <p className="text-[#FF69B4] text-lg mb-2 tracking-widest">CURRENT GARDEN</p>
-            <h2 className="text-6xl sanrio-header italic">{intensity}</h2>
-          </motion.div>
-          <div className="grid grid-cols-1 gap-6 w-full">
-            <button onClick={() => handleDraw('Truth')} className="sanrio-button text-4xl py-10 bg-[#FFF] border-[#FF69B4]">SWEET TRUTH</button>
-            <button onClick={() => handleDraw('Dare')} className="sanrio-button text-4xl py-10 bg-[#FFB7C5] border-[#FF1493] text-[#FFF]">SWEET DARE</button>
-            <button onClick={() => setIntensity(null)} className="text-[#FF69B4] uppercase text-sm tracking-widest mt-6 hover:underline">Go Back</button>
+
+        <div className="flex flex-col gap-4 mt-8">
+          <button onClick={() => setIntensity(null)} className="sanrio-button yellow w-full py-5 text-xl">
+            <span>NEW VISITOR 🎁</span>
+          </button>
+          <div className="flex gap-4">
+            <button className="sanrio-button pink flex-1 py-4 text-xs opacity-50" disabled>MORE INFO</button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col justify-center space-y-6">
+      <h2 className="sanrio-title text-3xl text-center mb-2">FRIENDSHIP LEVEL</h2>
+      {!intensity ? (
+        <div className="space-y-4">
+          {STAGES.map((ObjectDef: any) => {
+            return (
+              <button
+                key={ObjectDef.id}
+                onClick={() => setIntensity(ObjectDef.id as Intensity)}
+                className="w-full relative overflow-hidden sanrio-panel hover:scale-105 transition-transform flex items-center p-4 group border-4 border-white border-l-[#FF69B4] border-l-8"
+                style={{ borderLeftColor: ObjectDef?.secondary || '#FF69B4' }}
+              >
+                <div className="text-5xl mr-5 bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-sm drop-shadow-sm">{ObjectDef?.icon}</div>
+                <div className="text-left flex-1">
+                  <h3 className="text-2xl font-black mb-1 drop-shadow-sm" style={{ color: ObjectDef?.secondary }}>{ObjectDef?.title}</h3>
+                  <p className="text-[#A188A6] font-bold text-sm tracking-widest">{ObjectDef?.desc}</p>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       ) : (
-        <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="sanrio-card space-y-8">
-          <div className="flex justify-between items-center border-b-4 border-dashed border-[#FF69B4]/20 pb-6">
-            <span className="bg-[#FF69B4] text-white px-6 py-2 rounded-full text-xl">🎀 {prompt.type}</span>
-            <span className="text-[#FF69B4] text-sm">MEMO #{history.length}</span>
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-5">
+          <div className="sanrio-panel text-center">
+            <div className="inline-block bg-[#FFB3D9] text-[#D81B60] font-black px-4 py-1 rounded-full text-xs mb-4 tracking-widest uppercase shadow-sm">
+              {STAGES.find(s => s.id === intensity)?.title}
+            </div>
+            <h3 className="text-2xl font-black text-[#7B4B94] mb-8">CHOOSE ACTIVITY</h3>
+            <div className="flex gap-4">
+              <button onClick={() => handleDraw('Truth')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
+                <span className="text-4xl">🌸</span>
+                TRUTH
+              </button>
+              <button onClick={() => handleDraw('Dare')} className="sanrio-button yellow flex-1 h-32 flex-col justify-center text-xl">
+                <span className="text-4xl">🔥</span>
+                DARE
+              </button>
+            </div>
           </div>
-          <p className="text-4xl leading-tight text-[#FF1493] italic">"{prompt.text}"</p>
-          <div className="pt-6 border-t-4 border-[#FF69B4] border-dotted">
-            <p className="text-[#FF69B4] text-xs mb-2 uppercase tracking-widest">Oopsie Penalty!</p>
-            <p className="text-2xl opacity-80 italic">{prompt.penalty}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-6 pt-8">
-            <button onClick={() => setPrompt(null)} className="sanrio-button text-xl">BYE BYE</button>
-            <button onClick={() => handleDraw(prompt.type)} className="sanrio-button active text-xl">AGAIN!</button>
-          </div>
-          <div className="absolute -top-5 -left-5 text-4xl">🍓</div>
-          <div className="absolute -bottom-5 -right-5 text-4xl">🍰</div>
+          <button onClick={() => setIntensity(null)} className="sanrio-button w-full h-16 opacity-70 bg-white text-[#7B4B94] shadow-sm">
+            GO BACK ↩
+          </button>
         </motion.div>
       )}
-    </AnimatePresence>
+    </div>
   );
 };
 
 export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-  const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+  const { customDecks, activeDeckId, setActiveDeckId, editingDeck, setEditingDeck, saveDeck } = logic;
+
   return (
     <AnimatePresence mode="wait">
       {!editingDeck ? (
-        <>
-          <div className="flex justify-between items-end border-b-4 border-[#FF69B4] pb-4">
-            <h2 className="text-4xl sanrio-header italic">GIFT SHOP</h2>
-            <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="sanrio-button text-xs">+ NEW GIFT</button>
-          </div>
-          <div className="space-y-5 mt-6">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+          <h2 className="sanrio-title text-3xl text-center mb-6">WARDROBE</h2>
+          <div className="space-y-4">
             {customDecks.map((deck: any) => (
-              <div key={deck.id} className="sanrio-panel p-6 flex justify-between items-center hover:scale-[1.02] transition-transform">
-                <div>
-                  <h3 className="text-2xl text-[#FF1493]">{deck.name || 'Untitled'}</h3>
-                  <p className="text-xs opacity-60 mt-1 tracking-widest">{deck.prompts.length} SURPRISES INSIDE</p>
+              <div key={deck.id} className="sanrio-panel flex items-center p-5">
+                <div className="flex-1 text-left">
+                  <h3 className="text-xl font-black text-[#7B4B94] mb-1">{deck.name}</h3>
+                  <div className="text-xs text-[#A188A6] font-bold tracking-widest border border-[#E1BEE7] bg-[#FFF0F5] inline-block px-2 py-1 rounded-full">
+                    {deck.prompts.length} ITEMS
+                  </div>
                 </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setEditingDeck(deck)} className="sanrio-button text-xs">OPEN</button>
-                  <button onClick={() => deleteDeck(deck.id)} className="sanrio-button text-xs border-red-300 text-red-300">TOSS</button>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setActiveDeckId(deck.id)} className={`w-14 h-8 rounded-full flex items-center p-1 transition-colors ${activeDeckId === deck.id ? 'bg-[#4DD0E1]' : 'bg-[#E0E0E0]'}`}>
+                    <div className={`w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${activeDeckId === deck.id ? 'translate-x-6' : 'translate-x-0'}`} />
+                  </button>
+                  <button onClick={() => setEditingDeck(deck)} className="sanrio-button px-4 py-2 text-sm bg-white text-[#7B4B94] shadow-sm hover:scale-105 active:translate-y-1">EDIT</button>
                 </div>
               </div>
             ))}
+            <button onClick={() => setEditingDeck({ id: 'new', name: 'New Preset', prompts: [] })} className="sanrio-button pink w-full h-16 text-lg mt-4">
+              + NEW OUTFIT
+            </button>
           </div>
-        </>
+        </motion.div>
       ) : (
-        <div className="sanrio-panel p-8 space-y-8">
-          <div className="space-y-6">
-            <input className="w-full bg-[#FFF0F5] border-2 border-[#FF69B4] rounded-2xl p-4 text-2xl focus:outline-none text-[#FF1493] font-['Cherry_Bomb_One']" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="GIFT NAME" />
-            <textarea className="w-full bg-[#FFF0F5] border-2 border-[#FF69B4] rounded-2xl p-4 text-lg h-32 focus:outline-none text-[#FF1493] font-['Cherry_Bomb_One']" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="GIFT DESCRIPTION" />
-          </div>
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h3 className="text-2xl text-[#FF69B4]">CARDS ({editingDeck.prompts.length})</h3>
-              <button onClick={addNewPromptToEditingDeck} className="sanrio-button text-xs">+ ADD</button>
-            </div>
-            <div className="space-y-5 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
-              {editingDeck.prompts.map((p: any) => (
-                <div key={p.id} className="sanrio-panel p-5 space-y-4">
-                  <div className="flex gap-3">
-                    <select className="bg-white border-2 border-[#FF69B4] rounded-xl text-xs p-2 font-['Cherry_Bomb_One']" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                      <option>Truth</option><option>Dare</option>
-                    </select>
-                    <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-400 ml-auto text-xl">×</button>
-                  </div>
-                  <input className="w-full bg-transparent border-b-2 border-[#FF69B4] text-lg p-2 focus:outline-none" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="PROMPT TEXT" />
-                </div>
-              ))}
-            </div>
+        <div className="space-y-4">
+          <input
+            type="text"
+            value={editingDeck.name}
+            onChange={(e) => setEditingDeck({ ...editingDeck, name: e.target.value })}
+            className="w-full text-2xl font-black text-[#7B4B94] bg-white border-4 border-white shadow-[0_4px_0_#FFB3D9] rounded-[40px] p-4 text-center focus:outline-none"
+          />
+          <div className="sanrio-panel p-4 shadow-inner bg-[#F8F9FA] min-h-[40vh] border-none shadow-[inset_0_4px_10px_rgba(0,0,0,0.1)]">
+            <div className="text-center text-[#A188A6] font-bold py-10">OUTFIT CONTENTS HERE</div>
           </div>
           <div className="flex gap-4">
-            <button onClick={() => setEditingDeck(null)} className="sanrio-button flex-1 text-xl">CANCEL</button>
-            <button onClick={() => saveDeck(editingDeck)} className="sanrio-button flex-1 active text-xl">SAVE</button>
+            <button onClick={() => setEditingDeck(null)} className="sanrio-button flex-1 bg-white text-[#7B4B94] shadow-sm">CANCEL</button>
+            <button onClick={() => saveDeck(editingDeck)} className="sanrio-button yellow flex-1 text-lg">SAVE IT</button>
           </div>
         </div>
-      )}
-    </AnimatePresence>
+      )
+      }
+    </AnimatePresence >
   );
 };
 
 export const SanrioHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
   const { history } = logic;
   return (
-    <div className="space-y-8">
-      <h2 className="text-4xl sanrio-header italic border-b-4 border-[#FF69B4] pb-4">SWEET MEMORIES</h2>
-      <div className="space-y-5">
+    <div className="space-y-6">
+      <h2 className="sanrio-title text-3xl text-center mb-6">MEMORIES</h2>
+      <div className="space-y-4">
         {history.length === 0 ? (
-          <div className="py-20 text-center text-[#FF69B4] italic text-2xl opacity-40">NO MEMORIES YET...</div>
+          <div className="py-20 text-center text-[#A188A6] font-bold text-xl drop-shadow-sm">NO MEMORIES YET...</div>
         ) : (
           history.map((item: any, i: number) => (
-            <div key={i} className="sanrio-panel p-6 border-l-8 border-[#FF69B4]">
-              <div className="flex justify-between text-[#FF69B4] text-xs mb-3 tracking-widest uppercase">
-                <span>🎀 {item.type}</span>
-                <span>MEMO {history.length - i}</span>
+            <div key={i} className="sanrio-panel p-5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-[#F8BBD0] rounded-bl-full opacity-20 group-hover:opacity-40 transition-opacity"></div>
+              <div className="flex justify-between w-full mb-3">
+                <span className="bg-[#FFF0F5] px-3 py-1 rounded-full text-[#AB47BC] text-[10px] font-black tracking-widest w-max shadow-sm">
+                  🎀 {item.type}
+                </span>
+                <span className="text-[#A188A6] text-[10px] font-black tracking-widest">
+                  MEMO {history.length - i}
+                </span>
               </div>
-              <p className="text-2xl italic text-[#FF1493]">"{item.text}"</p>
+              <p className="text-lg font-bold text-[#7B4B94] leading-relaxed">"{item.text}"</p>
             </div>
           ))
         )}
@@ -320,16 +359,18 @@ export const SanrioHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 export const SanrioThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
   const { setTheme } = logic;
   return (
-    <div className="space-y-8">
-      <h2 className="text-4xl sanrio-header italic border-b-4 border-[#FF69B4] pb-4">WORLD SHIFT</h2>
-      <div className="grid grid-cols-1 gap-5 pb-12">
-        <button onClick={() => setTheme(Theme.PERSONA)} className="sanrio-button py-8 text-2xl">PHANTOM THIEF</button>
-        <button onClick={() => setTheme(Theme.MINECRAFT)} className="sanrio-button py-8 text-2xl">BLOCKY WORLD</button>
-        <button onClick={() => setTheme(Theme.DANGANRONPA)} className="sanrio-button py-8 text-2xl">KILLING HARMONY</button>
-        <button onClick={() => setTheme(Theme.OMORI)} className="sanrio-button py-8 text-2xl">DREAM WORLD</button>
-        <button onClick={() => setTheme(Theme.KIRBY)} className="sanrio-button py-8 text-2xl">KIRBY'S DREAM</button>
-        <button onClick={() => setTheme(Theme.SANRIO)} className="sanrio-button py-8 text-2xl active">SWEET WORLD</button>
-        <button onClick={() => setTheme(Theme.POKEMON)} className="sanrio-button py-8 text-2xl">POKéMON WORLD</button>
+    <div className="space-y-6">
+      <h2 className="sanrio-title text-3xl text-center mb-6">TRAVEL MAP</h2>
+      <div className="grid grid-cols-1 gap-4 pb-4">
+        <button onClick={() => setTheme(Theme.PERSONA)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#FCE4EC] hover:scale-[1.02] transition-all text-center">PHANTOM THIEF</button>
+        <button onClick={() => setTheme(Theme.MINECRAFT)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F1F8E9] hover:scale-[1.02] transition-all text-center">BLOCKY WORLD</button>
+        <button onClick={() => setTheme(Theme.DANGANRONPA)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F3E5F5] hover:scale-[1.02] transition-all text-center">KILLING HARMONY</button>
+        <button onClick={() => setTheme(Theme.OMORI)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E8EAF6] hover:scale-[1.02] transition-all text-center">DREAM WORLD</button>
+        <button onClick={() => setTheme(Theme.KIRBY)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#FCE4EC] hover:scale-[1.02] transition-all text-center">KIRBY'S DREAM</button>
+        <button onClick={() => setTheme(Theme.SANRIO)} className="sanrio-button pink w-full py-5 text-xl tracking-wider">SWEET WORLD</button>
+        <button onClick={() => setTheme(Theme.POKEMON)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E3F2FD] hover:scale-[1.02] transition-all text-center">POKéMON WORLD</button>
+        <button onClick={() => setTheme(Theme.SKYRIM)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#ECEFF1] hover:scale-[1.02] transition-all text-center">SKYRIM</button>
+        <button onClick={() => setTheme(Theme.SONIC)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E1F5FE] hover:scale-[1.02] transition-all text-center">SONIC MANIA</button>
       </div>
     </div>
   );
@@ -337,69 +378,61 @@ export const SanrioThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const SanrioSettingsScreen: React.FC<{ logic: any }> = ({ logic }) => {
   return (
-    <div className="space-y-8">
-      <h2 className="text-4xl sanrio-header italic border-b-4 border-[#FF69B4] pb-4">LOVE SYSTEM</h2>
-      <div className="sanrio-panel p-10 space-y-8 text-center">
-        <div className="flex justify-between items-center text-xl"><span className="opacity-60">FRIENDSHIP</span><span className="text-[#FF1493] font-black">MAX! 💖</span></div>
-        <div className="flex justify-between items-center text-xl"><span className="opacity-60">SWEETNESS</span><span className="text-[#FF1493] font-black">OVERFLOW! 🍬</span></div>
-        <div className="flex justify-between items-center text-xl"><span className="opacity-60">HAPPINESS</span><span className="text-[#FF1493] font-black animate-bounce">100% ✨</span></div>
-        <div className="pt-8 border-t-4 border-dashed border-[#FF69B4]/20">
-          <p className="text-sm opacity-60 italic">"You can never have too many friends!"</p>
+    <div className="space-y-6">
+      <h2 className="sanrio-title text-3xl text-center mb-6">COMPANION</h2>
+      <div className="sanrio-panel p-8 flex flex-col items-center text-center">
+        <div className="w-24 h-24 bg-white rounded-full border-4 border-[#4DD0E1] shadow-md flex items-center justify-center text-5xl mb-4 relative drop-shadow-md">
+          🎀
+          <div className="absolute -bottom-2 -right-2 bg-[#FFCA28] text-white text-xs font-black w-8 h-8 rounded-full border-2 border-white flex items-center justify-center shadow-sm">Lvl</div>
         </div>
+        <h3 className="text-2xl font-black text-[#7B4B94] mb-2">Hello Kitty</h3>
+        <p className="bg-[#E1F5FE] text-[#0288D1] px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-8 shadow-sm">Good Friend</p>
+
+        <button className="sanrio-button w-full mb-4">MORE INFO 🔄</button>
+        <button className="sanrio-button pink w-full" onClick={() => window.location.reload()}>END SESSION</button>
       </div>
     </div>
   );
 };
 
 export const SanrioMenu: React.FC<{ logic: any }> = ({ logic }) => {
-  const { setView, setTheme } = logic;
-  const [activeSection, setActiveSection] = useState<'themes' | null>(null);
-  const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
-  const [sparkles, setSparkles] = useState<{ id: number, x: number, y: number, size: number }[]>([]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSparkles(prev => [...prev.slice(-10), { id: Date.now(), x: Math.random() * 100, y: Math.random() * 100, size: Math.random() * 15 + 10 }]);
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
+  const { setView } = logic;
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#FFF0F5] text-[#FF1493] relative overflow-hidden font-['Cherry_Bomb_One'] select-none">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cherry+Bomb+One&display=swap');
-        .sanrio-theme { font-family: 'Cherry Bomb One', cursive; background: radial-gradient(#FFB7C5 10%, transparent 11%), radial-gradient(#FFB7C5 10%, transparent 11%), #FFF0F5; background-size: 40px 40px; background-position: 0 0, 20px 20px; }
-        @keyframes sparkle-anim { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 50% { transform: scale(1) rotate(180deg); opacity: 1; } 100% { transform: scale(0) rotate(360deg); opacity: 0; } }
-      `}</style>
-      <div className="absolute inset-0 sanrio-theme opacity-50"></div>
-      {sparkles.map(s => (
-        <div key={s.id} className="absolute pointer-events-none text-[#FFD700]" style={{ left: `${s.x}%`, top: `${s.y}%`, fontSize: `${s.size}px`, animation: 'sparkle-anim 1.5s ease-in-out forwards', zIndex: 5 }}>✨</div>
-      ))}
-      <div className="z-10 flex flex-col items-center gap-12">
-        <motion.h1 className="text-6xl sm:text-7xl italic text-center drop-shadow-[5px_5px_0_white]" animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 3, repeat: Infinity }}>SWEET <br /> ADVENTURE</motion.h1>
-        <div className="flex flex-col gap-6 w-72">
-          <button onClick={() => setView('game')} className="bg-white text-[#FF69B4] border-4 border-[#FF69B4] rounded-[30px] px-8 py-4 text-3xl font-bold shadow-[0_8px_0_#FFB7C5] hover:translate-y-[-4px] hover:shadow-[0_12px_0_#FFB7C5] transition-all">START!</button>
-          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-[#FFB7C5] text-white border-4 border-white rounded-[25px] px-6 py-2 text-xl font-bold shadow-[0_5px_0_#FF69B4] hover:translate-y-[-2px] hover:shadow-[0_8px_0_#FF69B4] transition-all uppercase">WORLD</button>
-          <AnimatePresence>
-            {activeSection === 'themes' && (
-              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="grid grid-cols-2 gap-2 bg-white/90 p-4 rounded-3xl border-4 border-[#FF69B4] max-h-48 overflow-y-auto no-scrollbar">
-                {themes.map(t => <button key={t} onClick={() => setTheme(t)} className="text-[10px] text-left hover:text-[#FF1493] font-bold uppercase">{t}</button>)}
-              </motion.div>
-            )}
-          </AnimatePresence>
+    <div className="sanrio-theme h-full w-full flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#FFB3D9] via-[#E6C3F8] to-[#FFD8B1] font-['Nunito'] text-[#7B4B94] relative overflow-hidden select-none">
+
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-10 left-10 text-6xl opacity-40 animate-pulse">☁️</div>
+        <div className="absolute top-20 right-10 text-5xl opacity-30">☁️</div>
+        <div className="absolute bottom-20 left-20 text-7xl opacity-50">☁️</div>
+        <div className="absolute top-1/2 left-1/4 text-4xl opacity-40">✨</div>
+        <div className="absolute top-1/3 right-1/4 text-5xl opacity-40">✨</div>
+      </div>
+
+      <div className="z-10 flex flex-col items-center gap-10 w-full max-w-sm">
+        <motion.div animate={{ y: [-10, 10, -10] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} className="w-full relative">
+          <h1 className="text-6xl sanrio-title text-center leading-tight mb-2">HELLO KITTY</h1>
+          <div className="bg-white px-6 py-2 rounded-full border-4 border-[#4DD0E1] shadow-lg transform -rotate-3 w-max mx-auto">
+            <span className="font-black text-xl text-[#FF69B4] tracking-widest">ISLAND ADVENTURE</span>
+          </div>
+        </motion.div>
+
+        <div className="space-y-4 w-full px-4 mt-8">
+          <button onClick={() => setView('game')} className="sanrio-button w-full py-5 text-xl">
+            START ADVENTURE
+          </button>
+          <button className="sanrio-button pink w-full py-5 text-xl">
+            TUTORIAL
+          </button>
         </div>
       </div>
-      <div className="absolute bottom-10 text-4xl animate-bounce">🎀</div>
     </div>
   );
 };
 
 export const SanrioTheme: ThemeDefinition = {
   id: Theme.SANRIO,
-  name: 'Sanrio',
-  cssVars: {
-    '--theme-accent': '#FF1493',
-  },
+  name: 'Sweet Garden',
+  cssVars: { '--theme-accent': '#FF69B4' },
   MenuComponent: SanrioMenu,
   LayoutComponent: SanrioLayout,
   PlayScreen: SanrioPlayScreen,
@@ -408,10 +441,10 @@ export const SanrioTheme: ThemeDefinition = {
   SettingsScreen: SanrioSettingsScreen,
   ThemesScreen: SanrioThemesScreen,
   tabLabels: {
-    play: 'SWEET',
-    decks: 'GIFT',
-    history: 'MEMO',
-    themes: 'WORLD',
-    settings: 'LOVE'
+    play: 'ADVENTURE',
+    decks: 'OUTFITS',
+    history: 'MEMORIES',
+    themes: 'TRAVEL',
+    settings: 'PROFILE'
   }
 };

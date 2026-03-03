@@ -1,0 +1,119 @@
+﻿
+> phantom:-obsidian@0.0.0 build
+> vite build
+
+[36mvite v6.4.1 [32mbuilding for production...[36m[39m
+node.exe : 
+At C:\Program Files\nod
+ejs\npm.ps1:29 char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (:String) [],    
+ RemoteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+/index.css doesn't 
+exist at build time, 
+it will remain 
+unchanged to be 
+resolved at runtime
+transforming...
+[32mÔ£ô[39m 93 modules transformed.
+[31mÔ£ù[39m Build 
+failed in 296ms
+[31merror during 
+build:
+[31m[vite:esbuild] 
+Transform failed with 
+1 error:
+F:/App Making/- Lab -/A
+ll-Star-Infinity/src/th
+emes/SanrioTheme.tsx:16
+9:102: ERROR: Syntax 
+error "`"[31m
+file: [36mF:/App 
+Making/- Lab -/All-Star
+-Infinity/src/themes/Sa
+nrioTheme.tsx:169:102[
+31m
+[33m
+[33mSyntax error 
+"`"[33m
+167|        {/* 
+Background Decorative 
+Sparkles */}
+168|        
+{sparkles.map(s => (
+169|          <div 
+key={s.id} className="s
+tar-sparkle font-black 
+text-white 
+drop-shadow-md" 
+style={{ left: 
+\`\${s.x}%\`, top: 
+\`\${s.y}%\`, 
+fontSize: 
+\`\${s.size}px\`, 
+animationDelay: 
+\`\${s.delay}s\` }}>
+   |                   
+                       
+                       
+                       
+                ^
+170|        {s.id % 3 
+=== 0 ? 'Ô£¿' : s.id % 
+2 === 0 ? 'Ôÿü´©Å' : '-
+ƒî©'}
+171|      </div>
+[31m
+    at 
+failureErrorWithLog 
+(F:\App Making\- Lab -\
+All-Star-Infinity\node_
+modules\esbuild\lib\mai
+n.js:1467:15)
+    at F:\App Making\- 
+Lab -\All-Star-Infinity
+\node_modules\esbuild\l
+ib\main.js:736:50
+    at responseCallback
+s.<computed> (F:\App 
+Making\- Lab -\All-Star
+-Infinity\node_modules\
+esbuild\lib\main.js:603
+:9)
+    at 
+handleIncomingPacket 
+(F:\App Making\- Lab -\
+All-Star-Infinity\node_
+modules\esbuild\lib\mai
+n.js:658:12)
+    at 
+Socket.readFromStdout 
+(F:\App Making\- Lab -\
+All-Star-Infinity\node_
+modules\esbuild\lib\mai
+n.js:581:7)
+    at Socket.emit 
+(node:events:518:28)
+    at addChunk (node:i
+nternal/streams/readabl
+e:561:12)
+    at readableAddChunk
+PushByteMode (node:inte
+rnal/streams/readable:5
+12:3)
+    at Readable.push (n
+ode:internal/streams/re
+adable:392:5)
+    at 
+Pipe.onStreamRead (node
+:internal/stream_base_c
+ommons:189:23)[39m
