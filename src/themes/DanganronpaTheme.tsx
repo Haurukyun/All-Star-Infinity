@@ -356,6 +356,8 @@ export const DanganronpaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => 
                     { id: Theme.POKEMON, label: 'KANTO REGION', color: '#6890F0' },
                     { id: Theme.ANIMAL_CROSSING, label: 'ISLAND PARADISE', color: '#9CCC65' },
                     { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
+                    { id: Theme.SONIC, label: 'SONIC MANIA', color: '#1E90FF' },
+                    { id: Theme.SANRIO, label: 'SWEET WORLD', color: '#FF69B4' },
                 ].map(t => (
                     <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`p-4 text-left border border-white/10 hover:border-white transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}>
                         <span className="font-black text-lg" style={{ color: theme === t.id ? '#fff' : t.color }}>{t.label}</span>

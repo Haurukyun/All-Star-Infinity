@@ -194,12 +194,24 @@ export const SonicHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const SonicThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
+    const themeLabels: Record<string, string> = {
+        [Theme.PERSONA]: 'PERSONA 5',
+        [Theme.MINECRAFT]: 'MINECRAFT',
+        [Theme.DANGANRONPA]: 'DANGANRONPA',
+        [Theme.OMORI]: 'OMORI',
+        [Theme.KIRBY]: 'KIRBY',
+        [Theme.POKEMON]: 'POKÉMON',
+        [Theme.ANIMAL_CROSSING]: 'ANIMAL CROSSING',
+        [Theme.SKYRIM]: 'SKYRIM',
+        [Theme.SONIC]: 'SONIC MANIA',
+        [Theme.SANRIO]: 'SANRIO',
+    };
     return (
         <div className="space-y-6">
             <h2 className="text-4xl italic font-black border-b-8 border-black pb-2 drop-shadow-[3px_3px_0_black]">STAGE SELECT</h2>
             <div className="grid grid-cols-1 gap-4 pb-20">
                 {[Theme.PERSONA, Theme.MINECRAFT, Theme.DANGANRONPA, Theme.OMORI, Theme.KIRBY, Theme.POKEMON, Theme.ANIMAL_CROSSING, Theme.SKYRIM, Theme.SONIC, Theme.SANRIO].map(t => (
-                    <button key={t} onClick={() => setTheme(t)} className={`sonic-button py-6 text-2xl font-black italic ${theme === t ? 'active !bg-yellow-400 !text-black border-white' : ''}`}>{t.toUpperCase()}</button>
+                    <button key={t} onClick={() => setTheme(t)} className={`sonic-button py-6 text-2xl font-black italic ${theme === t ? 'active !bg-yellow-400 !text-black border-white' : ''}`}>{themeLabels[t] || t.toUpperCase()}</button>
                 ))}
             </div>
         </div>

@@ -205,6 +205,8 @@ export const PokemonThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     { id: Theme.POKEMON, label: 'KANTO', color: '#6890F0' },
                     { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', color: '#9CCC65' },
                     { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
+                    { id: Theme.SONIC, label: 'SONIC', color: '#1E90FF' },
+                    { id: Theme.SANRIO, label: 'SANRIO', color: '#FF69B4' },
                 ].map(t => (
                     <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`poke-btn flex flex-col items-center justify-center gap-2 h-24 ${theme === t.id ? 'bg-[#F8D030] active' : ''}`}>
                         <div className="w-8 h-8 rounded-full border-2 border-gray-400" style={{ background: t.color }}></div>

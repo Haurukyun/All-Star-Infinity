@@ -374,6 +374,8 @@ export const MinecraftThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         { id: Theme.POKEMON, label: 'KANTO', icon: '🔴' },
                         { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', icon: '🏝️' },
                         { id: Theme.SKYRIM, label: 'SKYRIM', icon: '🐉' },
+                        { id: Theme.SONIC, label: 'SONIC', icon: '💨' },
+                        { id: Theme.SANRIO, label: 'SANRIO', icon: '🎀' },
                     ].map(t => (
                         <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`rpg-slot flex-col p-4 gap-2 hover:bg-[#333] ${theme === t.id ? 'active' : ''}`}>
                             <span className="text-3xl">{t.icon}</span>

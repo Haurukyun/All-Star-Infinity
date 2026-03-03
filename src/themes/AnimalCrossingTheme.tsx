@@ -319,6 +319,8 @@ export const AnimalCrossingThemesScreen: React.FC<{ logic: any }> = ({ logic }) 
         { id: Theme.POKEMON, label: 'Kanto', color: '#42A5F5' },
         { id: Theme.ANIMAL_CROSSING, label: 'Island', color: '#9CCC65' },
         { id: Theme.SKYRIM, label: 'Skyrim', color: '#B0BEC5' },
+        { id: Theme.SONIC, label: 'Sonic', color: '#1E90FF' },
+        { id: Theme.SANRIO, label: 'Sanrio', color: '#FF69B4' },
     ];
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">

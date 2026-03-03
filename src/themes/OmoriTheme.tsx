@@ -281,6 +281,8 @@ export const OmoriThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 <button onClick={() => setTheme(Theme.POKEMON)} className="omori-button py-6 text-xl">KANTO REGION</button>
                 <button onClick={() => setTheme(Theme.ANIMAL_CROSSING)} className="omori-button py-6 text-xl">ISLAND PARADISE</button>
                 <button onClick={() => setTheme(Theme.SKYRIM)} className="omori-button py-6 text-xl">SKYRIM</button>
+                <button onClick={() => setTheme(Theme.SONIC)} className="omori-button py-6 text-xl">SONIC MANIA</button>
+                <button onClick={() => setTheme(Theme.SANRIO)} className="omori-button py-6 text-xl">SWEET WORLD</button>
             </div>
         </motion.div>
     );

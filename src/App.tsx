@@ -5,14 +5,15 @@ import { useGameLogic } from './hooks/useGameLogic';
 import Layout from './components/Layout';
 import { getThemeDefinition } from './themes';
 
+
 const App: React.FC = () => {
   const logic = useGameLogic();
-  const themeDef = getThemeDefinition(logic.theme);
 
   if (logic.view === 'menu') {
-    return <themeDef.MenuComponent logic={logic} />;
+    return <MainMenu logic={logic} />;
   }
 
+  const themeDef = getThemeDefinition(logic.theme);
   const LayoutComponent = themeDef.LayoutComponent || Layout;
 
   return (

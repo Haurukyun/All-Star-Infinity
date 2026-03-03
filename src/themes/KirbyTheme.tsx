@@ -440,6 +440,8 @@ export const KirbyThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     { id: Theme.POKEMON, label: 'KANTO', color: 'from-blue-400 to-blue-600' },
                     { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', color: 'from-green-400 to-green-600' },
                     { id: Theme.SKYRIM, label: 'SKYRIM', color: 'from-gray-600 to-gray-800' },
+                    { id: Theme.SONIC, label: 'SONIC', color: 'from-blue-400 to-blue-600' },
+                    { id: Theme.SANRIO, label: 'SANRIO', color: 'from-pink-300 to-pink-500' },
                 ].map(t => (
                     <button
                         key={t.id}

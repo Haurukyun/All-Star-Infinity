@@ -40,10 +40,16 @@ export const PersonaLayout: React.FC<{ children: React.ReactNode; activeTab: str
         { id: 'settings', label: 'META' },
     ];
 
+    const { useEasyFont } = logic;
+
     return (
-        <div className="h-[100dvh] w-screen bg-black text-white overflow-hidden font-sans flex flex-col relative persona-theme-root">
+        <div className={`h-[100dvh] w-screen bg-black text-white overflow-hidden font-sans flex flex-col relative persona-theme-root ${useEasyFont ? 'p5-easy-font' : ''}`}>
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap');
+        
+        .p5-easy-font .font-p5-display { font-family: 'Nunito', sans-serif; font-weight: 900; letter-spacing: 0.02em; }
+        .p5-easy-font p, .p5-easy-font span, .p5-easy-font div { font-family: 'Nunito', sans-serif; }
+        .p5-easy-font h1, .p5-easy-font h2, .p5-easy-font h3 { font-family: 'Nunito', sans-serif; font-weight: 900; }
         
         .font-p5-display {
           font-family: 'Bangers', cursive;
@@ -389,7 +395,7 @@ export const PersonaHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const PersonaSettingsScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { setView } = logic;
+    const { setView, useEasyFont, setUseEasyFont } = logic;
     return (
         <motion.div variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="pt-2 space-y-4 sm:space-y-6">
             <h2 className="font-p5-display text-4xl sm:text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000] vibrate-hover cursor-default">SYSTEM</h2>
@@ -400,6 +406,15 @@ export const PersonaSettingsScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <span className="font-black text-[8px] sm:text-[9px] text-[#D80000] transform skew-x-[-12deg]">{s.val}</span>
                     </div>
                 ))}
+                <button
+                    onClick={() => setUseEasyFont(!useEasyFont)}
+                    className="w-full flex justify-between items-center p-3 sm:p-3.5 bg-black border-2 border-white/20 transform skew-x-12 hover:border-white/60 transition-colors"
+                >
+                    <span className="font-p5-display text-base sm:text-lg text-white transform skew-x-[-12deg]">EASY FONT MODE</span>
+                    <span className={`font-black text-[9px] sm:text-[10px] transform skew-x-[-12deg] ${useEasyFont ? 'text-[#D80000]' : 'text-white/40'}`}>
+                        {useEasyFont ? 'ON' : 'OFF'}
+                    </span>
+                </button>
                 <button onClick={() => setView('menu')} className="w-full flex justify-between items-center p-3 sm:p-3.5 bg-white text-black border-[2px] sm:border-[3px] border-black transform -skew-x-12 shadow-[4px_4px_0_black] hover:bg-[#D80000] hover:text-white transition-colors active:translate-x-1 active:translate-y-1 active:shadow-none">
                     <span className="font-p5-display text-base sm:text-lg transform skew-x-[12deg]">RETURN TO TITLE</span>
                     <span className="font-black text-[8px] sm:text-[9px] transform skew-x-[12deg]">EXEC</span>
@@ -419,7 +434,9 @@ export const PersonaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         { id: Theme.KIRBY, label: 'KIRBY', sub: 'DREAM LAND' },
         { id: Theme.POKEMON, label: 'POKEMON', sub: 'KANTO REGION' },
         { id: Theme.ANIMAL_CROSSING, label: 'ANIMAL CROSSING', sub: 'ISLAND PARADISE' },
-        { id: Theme.SKYRIM, label: 'SKYRIM', sub: 'THE ELDER SCROLLS' }
+        { id: Theme.SKYRIM, label: 'SKYRIM', sub: 'THE ELDER SCROLLS' },
+        { id: Theme.SONIC, label: 'SONIC', sub: 'MANIA INFINITY' },
+        { id: Theme.SANRIO, label: 'SANRIO', sub: 'SWEET WORLD' }
     ];
 
     return (

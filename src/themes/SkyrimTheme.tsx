@@ -210,6 +210,8 @@ export const SkyrimThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     { id: Theme.POKEMON, label: 'KANTO' },
                     { id: Theme.ANIMAL_CROSSING, label: 'PARADISE' },
                     { id: Theme.SKYRIM, label: 'SKYRIM' },
+                    { id: Theme.SONIC, label: 'SONIC' },
+                    { id: Theme.SANRIO, label: 'SANRIO' },
                 ].map(t => (
                     <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`group relative p-6 border border-white/10 hover:border-white/50 transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}>
                         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black px-2"><div className="w-2 h-2 bg-white rotate-45 group-hover:bg-yellow-100 transition-colors"></div></div>
