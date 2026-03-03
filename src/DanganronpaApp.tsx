@@ -35,7 +35,7 @@ const SpiralBackground = () => (
 );
 
 const RevolverUI = ({ onShoot }: { onShoot: () => void }) => (
-  <button 
+  <button
     onClick={onShoot}
     className="relative w-32 h-32 group transition-transform active:scale-95"
   >
@@ -188,17 +188,17 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
             <div className="w-2/3 h-full bg-gradient-to-r from-[#00FFFF] to-[#FF00FF]"></div>
           </div>
         </div>
-        
+
         {/* Influence Gauge */}
         <div className="flex flex-col items-end">
-           <div className="flex -space-x-1">
-             {[1,2,3,4,5].map(i => (
-               <div key={i} className="w-6 h-6 transform rotate-45 border-2 border-[#FF00FF] bg-black flex items-center justify-center shadow-[0_0_5px_#FF00FF]">
-                 <div className="w-3 h-3 bg-[#FF00FF]"></div>
-               </div>
-             ))}
-           </div>
-           <span className="text-[10px] italic font-black text-[#FF00FF] mt-1 pr-2">INFLUENCE</span>
+          <div className="flex -space-x-1">
+            {[1, 2, 3, 4, 5].map(i => (
+              <div key={i} className="w-6 h-6 transform rotate-45 border-2 border-[#FF00FF] bg-black flex items-center justify-center shadow-[0_0_5px_#FF00FF]">
+                <div className="w-3 h-3 bg-[#FF00FF]"></div>
+              </div>
+            ))}
+          </div>
+          <span className="text-[10px] italic font-black text-[#FF00FF] mt-1 pr-2">INFLUENCE</span>
         </div>
       </header>
 
@@ -232,8 +232,8 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                       </h2>
                       <div className="flex flex-col gap-3">
                         {STAGES.map((stage) => (
-                          <button 
-                            key={stage.id} 
+                          <button
+                            key={stage.id}
                             onClick={() => setIntensity(stage.id)}
                             className="flex items-center justify-between p-3 bg-black/40 border border-white/10 hover:border-[#FF00FF] hover:bg-[#FF00FF]/10 transition-all group"
                           >
@@ -247,7 +247,7 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                 ) : !prompt ? (
                   <div className="flex-1 flex flex-col items-center justify-center relative">
                     {/* Floating Text Effect */}
-                    <motion.div 
+                    <motion.div
                       initial={{ scale: 2, opacity: 0, rotate: -10 }}
                       animate={{ scale: 1, opacity: 1, rotate: 0 }}
                       className="absolute top-10 w-full text-center"
@@ -285,7 +285,7 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                 ) : (
                   <div className="flex-1 flex flex-col justify-center relative">
                     {/* The "Argument" Text */}
-                    <motion.div 
+                    <motion.div
                       initial={{ scale: 0.8, opacity: 0, y: 50 }}
                       animate={{ scale: 1, opacity: 1, y: 0 }}
                       className="relative z-20 mb-12"
@@ -294,11 +294,11 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                         <motion.span
                           key={i}
                           className="inline-block dr-argument-text text-4xl sm:text-5xl mx-1 text-white"
-                          animate={{ 
+                          animate={{
                             y: [0, -5, 0],
                             rotate: [0, i % 2 === 0 ? 2 : -2, 0]
                           }}
-                          transition={{ 
+                          transition={{
                             duration: 2,
                             repeat: Infinity,
                             delay: i * 0.1,
@@ -314,7 +314,7 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                     </motion.div>
 
                     {/* Speaker Box */}
-                    <motion.div 
+                    <motion.div
                       initial={{ x: -100, opacity: 0 }}
                       animate={{ x: 0, opacity: 1 }}
                       className="dr-text-box p-4 mb-4"
@@ -373,9 +373,9 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                   </>
                 ) : (
                   <div className="dr-text-box p-4 space-y-4">
-                    <input className="w-full bg-transparent border-b border-[#00FFFF] text-xl font-bold py-2 focus:outline-none" value={editingDeck.name} onChange={e => setEditingDeck({...editingDeck, name: e.target.value})} placeholder="FILE NAME" />
-                    <textarea className="w-full bg-black/30 border border-white/20 p-2 text-xs font-mono h-20 focus:border-[#FF00FF] outline-none" value={editingDeck.description} onChange={e => setEditingDeck({...editingDeck, description: e.target.value})} placeholder="DESCRIPTION" />
-                    
+                    <input className="w-full bg-transparent border-b border-[#00FFFF] text-xl font-bold py-2 focus:outline-none" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="FILE NAME" />
+                    <textarea className="w-full bg-black/30 border border-white/20 p-2 text-xs font-mono h-20 focus:border-[#FF00FF] outline-none" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="DESCRIPTION" />
+
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="text-[#00FFFF] font-bold text-sm">BULLETS</span>
@@ -435,7 +435,7 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
                     { id: Theme.ANIMAL_CROSSING, label: 'ISLAND PARADISE', color: '#9CCC65' },
                     { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
                   ].map(t => (
-                    <button 
+                    <button
                       key={t.id}
                       onClick={() => setTheme(t.id as Theme)}
                       className={`p-4 text-left border border-white/10 hover:border-white transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}
@@ -483,11 +483,11 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
       <nav className="fixed bottom-0 left-0 w-full h-20 z-50">
         {/* Angled background shape */}
         <div className="absolute inset-0 bg-[#050510] border-t border-[#00FFFF] shadow-[0_-5px_20px_rgba(0,255,255,0.2)]" style={{ clipPath: 'polygon(0 20%, 5% 0, 95% 0, 100% 20%, 100% 100%, 0 100%)' }}></div>
-        
+
         <div className="relative h-full flex justify-around items-center px-2 pt-2">
           {tabs.map((tab) => (
-            <button 
-              key={tab.id} 
+            <button
+              key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`dr-nav-item flex-1 h-full flex flex-col justify-center items-center transition-all ${activeTab === tab.id ? 'active' : 'opacity-50 hover:opacity-100'}`}
             >
@@ -504,44 +504,119 @@ const DanganronpaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ 
 };
 
 export const DanganronpaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
-  const { setView, setTheme } = logic;
-  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
+  const { setView, setTheme, theme } = logic;
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#2b002b] font-sans text-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #2b002b 0, #2b002b 20px, #3b003b 20px, #3b003b 40px)' }}></div>
-      
-      {/* Spinning Spiral Overlay */}
-      <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-20">
-        <motion.div 
-          className="w-[200%] h-[200%] border-[40px] border-dashed border-[#ff00ff] rounded-full"
+    <div className="h-full w-full flex flex-col items-center justify-center p-4 sm:p-8 bg-[#000] font-['Orbitron'] text-white relative overflow-hidden select-none">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,0,255,0.15)_0%,transparent_70%)]"></div>
+        <motion.div
+          className="absolute -top-[20%] -left-[20%] w-[140%] h-[140%] border-[2px] border-[#ff00ff]/20 rounded-full"
           animate={{ rotate: 360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div
+          className="absolute -bottom-[20%] -right-[20%] w-[120%] h-[120%] border-[1px] border-[#00ffff]/10 rounded-full"
+          animate={{ rotate: -360 }}
+          transition={{ duration: 45, repeat: Infinity, ease: "linear" }}
         />
       </div>
 
-      <div className="z-10 flex flex-col items-center gap-12">
-        <motion.h1 
-          animate={{ rotate: [0, -2, 2, 0], scale: [1, 1.05, 1] }} 
-          transition={{ repeat: Infinity, duration: 4 }} 
-          className="text-7xl font-black tracking-widest text-[#ff00ff] drop-shadow-[6px_6px_0_#000] italic font-['Orbitron']"
-        >
-          DANGANRONPA
-        </motion.h1>
-        <div className="flex flex-col gap-6 w-72">
-          <button onClick={() => setView('game')} className="bg-black border-4 border-[#ff00ff] p-4 hover:rotate-2 hover:scale-105 transition-all text-2xl font-black italic shadow-[8px_8px_0_#ff00ff] font-['Orbitron']">START TRIAL</button>
-          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-black border-4 border-[#ff00ff] p-4 hover:-rotate-2 hover:scale-105 transition-all text-2xl font-black italic shadow-[8px_8px_0_#ff00ff] font-['Orbitron']">SELECT THEME</button>
+      {/* Scanlines Effect */}
+      <div className="absolute inset-0 pointer-events-none z-10 opacity-20" style={{ background: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06))', backgroundSize: '100% 4px, 3px 100%' }}></div>
+
+      <div className="z-20 w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
+
+        {/* Title Section */}
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-2">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-2"
+          >
+            <div className="w-8 h-1 bg-[#ff00ff]"></div>
+            <span className="text-[10px] tracking-[0.5em] text-[#ff00ff] font-black">ULTIMATE_DECISION_MAKER</span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-white drop-shadow-[5px_5px_0_#ff00ff] italic"
+          >
+            DANGAN<span className="text-[#ff00ff]">RONPA</span>
+          </motion.h1>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5 }}
+            className="text-[8px] sm:text-[10px] uppercase tracking-[0.8em] font-bold"
+          >
+            Execution Overhaul • v3.0
+          </motion.div>
         </div>
-        <AnimatePresence>
-          {activeSection === 'themes' && (
-            <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="grid grid-cols-2 gap-3 bg-black/90 p-6 border-4 border-[#ff00ff] shadow-[12px_12px_0_#000] max-h-48 overflow-y-auto custom-scrollbar">
-              {themes.map(t => (
-                <button key={t} onClick={() => setTheme(t)} className="text-[#ff00ff] hover:text-white font-bold text-[10px] uppercase tracking-widest font-['Orbitron']">{t}</button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+        {/* Menu Section */}
+        <div className="flex flex-col gap-4 w-full max-w-xs sm:max-w-sm">
+          <motion.button
+            whileHover={{ x: 10, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setView('game')}
+            className="group relative bg-black border-l-8 border-[#ff00ff] p-5 flex items-center justify-between transition-all hover:bg-white hover:text-black overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-[#ff00ff] translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 z-0"></div>
+            <div className="relative z-10 flex flex-col items-start">
+              <span className="text-2xl sm:text-3xl font-black italic">START TRIAL</span>
+              <span className="text-[8px] tracking-widest opacity-60">NON-STOP DEBATE</span>
+            </div>
+            <span className="relative z-10 text-3xl font-bold group-hover:translate-x-2 transition-transform">▶</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ x: 10, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')}
+            className={`group relative border-l-8 ${activeSection === 'themes' ? 'border-[#00ffff] bg-white text-black' : 'border-white bg-black'} p-5 flex items-center justify-between transition-all hover:border-[#00ffff] overflow-hidden`}
+          >
+            <div className="relative z-10 flex flex-col items-start">
+              <span className="text-2xl sm:text-3xl font-black italic">SHIFTER</span>
+              <span className="text-[8px] tracking-widest opacity-60">REALITY COLLAPSE</span>
+            </div>
+            <span className={`relative z-10 text-2xl transition-transform ${activeSection === 'themes' ? 'rotate-90' : ''}`}>▼</span>
+          </motion.button>
+
+          <AnimatePresence>
+            {activeSection === 'themes' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden bg-[#111] border-l-8 border-[#00ffff] grid grid-cols-2 gap-px"
+              >
+                {themes.map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setTheme(t)}
+                    className={`p-3 text-[9px] font-black uppercase tracking-widest transition-colors hover:bg-[#00ffff] hover:text-black ${theme === t ? 'bg-[#00ffff] text-black' : 'text-white/50'}`}
+                  >
+                    {t.replace('_', ' ')}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Spinning Monokuma-eye style background decorator */}
+      <div className="absolute -bottom-20 -left-20 w-80 h-80 opacity-10 pointer-events-none">
+        <motion.div
+          className="w-full h-full border-[40px] border-double border-[#ff00ff] rounded-full"
+          animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        />
       </div>
     </div>
   );

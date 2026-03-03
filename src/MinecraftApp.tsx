@@ -215,8 +215,8 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                     <div className="rpg-panel">
                       <div className="rpg-ribbon">SELECT WORLD</div>
                       <div className="grid grid-cols-1 gap-2 mt-2">
-                        <button 
-                          onClick={() => setActiveDeckId('default')} 
+                        <button
+                          onClick={() => setActiveDeckId('default')}
                           className={`rpg-slot p-3 w-full text-left justify-start gap-3 ${activeDeckId === 'default' ? 'active' : ''}`}
                         >
                           <span className="text-2xl">🌲</span>
@@ -226,7 +226,7 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                           </div>
                         </button>
                         {customDecks.map(deck => (
-                          <button 
+                          <button
                             key={deck.id}
                             onClick={() => setActiveDeckId(deck.id)}
                             className={`rpg-slot p-3 w-full text-left justify-start gap-3 ${activeDeckId === deck.id ? 'active' : ''}`}
@@ -246,8 +246,8 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                       <div className="rpg-ribbon" style={{ background: '#ff8f00', borderColor: '#000' }}>DIFFICULTY</div>
                       <div className="grid grid-cols-3 gap-2 mt-2">
                         {STAGES.map((stage) => (
-                          <button 
-                            key={stage.id} 
+                          <button
+                            key={stage.id}
                             onClick={() => setIntensity(stage.id)}
                             className="rpg-slot flex-col p-2 gap-1 hover:bg-[#333]"
                           >
@@ -262,7 +262,7 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                   <div className="flex flex-col items-center justify-center h-[60vh]">
                     <div className="rpg-panel w-full text-center space-y-6">
                       <div className="rpg-ribbon">QUEST STARTED</div>
-                      
+
                       <div className="py-8">
                         <div className="text-gray-400 text-sm mb-2 pixel-font">CURRENT MODE</div>
                         <div className="text-4xl gold-title">{intensity}</div>
@@ -285,7 +285,7 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                 ) : (
                   <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="rpg-panel rpg-panel-gold mt-8">
                     <div className="rpg-ribbon" style={{ background: '#ff8f00' }}>NEW OBJECTIVE</div>
-                    
+
                     <div className="text-center space-y-6 mt-4">
                       <div className="flex justify-center items-center gap-2 mb-4">
                         <span className="text-2xl">{prompt.type === 'Truth' ? '📜' : '⚔️'}</span>
@@ -355,13 +355,13 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                     <div className="space-y-4 mt-2">
                       <div className="space-y-2">
                         <label className="text-xs text-[#ffb300] pixel-font">ITEM NAME</label>
-                        <input className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]" value={editingDeck.name} onChange={e => setEditingDeck({...editingDeck, name: e.target.value})} placeholder="Name..." />
+                        <input className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="Name..." />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs text-[#ffb300] pixel-font">LORE</label>
-                        <textarea className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300] h-20" value={editingDeck.description} onChange={e => setEditingDeck({...editingDeck, description: e.target.value})} placeholder="Description..." />
+                        <textarea className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300] h-20" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="Description..." />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <label className="text-xs text-[#ffb300] pixel-font">ENCHANTMENTS ({editingDeck.prompts.length})</label>
@@ -426,7 +426,7 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
                       { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', icon: '🏝️' },
                       { id: Theme.SKYRIM, label: 'SKYRIM', icon: '🐉' },
                     ].map(t => (
-                      <button 
+                      <button
                         key={t.id}
                         onClick={() => setTheme(t.id as Theme)}
                         className={`rpg-slot flex-col p-4 gap-2 hover:bg-[#333] ${theme === t.id ? 'active' : ''}`}
@@ -475,8 +475,8 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
       <nav className="fixed bottom-0 left-0 w-full h-20 z-50 bg-[#111] border-t-4 border-[#333] shadow-[0_-4px_0_#000]">
         <div className="flex justify-around items-center h-full px-2">
           {tabs.map((tab) => (
-            <button 
-              key={tab.id} 
+            <button
+              key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`nav-slot flex-1 ${activeTab === tab.id ? 'active' : ''}`}
             >
@@ -491,72 +491,101 @@ const MinecraftApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ lo
 };
 
 export const MinecraftMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
-  const { setView, setTheme } = logic;
-  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
+  const { setView, setTheme, theme } = logic;
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const [pixels, setPixels] = React.useState<{ id: number, width: number, height: number, left: string, top: string }[]>([]);
-
-  React.useEffect(() => {
-    setPixels([...Array(10)].map((_, i) => ({
-      id: i,
-      width: 20 + Math.random() * 40,
-      height: 20 + Math.random() * 20,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-    })));
-  }, []);
-
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#1a1a1a] font-mono text-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/dirt.png")' }}></div>
-      
-      {/* Floating Clouds/Pixels */}
-      <div className="absolute inset-0 pointer-events-none">
-        {pixels.map((pixel, i) => (
+    <div className="h-full w-full flex flex-col items-center justify-center p-4 bg-[#1a1a1a] font-['VT323'] text-white relative overflow-hidden select-none">
+      {/* Blocky Background Pattern */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000)', backgroundSize: '60px 60px', backgroundPosition: '0 0, 30px 30px' }}></div>
+
+      {/* Floating Pixel Clouds */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {[...Array(4)].map((_, i) => (
           <motion.div
-            key={pixel.id}
-            className="absolute bg-white/10"
+            key={i}
+            className="absolute bg-white/5"
             style={{
-              width: pixel.width,
-              height: pixel.height,
-              left: pixel.left,
-              top: pixel.top,
+              width: 160,
+              height: 40,
+              left: `${-20 + i * 30}%`,
+              top: `${10 + (i % 3) * 20}%`,
+              boxShadow: '20px 0 0 0 transparent, 40px 0 0 0 transparent, 0 20px 0 0 rgba(255,255,255,0.05)'
             }}
-            animate={{
-              x: [0, 100, 0],
-              opacity: [0.1, 0.3, 0.1],
-            }}
-            transition={{
-              duration: 10 + i * 2,
-              repeat: Infinity,
-              ease: "linear",
-            }}
+            animate={{ x: [0, 100, 0] }}
+            transition={{ duration: 20 + i * 5, repeat: Infinity, ease: "linear" }}
           />
         ))}
       </div>
 
-      <div className="z-10 flex flex-col items-center gap-8">
-        <motion.h1 
-          className="text-6xl font-bold tracking-widest text-shadow-[4px_4px_0_#000] mb-8 pixel-font"
-          animate={{ y: [0, -5, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-        >
-          MINECRAFT
-        </motion.h1>
-        <div className="flex flex-col gap-4 w-64">
-          <button onClick={() => setView('game')} className="bg-[#555] border-4 border-black p-3 hover:bg-[#777] active:translate-y-1 shadow-[4px_4px_0_#000] text-xl pixel-font">PLAY GAME</button>
-          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-[#555] border-4 border-black p-3 hover:bg-[#777] active:translate-y-1 shadow-[4px_4px_0_#000] text-xl pixel-font">THEMES</button>
+      <div className="z-10 flex flex-col items-center w-full max-w-sm gap-12">
+        {/* Title Section */}
+        <div className="flex flex-col items-center">
+          <motion.h1
+            className="text-6xl sm:text-8xl font-bold tracking-widest text-[#55FF55] drop-shadow-[6px_6px_0_#2e2e2e]"
+            initial={{ y: -50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
+            MINECRAFT
+          </motion.h1>
+          <div className="bg-[#373737] px-4 py-1 -mt-2 border-2 border-[#1e1e1e] shadow-[4px_4px_0_#000]">
+            <span className="text-yellow-400 text-sm tracking-[0.3em]">PHANTOM EDITION</span>
+          </div>
         </div>
-        <AnimatePresence>
-          {activeSection === 'themes' && (
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="grid grid-cols-2 gap-2 bg-[#333] p-4 border-4 border-black shadow-[8px_8px_0_#000] max-h-48 overflow-y-auto custom-scrollbar">
-              {themes.map(t => (
-                <button key={t} onClick={() => setTheme(t)} className="bg-[#555] border-2 border-black p-2 text-[8px] hover:bg-[#777] pixel-font">{t.toUpperCase()}</button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+        {/* Menu Buttons */}
+        <div className="flex flex-col gap-4 w-full">
+          <motion.button
+            whileHover={{ scale: 1.02, brightness: 1.2 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setView('game')}
+            className="relative group h-16 w-full"
+          >
+            {/* Layered Block Style */}
+            <div className="absolute inset-0 bg-[#7c7c7c] border-b-4 border-r-4 border-[#373737] border-t-4 border-l-4 border-[#bababa]"></div>
+            <div className="absolute inset-0 bg-[#7c7c7c] group-hover:bg-[#55FF55] opacity-0 group-hover:opacity-10 transition-colors"></div>
+            <span className="relative z-10 text-3xl font-bold drop-shadow-[2px_2px_0_#373737] group-hover:text-[#55FF55]">SINGLEPLAYER</span>
+          </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')}
+            className="relative group h-16 w-full"
+          >
+            <div className="absolute inset-0 bg-[#7c7c7c] border-b-4 border-r-4 border-[#373737] border-t-4 border-l-4 border-[#bababa]"></div>
+            <span className="relative z-10 text-3xl font-bold drop-shadow-[2px_2px_0_#373737]">MULTIPLAYER</span>
+          </motion.button>
+
+          <AnimatePresence>
+            {activeSection === 'themes' && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden bg-[#373737] border-4 border-[#1e1e1e] p-4 flex flex-col gap-2 shadow-[8px_8px_0_#000]"
+              >
+                <div className="text-[10px] text-yellow-400 mb-2 tracking-widest uppercase">Select World</div>
+                <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto no-scrollbar">
+                  {themes.map(t => (
+                    <button
+                      key={t}
+                      onClick={() => setTheme(t)}
+                      className={`p-2 text-left text-sm border-2 transition-colors ${theme === t ? 'border-[#55FF55] bg-[#1e1e1e] text-[#55FF55]' : 'border-transparent hover:bg-[#1e1e1e]'}`}
+                    >
+                      {t.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      <div className="absolute bottom-6 right-6 text-[10px] opacity-30">
+        Minecraft 1.21-PHANTOM
       </div>
     </div>
   );

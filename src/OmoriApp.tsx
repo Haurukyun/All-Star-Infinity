@@ -153,8 +153,8 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                       <h2 className="text-xl mb-4 border-b-2 border-black pb-1">HOW DEEP?</h2>
                       <div className="grid grid-cols-1 gap-4">
                         {STAGES.map((stage) => (
-                          <button 
-                            key={stage.id} 
+                          <button
+                            key={stage.id}
                             onClick={() => setIntensity(stage.id)}
                             className="omori-button flex flex-col items-center py-4"
                             style={{ backgroundColor: stage.color, color: stage.text }}
@@ -168,7 +168,7 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                   </div>
                 ) : !prompt ? (
                   <div className="flex flex-col items-center gap-8 py-12">
-                    <motion.div 
+                    <motion.div
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       className="text-center"
@@ -228,8 +228,8 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                 ) : (
                   <div className="omori-panel p-6 space-y-6">
                     <div className="space-y-4">
-                      <input className="w-full border-b-2 border-black p-2 text-2xl focus:outline-none" value={editingDeck.name} onChange={e => setEditingDeck({...editingDeck, name: e.target.value})} placeholder="NAME YOUR MEMORY" />
-                      <textarea className="w-full border-2 border-black p-2 text-sm h-24 focus:outline-none" value={editingDeck.description} onChange={e => setEditingDeck({...editingDeck, description: e.target.value})} placeholder="WHAT HAPPENED?" />
+                      <input className="w-full border-b-2 border-black p-2 text-2xl focus:outline-none" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="NAME YOUR MEMORY" />
+                      <textarea className="w-full border-2 border-black p-2 text-sm h-24 focus:outline-none" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="WHAT HAPPENED?" />
                     </div>
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
@@ -270,7 +270,7 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                     <div key={i} className="omori-panel p-4">
                       <div className="flex justify-between text-xs mb-2 opacity-60">
                         <span>{item.type.toUpperCase()}</span>
-                        <span>LOG {history.length-i}</span>
+                        <span>LOG {history.length - i}</span>
                       </div>
                       <p className="text-lg italic">"{item.text}"</p>
                     </div>
@@ -326,8 +326,8 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
       <nav className="fixed bottom-0 left-0 w-full bg-white border-t-4 border-black h-20 z-50">
         <div className="flex justify-around items-center h-full px-2">
           {tabs.map((tab) => (
-            <button 
-              key={tab.id} 
+            <button
+              key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`omori-nav-btn flex-1 h-full ${activeTab === tab.id ? 'active' : ''}`}
             >
@@ -341,74 +341,106 @@ const OmoriApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
 };
 
 export const OmoriMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
-  const { setView, setTheme } = logic;
-  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
+  const { setView, setTheme, theme } = logic;
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const [floatingElements, setFloatingElements] = React.useState<{ id: number, left: string, top: string, x: number[], y: number[] }[]>([]);
-
-  React.useEffect(() => {
-    setFloatingElements([...Array(8)].map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      x: [0, Math.random() * 20 - 10, 0],
-      y: [0, Math.random() * 20 - 10, 0],
-    })));
-  }, []);
-
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-white font-['Gloria_Hallelujah'] text-black relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
-      
-      {/* Sketchy Floating Elements */}
+    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-white font-['Gloria_Hallelujah'] text-black relative overflow-hidden select-none">
+      {/* Hand-drawn Grid Background */}
+      <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}></div>
+
+      {/* Sketchy Floating Elements (No Emotes) */}
       <div className="absolute inset-0 pointer-events-none">
-        {floatingElements.map((el, i) => (
+        {[...Array(6)].map((_, i) => (
           <motion.div
-            key={el.id}
-            className="absolute text-4xl opacity-10"
+            key={i}
+            className="absolute border border-black opacity-10"
             style={{
-              left: el.left,
-              top: el.top,
+              width: Math.random() * 100 + 50,
+              height: Math.random() * 2 + 1,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              rotate: Math.random() * 360,
             }}
             animate={{
-              x: el.x,
-              y: el.y,
-              rotate: [0, 5, -5, 0],
-              scale: [1, 1.1, 0.9, 1],
+              x: [0, 10, -10, 0],
+              y: [0, 5, -5, 0],
+              opacity: [0.05, 0.15, 0.05],
             }}
             transition={{
-              duration: 3 + i,
+              duration: 5 + i,
               repeat: Infinity,
               ease: "easeInOut",
             }}
-          >
-            {['👁️', '💡', '🔪', '🐈', '🌱'][i % 5]}
-          </motion.div>
+          />
         ))}
       </div>
 
-      <div className="z-10 flex flex-col items-center gap-12">
-        <motion.h1 
-          className="text-8xl font-bold tracking-tighter"
-          animate={{ scale: [1, 1.02, 1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        >
-          OMORI
-        </motion.h1>
-        <div className="flex flex-col gap-4 w-64">
-          <button onClick={() => setView('game')} className="omori-button text-3xl py-4">ENTER DREAM</button>
-          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="omori-button text-3xl py-4">REALITY CHECK</button>
+      <div className="z-10 flex flex-col items-center max-w-sm w-full">
+        {/* Subtle Title Backdrop */}
+        <div className="relative mb-12">
+          <motion.div
+            className="absolute -inset-8 border-2 border-dashed border-black/5 rounded-full"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.h1
+            className="text-7xl sm:text-9xl font-bold tracking-tighter text-black relative"
+            animate={{ y: [0, -2, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          >
+            OMORI
+          </motion.h1>
+          <div className="absolute -bottom-2 right-0 text-[10px] opacity-30 italic">Welcome to White Space.</div>
         </div>
+
+        <div className="flex flex-col gap-6 w-full px-8">
+          <button
+            onClick={() => setView('game')}
+            className="group relative py-4 transition-all"
+          >
+            <div className="absolute inset-0 border-2 border-black group-hover:bg-black group-hover:text-white transition-all transform group-hover:translate-x-1 group-hover:translate-y-1" style={{ borderRadius: '2px 8px 4px 12px' }}></div>
+            <span className="relative z-10 text-3xl font-bold group-hover:text-white transition-colors block text-center">ENTER DREAM</span>
+          </button>
+
+          <button
+            onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')}
+            className="group relative py-4 transition-all"
+          >
+            <div className="absolute inset-0 border-2 border-black group-hover:bg-black group-hover:text-white transition-all transform group-hover:translate-x-1 group-hover:translate-y-1" style={{ borderRadius: '12px 4px 8px 2px' }}></div>
+            <span className="relative z-10 text-3xl font-bold group-hover:text-white transition-colors block text-center">REALITY CHECK</span>
+          </button>
+        </div>
+
         <AnimatePresence>
           {activeSection === 'themes' && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="grid grid-cols-2 gap-4 bg-white p-6 border-4 border-black shadow-[10px_10px_0_#000] max-h-48 overflow-y-auto custom-scrollbar">
-              {themes.map(t => (
-                <button key={t} onClick={() => setTheme(t)} className="text-sm hover:underline decoration-wavy">{t.toUpperCase()}</button>
-              ))}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="mt-8 w-full bg-white border-2 border-black p-6 shadow-[8px_8px_0_#000] max-h-48 overflow-y-auto no-scrollbar"
+              style={{ borderRadius: '15px 5px 20px 8px' }}
+            >
+              <div className="grid grid-cols-1 gap-4">
+                {themes.map(t => (
+                  <button
+                    key={t}
+                    onClick={() => setTheme(t)}
+                    className={`text-left text-lg hover:underline decoration-wavy transition-all ${theme === t ? 'font-bold' : 'opacity-40'}`}
+                  >
+                    {t.replace('_', ' ')}
+                  </button>
+                ))}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
+
+      {/* Atmospheric bottom corner text */}
+      <div className="absolute bottom-10 left-10 opacity-10 text-[10px] max-w-[150px] leading-tight">
+        You have been living here for as long as you can remember.
       </div>
     </div>
   );

@@ -138,34 +138,35 @@ const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
 
     return (
         <Layout activeTab={activeTab} setActiveTab={setActiveTab}>
-            <Animated.View
-                key={activeTab}
-                entering={FadeIn.duration(300)}
-                exiting={FadeOut.duration(300)}
-                style={{ flex: 1 }}
-            >
-                {activeTab === 'play' && renderPlayTab()}
-                {activeTab === 'history' && (
-                    <ScrollView style={styles.tabContent}>
-                        <Text style={styles.viewTitle}>ARCHIVES</Text>
-                        {history.map((item, i) => (
-                            <View key={i} style={styles.logItem}>
-                                <View style={styles.logHeader}>
-                                    <Text style={styles.logType}>{item.type}</Text>
-                                    <Text style={styles.logLabel}>LOG_0{history.length - i}</Text>
+            <View key={activeTab} style={{ flex: 1 }}>
+                <Animated.View
+                    entering={FadeIn.duration(300)}
+                    exiting={FadeOut.duration(300)}
+                    style={{ flex: 1 }}
+                >
+                    {activeTab === 'play' && renderPlayTab()}
+                    {activeTab === 'history' && (
+                        <ScrollView style={styles.tabContent}>
+                            <Text style={styles.viewTitle}>ARCHIVES</Text>
+                            {history.map((item, i) => (
+                                <View key={i} style={styles.logItem}>
+                                    <View style={styles.logHeader}>
+                                        <Text style={styles.logType}>{item.type}</Text>
+                                        <Text style={styles.logLabel}>LOG_0{history.length - i}</Text>
+                                    </View>
+                                    <Text style={styles.logText}>"{item.text}"</Text>
                                 </View>
-                                <Text style={styles.logText}>"{item.text}"</Text>
-                            </View>
-                        ))}
-                    </ScrollView>
-                )}
-                {/* Placeholder for other tabs */}
-                {(activeTab === 'decks' || activeTab === 'themes' || activeTab === 'settings') && (
-                    <View style={styles.centered}>
-                        <Text style={styles.placeholderText}>{activeTab.toUpperCase()} IN PROGRESS</Text>
-                    </View>
-                )}
-            </Animated.View>
+                            ))}
+                        </ScrollView>
+                    )}
+                    {/* Placeholder for other tabs */}
+                    {(activeTab === 'decks' || activeTab === 'themes' || activeTab === 'settings') && (
+                        <View style={styles.centered}>
+                            <Text style={styles.placeholderText}>{activeTab.toUpperCase()} IN PROGRESS</Text>
+                        </View>
+                    )}
+                </Animated.View>
+            </View>
         </Layout>
     );
 };
@@ -263,17 +264,59 @@ const styles = StyleSheet.create({
     logText: { color: '#000', fontWeight: '700', fontStyle: 'italic', fontSize: 10 },
     centered: { flex: 1, justifyContent: 'center', alignItems: 'center' },
     placeholderText: { color: 'rgba(255,255,255,0.2)', fontWeight: '900', letterSpacing: 4 },
+    menuContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingLeft: 20,
+    },
+    menuItem: {
+        width: width * 0.8,
+        marginVertical: 10,
+    },
+    menuBox: {
+        backgroundColor: '#FFF',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        borderWidth: 4,
+        borderColor: '#000',
+        transform: [{ skewX: '-12deg' }],
+        position: 'relative',
+    },
+    redBar: {
+        position: 'absolute',
+        left: -15,
+        top: '20%',
+        bottom: '20%',
+        width: 8,
+        backgroundColor: '#D80000',
+        transform: [{ skewX: '0deg' }], // Keep it straight or slightly skewed
+    },
+    menuText: {
+        fontSize: 48,
+        fontWeight: '900',
+        fontStyle: 'italic',
+        color: '#000',
+        transform: [{ skewX: '12deg' }],
+    },
+    menuSub: {
+        fontSize: 14,
+        fontWeight: '900',
+        color: '#D80000',
+        letterSpacing: 2,
+        marginTop: -5,
+        transform: [{ skewX: '12deg' }],
+    }
 });
 
 export default PersonaApp;
 
 export const PersonaMenu: React.FC<{ logic: any }> = ({ logic }) => {
     const { setView } = logic;
-    // Simple menu for now, can be expanded to match the web version's complexity later
     return (
         <View style={styles.menuContainer}>
             <Pressable onPress={() => setView('game')} style={styles.menuItem}>
                 <View style={styles.menuBox}>
+                    <View style={styles.redBar} />
                     <Text style={styles.menuText}>STEAL</Text>
                     <Text style={styles.menuSub}>START_MISSION</Text>
                 </View>

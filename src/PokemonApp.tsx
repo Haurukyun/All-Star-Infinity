@@ -171,8 +171,8 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
       <header className="p-4 shrink-0 relative z-10 bg-[#D04040] border-b-4 border-[#802020] shadow-md flex justify-between items-center text-white">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-white rounded-full border-4 border-[#404040] flex items-center justify-center relative overflow-hidden">
-             <div className="absolute top-1/2 left-0 w-full h-1 bg-[#404040] -translate-y-1/2"></div>
-             <div className="w-3 h-3 bg-white rounded-full border-2 border-[#404040] relative z-10"></div>
+            <div className="absolute top-1/2 left-0 w-full h-1 bg-[#404040] -translate-y-1/2"></div>
+            <div className="w-3 h-3 bg-white rounded-full border-2 border-[#404040] relative z-10"></div>
           </div>
           <span className="text-sm tracking-tighter">POKéMON TRUTH/DARE</span>
         </div>
@@ -195,9 +195,9 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                         <h2 className="text-sm">SELECT DECK</h2>
                         <span className="text-xs text-gray-500">{customDecks.length + 1} ITEMS</span>
                       </div>
-                      
+
                       <div className="space-y-2">
-                        <div 
+                        <div
                           onClick={() => setActiveDeckId('default')}
                           className={`poke-list-item cursor-pointer hover:bg-[#F0F0C0] ${activeDeckId === 'default' ? 'bg-[#E8E8A0]' : ''}`}
                         >
@@ -208,9 +208,9 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                           </div>
                           <span className="poke-type-tag bg-[#A8A878]">NORMAL</span>
                         </div>
-                        
+
                         {customDecks.map(deck => (
-                          <div 
+                          <div
                             key={deck.id}
                             onClick={() => setActiveDeckId(deck.id)}
                             className={`poke-list-item cursor-pointer hover:bg-[#F0F0C0] ${activeDeckId === deck.id ? 'bg-[#E8E8A0]' : ''}`}
@@ -231,8 +231,8 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                       <h2 className="text-sm mb-4">SELECT DIFFICULTY</h2>
                       <div className="grid grid-cols-1 gap-3">
                         {STAGES.map((stage) => (
-                          <button 
-                            key={stage.id} 
+                          <button
+                            key={stage.id}
                             onClick={() => setIntensity(stage.id)}
                             className="poke-btn flex items-center gap-4"
                           >
@@ -255,7 +255,7 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                       <div className="bg-[#404040] text-white py-2 -mx-4 -mt-4 mb-4 text-center text-xs">
                         A WILD PROMPT APPEARED!
                       </div>
-                      
+
                       <div className="py-4">
                         <div className="w-24 h-24 mx-auto bg-[#F8F8F8] rounded-full border-4 border-[#D0D0D0] flex items-center justify-center mb-4">
                           <span className="text-4xl animate-bounce">
@@ -292,7 +292,7 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                         {prompt.type.toUpperCase()}
                       </span>
                     </div>
-                    
+
                     <div className="bg-white border-2 border-[#C0C0C0] p-4 rounded mb-4 min-h-[120px] flex items-center justify-center text-center">
                       <p className="text-sm leading-relaxed">
                         {prompt.text}
@@ -328,7 +328,7 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                           NEW ITEM
                         </button>
                       </div>
-                      
+
                       <div className="bg-white border-2 border-[#A8C0D8] rounded h-[60vh] overflow-y-auto p-2 custom-scrollbar">
                         {customDecks.length === 0 ? (
                           <div className="text-center py-8 text-gray-500 text-xs">
@@ -358,13 +358,13 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                     <div className="space-y-4">
                       <div className="space-y-1">
                         <label className="text-[10px] text-gray-500">NAME</label>
-                        <input className="w-full bg-white border-2 border-[#C0C0C0] p-2 text-xs outline-none focus:border-[#6890F0]" value={editingDeck.name} onChange={e => setEditingDeck({...editingDeck, name: e.target.value})} placeholder="TM NAME" />
+                        <input className="w-full bg-white border-2 border-[#C0C0C0] p-2 text-xs outline-none focus:border-[#6890F0]" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="TM NAME" />
                       </div>
                       <div className="space-y-1">
                         <label className="text-[10px] text-gray-500">DESCRIPTION</label>
-                        <textarea className="w-full bg-white border-2 border-[#C0C0C0] p-2 text-xs outline-none focus:border-[#6890F0] h-16" value={editingDeck.description} onChange={e => setEditingDeck({...editingDeck, description: e.target.value})} placeholder="INFO..." />
+                        <textarea className="w-full bg-white border-2 border-[#C0C0C0] p-2 text-xs outline-none focus:border-[#6890F0] h-16" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="INFO..." />
                       </div>
-                      
+
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <label className="text-[10px] text-gray-500">MOVES ({editingDeck.prompts.length})</label>
@@ -432,7 +432,7 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                       { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', color: '#9CCC65' },
                       { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
                     ].map(t => (
-                      <button 
+                      <button
                         key={t.id}
                         onClick={() => setTheme(t.id as Theme)}
                         className={`poke-btn flex flex-col items-center justify-center gap-2 h-24 ${theme === t.id ? 'active' : ''}`}
@@ -466,7 +466,7 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
                     <div className="pt-2">
                       <span className="text-xs">BADGES</span>
                       <div className="flex gap-1 mt-2">
-                        {[1,2,3,4,5,6,7,8].map(i => (
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                           <div key={i} className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-600 border border-yellow-700 shadow-sm"></div>
                         ))}
                       </div>
@@ -489,8 +489,8 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
       <nav className="fixed bottom-0 left-0 w-full h-16 z-50 bg-[#404040] border-t-4 border-[#202020]">
         <div className="flex justify-around items-end h-full px-2 pb-0">
           {tabs.map((tab) => (
-            <button 
-              key={tab.id} 
+            <button
+              key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`nav-pill flex-1 flex flex-col items-center justify-center gap-1 h-14 transition-all ${activeTab === tab.id ? 'active' : ''}`}
             >
@@ -505,74 +505,123 @@ const PokemonApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
 };
 
 export const PokemonMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
-  const { setView, setTheme } = logic;
-  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
+  const { setView, setTheme, theme } = logic;
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
-  const [pokeballs, setPokeballs] = React.useState<{ id: number, left: string, top: string }[]>([]);
-
-  React.useEffect(() => {
-    setPokeballs([...Array(10)].map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-    })));
-  }, []);
-
   return (
-    <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-[#384858] font-mono text-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'linear-gradient(to bottom, #384858, #202830)' }}></div>
-      
-      {/* Floating Pokéballs/Particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {pokeballs.map((ball, i) => (
+    <div className="h-full w-full flex flex-col items-center justify-end p-4 pb-12 sm:pb-20 bg-[#6890F0] font-['Press_Start_2P'] text-[#404040] relative overflow-hidden select-none">
+      {/* Dynamic Background Particles (Pixel Style) */}
+      <div className="absolute inset-0 z-0">
+        {[...Array(15)].map((_, i) => (
           <motion.div
-            key={ball.id}
-            className="absolute w-8 h-8 opacity-20"
+            key={i}
+            className="absolute bg-white/20"
             style={{
-              left: ball.left,
-              top: ball.top,
+              width: 8,
+              height: 8,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
             }}
             animate={{
-              y: [0, -100, 0],
-              rotate: [0, 360],
+              y: [-20, -120],
+              opacity: [0, 1, 0],
+              scale: [1, 1.5, 1],
             }}
             transition={{
-              duration: 8 + i,
+              duration: 3 + Math.random() * 4,
               repeat: Infinity,
+              delay: Math.random() * 5,
               ease: "linear",
             }}
-          >
-            <div className="w-full h-full bg-white rounded-full border-2 border-black relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1/2 bg-red-500"></div>
-              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-black -translate-y-1/2"></div>
-              <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-white border border-black rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-            </div>
-          </motion.div>
+          />
         ))}
       </div>
 
-      <div className="z-10 flex flex-col items-center gap-12">
-        <motion.h1 
-          className="text-7xl font-bold tracking-widest text-yellow-400 drop-shadow-[4px_4px_0_#3b4cca] uppercase"
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ duration: 2, repeat: Infinity }}
+      <div className="z-10 w-full max-w-2xl flex flex-col gap-6">
+        {/* Title Area - Floating Logo Style */}
+        <motion.div
+          className="flex flex-col items-center mb-8"
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
-          POKEMON
-        </motion.h1>
-        <div className="flex flex-col gap-4 w-72">
-          <button onClick={() => setView('game')} className="bg-white text-[#384858] border-4 border-[#3b4cca] p-4 text-2xl font-bold hover:bg-yellow-400 transition-colors shadow-lg">NEW GAME</button>
-          <button onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')} className="bg-white text-[#384858] border-4 border-[#3b4cca] p-4 text-2xl font-bold hover:bg-yellow-400 transition-colors shadow-lg">THEMES</button>
+          <h1 className="text-4xl sm:text-6xl text-yellow-400 drop-shadow-[4px_4px_0_#3b4cca] tracking-tight">POKéMON</h1>
+          <div className="bg-white px-4 py-1 mt-2 border-2 border-[#3b4cca] shadow-[4px_4px_0_#000]">
+            <span className="text-[8px] sm:text-[10px] text-[#3b4cca]">OBSIDIAN VERSION</span>
+          </div>
+        </motion.div>
+
+        {/* GBA Dialog Box Menu */}
+        <div className="relative group">
+          {/* Outer Border */}
+          <div className="bg-[#5870B8] p-1.5 rounded-lg shadow-[6px_6px_0_black]">
+            {/* Inner White Border */}
+            <div className="bg-[#F8F8F8] p-1 rounded-md">
+              {/* Main Dialog Content */}
+              <div className="bg-[#F8F8F8] border-2 border-[#5870B8] rounded-md p-6 sm:p-10 flex flex-col gap-6">
+
+                <button
+                  onClick={() => setView('game')}
+                  className="flex items-center gap-4 group/item"
+                >
+                  <motion.span
+                    className="text-2xl opacity-0 group-hover/item:opacity-100"
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.6 }}
+                  >
+                    ▶
+                  </motion.span>
+                  <span className="text-xl sm:text-2xl hover:text-[#5870B8] transition-colors uppercase">NEW GAME</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')}
+                  className="flex items-center gap-4 group/item"
+                >
+                  <motion.span
+                    className={`text-2xl ${activeSection === 'themes' ? 'opacity-100' : 'opacity-0'} group-hover/item:opacity-100`}
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 0.6 }}
+                  >
+                    ▶
+                  </motion.span>
+                  <span className="text-xl sm:text-2xl hover:text-[#5870B8] transition-colors uppercase">REGION MAP</span>
+                </button>
+
+                <AnimatePresence>
+                  {activeSection === 'themes' && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="grid grid-cols-2 gap-4 mt-2 border-t-2 border-[#5870B8] pt-4"
+                    >
+                      {themes.map(t => (
+                        <button
+                          key={t}
+                          onClick={() => setTheme(t)}
+                          className={`text-[8px] sm:text-[10px] text-left hover:text-[#5870B8] transition-colors ${theme === t ? 'text-[#5870B8] font-bold' : ''}`}
+                        >
+                          {t.replace('_', ' ')}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+
+          {/* Subtle "A" Button Indicator */}
+          <div className="absolute -bottom-4 -right-2 bg-red-500 w-10 h-10 rounded-full border-4 border-black flex items-center justify-center shadow-lg">
+            <span className="text-white text-xs">A</span>
+          </div>
         </div>
-        <AnimatePresence>
-          {activeSection === 'themes' && (
-            <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-2 gap-2 bg-[#202830] p-6 border-4 border-white rounded-lg shadow-2xl max-h-48 overflow-y-auto custom-scrollbar">
-              {themes.map(t => (
-                <button key={t} onClick={() => setTheme(t)} className="text-yellow-400 hover:text-white text-[10px] uppercase font-bold">{t}</button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+      </div>
+
+      {/* Retro Footer */}
+      <div className="absolute bottom-4 left-0 w-full text-center opacity-40">
+        <p className="text-[6px] sm:text-[8px]">©2024 PHANTOM / GAME FREAK / NINTENDO</p>
       </div>
     </div>
   );
