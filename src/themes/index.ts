@@ -10,6 +10,7 @@ import { AnimalCrossingTheme } from './AnimalCrossingTheme';
 import { SkyrimTheme } from './SkyrimTheme';
 import { SanrioTheme } from './SanrioTheme';
 import { CyberpunkTheme } from './CyberpunkTheme';
+import { UndertaleTheme } from './UndertaleTheme';
 
 export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.SONIC]: SonicTheme,
@@ -23,6 +24,7 @@ export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.SKYRIM]: SkyrimTheme,
     [Theme.SANRIO]: SanrioTheme,
     [Theme.CYBERPUNK]: CyberpunkTheme,
+    [Theme.UNDERTALE]: UndertaleTheme,
 };
 
 export const getThemeDefinition = (theme: Theme): ThemeDefinition => {

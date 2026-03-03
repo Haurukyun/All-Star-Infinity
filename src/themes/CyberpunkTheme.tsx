@@ -201,32 +201,37 @@ export const CyberpunkLayout: React.FC<{ children: React.ReactNode; activeTab: s
 
 export const CyberpunkMenuLayout: React.FC<{ children: React.ReactNode; logic: any }> = ({ children }) => {
     return (
-        <div className="h-full w-full flex flex-col justify-center p-8 sm:p-16 relative overflow-hidden bg-[#050505] text-[#ff003c] font-['Rajdhani']">
+        <div className="h-[100dvh] w-screen flex flex-col justify-center p-8 sm:p-24 relative overflow-hidden bg-[#050505] text-[#ff003c] font-['Rajdhani']">
             <style>{`
-                .cyber-glitch-bg {
-                    background: radial-gradient(circle at 30% 50%, rgba(255,0,60,0.1) 0%, transparent 60%);
+                .cyber-menu-bg {
+                    background-image: linear-gradient(to right, rgba(255, 0, 60, 0.1) 1px, transparent 1px),
+                                      linear-gradient(to bottom, rgba(255, 0, 60, 0.1) 1px, transparent 1px);
+                    background-size: 40px 40px;
                 }
             `}</style>
 
-            <div className="absolute inset-0 cyber-glitch-bg z-0"></div>
-            <div className="absolute inset-0 cyber-scanlines pointer-events-none z-50"></div>
+            <div className="absolute inset-0 cyber-menu-bg opacity-20 z-0"></div>
+            <div className="absolute inset-0 cyber-scanlines pointer-events-none z-50 opacity-30"></div>
 
-            <div className="absolute left-[10%] top-0 bottom-0 w-[40%] bg-gradient-to-r from-[rgba(255,0,60,0.15)] to-transparent border-l border-[#ff003c]/30 z-0"></div>
+            {/* CP2077 Dark Red Left Overlay */}
+            <div className="absolute left-[15%] top-0 bottom-0 w-[40%] bg-gradient-to-r from-[rgba(255,0,60,0.15)] to-transparent border-l-2 border-[#ff003c]/40 z-0"></div>
 
-            <div className="relative z-10 w-full max-w-xl">
-                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-12">
-                    <h1 className="text-6xl sm:text-8xl font-black italic text-[#fcee0a] glitch-text leading-none tracking-tighter" data-text="ALL-STAR">
-                        ALL-STAR
+            <div className="relative z-10 w-full max-w-2xl ml-[15%]">
+                <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="mb-20">
+                    <h1 className="text-7xl sm:text-[8rem] font-black italic text-[#fcee0a] leading-none tracking-tighter" style={{ textShadow: '4px 4px 0 rgba(0,240,255,0.4)' }}>
+                        ALL-STAR<br /><span className="text-[#00f0ff] text-5xl sm:text-[6rem]">INFINITY</span>
                     </h1>
-                    <div className="flex items-center gap-4 mt-2">
-                        <span className="text-3xl sm:text-4xl text-[#00f0ff] font-bold tracking-widest">INFINITY</span>
-                        <span className="text-xs cyber-mono border border-[#00f0ff] text-[#00f0ff] px-2 py-1">v. 1.05</span>
-                    </div>
+                    <div className="text-xl cyber-mono text-[#ff003c] mt-4 opacity-80">1.05</div>
                 </motion.div>
 
-                <div className="flex flex-col gap-4 w-full sm:w-64 items-stretch">
+                <div className="flex flex-col gap-2 w-full sm:w-80 items-stretch">
                     {children}
                 </div>
+            </div>
+
+            {/* Version string fixed bottom left matching UI */}
+            <div className="absolute bottom-10 left-10 text-xs cyber-mono text-[#ff003c] opacity-50">
+                TRN_TLCAS_000095
             </div>
         </div>
     );
@@ -234,13 +239,18 @@ export const CyberpunkMenuLayout: React.FC<{ children: React.ReactNode; logic: a
 
 export const CyberpunkMenuButton: React.FC<{ label: string; onClick: () => void; isPrimary?: boolean }> = ({ label, onClick, isPrimary }) => {
     return (
-        <motion.button
-            whileHover={{ x: 10 }}
+        <button
             onClick={onClick}
-            className={`text-left py-3 px-4 text-2xl font-semibold tracking-widest transition-all ${isPrimary ? 'text-[#00f0ff] border border-[#00f0ff] bg-[rgba(0,240,255,0.05)] hover:bg-[#00f0ff] hover:text-black' : 'text-[#ff003c] hover:text-[#fcee0a]'}`}
+            className={`text-left py-4 px-6 text-2xl font-medium tracking-widest transition-all cyber-mono group relative ${isPrimary ? 'text-[#00f0ff] hover:bg-[rgba(0,240,255,0.1)]' : 'text-[#ff003c] hover:text-[#fcee0a] hover:bg-white/5'}`}
         >
-            {label}
-        </motion.button>
+            <div className={`absolute left-0 top-0 bottom-0 w-1 transition-all ${isPrimary ? 'bg-[#00f0ff] group-hover:w-full group-hover:opacity-10' : 'bg-transparent'}`}></div>
+            <div className={`absolute inset-0 border transition-all ${isPrimary ? 'border-[#00f0ff] group-hover:border-[#00f0ff]' : 'border-transparent group-hover:border-[#fcee0a]'}`}></div>
+
+            <span className="relative z-10 flex items-center justify-between">
+                <span>{label}</span>
+                {isPrimary && <span className="opacity-0 group-hover:opacity-100 text-sm">▶</span>}
+            </span>
+        </button>
     );
 };
 

@@ -19,7 +19,8 @@ export enum Theme {
   SKYRIM = 'Skyrim',
   SONIC = 'Sonic',
   SANRIO = 'Sanrio',
-  CYBERPUNK = 'Cyberpunk'
+  CYBERPUNK = 'Cyberpunk',
+  UNDERTALE = 'Undertale'
 }
 
 export enum GameMode {
