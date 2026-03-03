@@ -349,33 +349,7 @@ export const OmoriMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = (
     <div className="h-full w-full flex flex-col items-center justify-center p-6 bg-white font-['Gloria_Hallelujah'] text-black relative overflow-hidden select-none">
       {/* Hand-drawn Grid Background */}
       <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#000 0.5px, transparent 0.5px)', backgroundSize: '30px 30px' }}></div>
-
-      {/* Sketchy Floating Elements (No Emotes) */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute border border-black opacity-10"
-            style={{
-              width: Math.random() * 100 + 50,
-              height: Math.random() * 2 + 1,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              rotate: Math.random() * 360,
-            }}
-            animate={{
-              x: [0, 10, -10, 0],
-              y: [0, 5, -5, 0],
-              opacity: [0.05, 0.15, 0.05],
-            }}
-            transition={{
-              duration: 5 + i,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
+      <div className="absolute inset-0 pointer-events-none"></div>
 
       <div className="z-10 flex flex-col items-center max-w-sm w-full">
         {/* Subtle Title Backdrop */}

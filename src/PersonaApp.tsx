@@ -401,207 +401,102 @@ const PersonaApp: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logi
 
 export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
   const { setView, setTheme, theme } = logic;
-  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | 'options' | null>(null);
-
-  const menuItems = [
-    { id: 'gamemodes', label: 'STEAL', sub: 'START_MISSION', rotation: -5, x: -20 },
-    { id: 'themes', label: 'DECKS', sub: 'FORGE_CARDS', rotation: 3, x: 10 },
-    { id: 'options', label: 'META', sub: 'SYSTEM_CONFIG', rotation: -2, x: -5 },
-  ];
-
+  const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
-
-  const [shards, setShards] = React.useState<{ id: number, width: number, height: number, left: string, top: string, rotate: number }[]>([]);
-  const [stars, setStars] = React.useState<{ id: number, left: string, top: string, fontSize: number }[]>([]);
-
-  React.useEffect(() => {
-    setShards([...Array(12)].map((_, i) => ({
-      id: i,
-      width: Math.random() * 150 + 50,
-      height: Math.random() * 150 + 50,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      rotate: Math.random() * 360,
-    })));
-
-    setStars([...Array(5)].map((_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      fontSize: Math.random() * 40 + 20,
-    })));
-  }, []);
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden bg-black select-none">
-      {/* Dynamic Background */}
-      <div className="absolute inset-0 p5-dots-bg opacity-40"></div>
-      <div className="absolute top-0 right-0 w-full sm:w-2/3 h-full bg-[#D80000] transform skew-x-[-25deg] translate-x-1/2 opacity-20 z-0 mix-blend-multiply"></div>
+      {/* Background Layers */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 p5-dots-bg opacity-30"></div>
+        <div className="absolute top-0 right-[-10%] w-[120%] h-full bg-[#D80000] transform skew-x-[-15deg] translate-x-[30%] opacity-90 shadow-[inset_20px_0_40px_rgba(0,0,0,0.5)]"></div>
 
-      {/* Floating Shards */}
-      <div className="absolute inset-0 pointer-events-none">
-        {shards.map((shard, i) => (
-          <motion.div
-            key={shard.id}
-            className="absolute bg-white/5 border border-white/10"
-            style={{
-              width: shard.width,
-              height: shard.height,
-              left: shard.left,
-              top: shard.top,
-              rotate: shard.rotate,
-              skewX: -15,
-            }}
-            animate={{
-              y: [0, -40, 0],
-              x: [0, 20, 0],
-              rotate: [shard.rotate, shard.rotate + 10, shard.rotate],
-              opacity: [0.05, 0.15, 0.05],
-            }}
-            transition={{
-              duration: 8 + i,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
+        {/* Decorative Jagged Shapes */}
+        <div className="absolute top-[10%] left-[-5%] w-1/2 h-[60px] bg-white transform rotate-6 skew-x-[-20deg] opacity-10"></div>
+        <div className="absolute bottom-[15%] right-[-10%] w-[60%] h-[120px] bg-black transform -rotate-12 skew-x-[15deg] opacity-40 shadow-[15px_15px_0_#D80000]"></div>
+      </div>
 
-        {/* Decorative Stars */}
-        {stars.map((star, i) => (
+      <div className="z-10 w-full max-w-5xl flex flex-col items-center justify-center gap-12 sm:gap-20">
+
+        {/* Overlapping Strips Selection Zone */}
+        <div className="flex flex-col items-center gap-10 w-full">
+
+          {/* STEAL STRIP */}
           <motion.div
-            key={`star-${star.id}`}
-            className="absolute text-[#D80000] opacity-20"
-            style={{
-              left: star.left,
-              top: star.top,
-              fontSize: star.fontSize
-            }}
-            animate={{
-              rotate: 360,
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 10 + i * 2,
-              repeat: Infinity,
-              ease: "linear"
-            }}
+            initial={{ x: -600, rotate: -10 }}
+            animate={{ x: 20, rotate: -4 }}
+            whileHover={{ x: 50, scale: 1.02 }}
+            className={`cursor-pointer relative w-[95%] sm:w-[85%] h-20 sm:h-28 transition-all duration-300 ${activeSection === 'gamemodes' ? 'z-50' : 'z-30 opacity-90'}`}
+            onClick={() => setActiveSection(activeSection === 'gamemodes' ? null : 'gamemodes')}
           >
-            ★
+            <div className={`absolute inset-0 bg-white transform skew-x-[-15deg] shadow-[15px_15px_0_#000] border-r-[12px] border-[#D80000] p5-border`}></div>
+            <div className={`absolute top-0 left-0 h-full w-4 bg-[#D80000] transform skew-y-[45deg] origin-top`}></div>
+            <div className="relative h-full flex items-center justify-between px-10 sm:px-16">
+              <span className="font-p5-display text-5xl sm:text-8xl italic text-black uppercase tracking-tighter">STEAL</span>
+              <div className="flex flex-col items-end opacity-40">
+                <span className="text-black font-black text-[10px] sm:text-xs tracking-[0.4em] italic leading-none">START_MISSION</span>
+                <div className="w-16 h-[2px] bg-black mt-1"></div>
+              </div>
+            </div>
           </motion.div>
-        ))}
-      </div>
 
-      {/* Character Silhouette Background */}
-      <div className="absolute bottom-0 right-0 w-full h-full pointer-events-none z-0 overflow-hidden">
-        <motion.div
-          initial={{ x: 100, opacity: 0 }}
-          animate={{ x: 0, opacity: 0.15 }}
-          className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[120%] bg-[#D80000] transform skew-x-[-15deg]"
-          style={{
-            clipPath: 'polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%)'
-          }}
-        ></motion.div>
-      </div>
-
-      <div className="z-10 w-full max-w-4xl flex flex-col sm:flex-row items-center sm:items-start justify-center gap-6 sm:gap-10">
-        {/* Main Menu Items */}
-        <div className="relative flex flex-col items-center sm:items-start gap-2 sm:gap-3 w-full sm:w-1/2">
-          {menuItems.map((item, idx) => (
-            <motion.div
-              key={item.id}
-              initial={{ x: -200, opacity: 0, rotate: -15 }}
-              animate={{ x: 0, opacity: 1, rotate: 0 }}
-              transition={{ delay: idx * 0.1, type: 'spring', stiffness: 120, damping: 12 }}
-              className="w-full"
-            >
-              <button
-                onClick={() => setActiveSection(activeSection === item.id ? null : item.id as 'gamemodes' | 'themes' | 'options')}
-                className={`
-                  relative group w-full text-left transition-all duration-500
-                  ${activeSection === item.id ? 'scale-110 z-30 translate-x-8' : 'hover:scale-105 z-10 hover:translate-x-4'}
-                `}
-              >
-                {/* Background Box with shadow */}
-                <div
-                  className={`
-                    absolute inset-0 bg-black transform transition-all duration-300 p5-border
-                    ${activeSection === item.id ? 'bg-white !shadow-[12px_12px_0_#D80000]' : 'group-hover:bg-[#D80000] !shadow-[6px_6px_0_black]'}
-                  `}
-                  style={{ transform: `skewX(-20deg) rotate(${item.rotation * 1.5}deg)` }}
-                ></div>
-
-                {/* Content */}
-                <div className="relative px-8 py-3 sm:py-5 flex flex-col overflow-hidden">
-                  {/* Red indicator bar - positioned to stay aligned with the choice box */}
-                  <div className={`absolute top-0 left-[-5px] w-3 h-full bg-[#D80000] transition-all duration-300 origin-left ${activeSection === item.id ? 'scale-x-100 opacity-100 translate-x-0' : 'scale-x-0 opacity-0 -translate-x-4'}`}></div>
-
-                  <span
-                    className={`
-                      font-p5-display text-5xl sm:text-8xl tracking-tighter uppercase italic leading-none transition-colors duration-300
-                      ${activeSection === item.id ? 'text-black' : 'text-white'}
-                    `}
-                  >
-                    {item.label}
-                  </span>
-                  <div className="flex items-center gap-3 mt-1">
-                    <div className={`h-[3px] bg-[#D80000] transition-all duration-300 ${activeSection === item.id ? 'w-12' : 'w-0'}`}></div>
-                    <span
-                      className={`
-                        font-black text-[10px] sm:text-[14px] tracking-[0.5em] uppercase italic transition-colors duration-300
-                        ${activeSection === item.id ? 'text-[#D80000]' : 'text-white/60'}
-                      `}
-                    >
-                      {item.sub}
-                    </span>
-                  </div>
-                </div>
-              </button>
-            </motion.div>
-          ))}
-
-          {/* Decorative "01" or other numbers */}
-          <div className="absolute -top-10 -left-10 font-p5-display text-white/5 text-[12rem] italic select-none pointer-events-none">01</div>
+          {/* DECKS STRIP */}
+          <motion.div
+            initial={{ x: 600, rotate: 10 }}
+            animate={{ x: -20, rotate: 2 }}
+            whileHover={{ x: -50, scale: 1.02 }}
+            className={`cursor-pointer relative w-[95%] sm:w-[85%] h-20 sm:h-28 transition-all duration-300 ${activeSection === 'themes' ? 'z-50' : 'z-30 opacity-90'}`}
+            onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')}
+          >
+            <div className={`absolute inset-0 bg-black transform skew-x-[-15deg] shadow-[15px_15px_0_#D80000] border-l-[12px] border-white p5-border`}></div>
+            <div className="relative h-full flex items-center justify-between px-10 sm:px-16 text-white">
+              <div className="flex flex-col items-start opacity-40">
+                <span className="font-black text-[10px] sm:text-xs tracking-[0.4em] italic leading-none">FORGE_CARDS</span>
+                <div className="w-16 h-[2px] bg-white mt-1"></div>
+              </div>
+              <span className="font-p5-display text-5xl sm:text-8xl italic uppercase tracking-tighter text-shadow-[4px_4px_0_#D80000]">DECKS</span>
+            </div>
+          </motion.div>
         </div>
 
-        {/* Sub-menu Content */}
-        <div className="w-full sm:w-1/2 h-56 sm:h-96 relative flex items-center justify-center">
+        {/* Dynamic Sub-menu Content */}
+        <div className="h-64 sm:h-80 w-full flex items-center justify-center relative">
           <AnimatePresence mode="wait">
             {!activeSection && (
               <motion.div
                 key="idle"
-                initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 1.2, rotate: 5 }}
-                className="text-center relative"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.2 }}
+                className="flex flex-col items-center opacity-20 group"
               >
-                <div className="absolute inset-0 bg-white/5 blur-3xl rounded-full"></div>
-                <div className="font-p5-display text-white/10 text-[10rem] sm:text-[14rem] italic tracking-tighter select-none relative z-0">P5</div>
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-                  <p className="text-white/40 font-black tracking-[1.2em] uppercase text-[10px] sm:text-xs bg-black/40 px-4 py-1 backdrop-blur-sm">WAITING_FOR_INPUT</p>
-                  <div className="w-12 h-1 bg-[#D80000] mt-2 animate-pulse"></div>
-                </div>
+                <div className="font-p5-display text-[10rem] sm:text-[14rem] italic tracking-tighter text-white/30 leading-none">P5</div>
+                <div className="mt-[-2rem] text-white/50 font-black tracking-[1.5em] text-[10px] uppercase italic animate-pulse">Waiting_Input</div>
               </motion.div>
             )}
 
             {activeSection === 'gamemodes' && (
               <motion.div
-                key="gamemodes"
-                initial={{ opacity: 0, x: 100, skewX: 20 }}
-                animate={{ opacity: 1, x: 0, skewX: 0 }}
-                exit={{ opacity: 0, x: -100, skewX: -20 }}
-                className="w-full flex flex-col gap-4"
+                key="steal-sub"
+                initial={{ opacity: 0, y: 30, rotate: 5 }}
+                animate={{ opacity: 1, y: 0, rotate: -3 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="w-full max-w-sm px-4"
               >
                 <button
                   onClick={() => setView('game')}
-                  className="group relative bg-white text-black p-6 sm:p-10 transform -skew-x-12 shadow-[12px_12px_0_black] p5-border transition-all hover:-translate-y-2 hover:shadow-[16px_16px_0_#D80000] active:translate-y-1 active:shadow-none"
+                  className="w-full bg-white text-black p-8 sm:p-12 transform hover:scale-105 transition-all shadow-[20px_20px_0_#000] p5-border group relative overflow-hidden"
                 >
-                  <div className="absolute top-0 left-0 w-full h-1 bg-[#D80000]"></div>
-                  <span className="font-p5-display text-3xl sm:text-5xl italic block leading-none">★ START MISSION</span>
-                  <div className="flex items-center gap-3 mt-3">
-                    <div className="w-6 h-6 bg-black flex items-center justify-center transform rotate-45">
-                      <div className="w-3 h-3 bg-[#D80000]"></div>
+                  <div className="absolute top-0 right-0 w-12 h-12 bg-[#D80000] transform translate-x-1/2 -translate-y-1/2 rotate-45 z-0"></div>
+                  <span className="font-p5-display text-4xl sm:text-7xl italic block leading-none mb-6 relative z-10 group-hover:text-[#D80000]">★ START MISSION</span>
+                  <div className="flex items-center gap-5 border-t-8 border-black pt-6 relative z-10">
+                    <div className="w-10 h-10 bg-black flex items-center justify-center transform rotate-45 border-4 border-[#D80000] group-hover:scale-125 transition-transform duration-500">
+                      <div className="w-4 h-4 bg-white animate-pulse"></div>
                     </div>
-                    <span className="block text-[10px] sm:text-xs font-black tracking-widest opacity-70 uppercase italic">EXECUTE_COGNITIVE_HEIST</span>
+                    <div className="flex flex-col items-start translate-y-[-2px]">
+                      <span className="text-[10px] sm:text-xs font-black tracking-[0.3em] italic uppercase text-[#D80000]">Operation_Heist</span>
+                      <span className="text-[8px] sm:text-[10px] font-bold tracking-widest uppercase opacity-40">Execute_Cognitive_Sync</span>
+                    </div>
                   </div>
                 </button>
               </motion.div>
@@ -609,60 +504,38 @@ export const PersonaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> =
 
             {activeSection === 'themes' && (
               <motion.div
-                key="themes"
-                initial={{ opacity: 0, scale: 0.8, rotate: 10 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                exit={{ opacity: 0, scale: 1.2, rotate: -10 }}
-                className="w-full grid grid-cols-2 gap-3 sm:gap-4"
+                key="decks-sub"
+                initial={{ opacity: 0, x: 100, rotate: -5 }}
+                animate={{ opacity: 1, x: 0, rotate: 2 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                className="w-full max-w-2xl grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 px-4"
               >
                 {themes.map((t, i) => (
                   <motion.button
                     key={t}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    whileHover={{ scale: 1.1, rotate: i % 2 === 0 ? 3 : -3, zIndex: 10 }}
                     onClick={() => setTheme(t)}
                     className={`
-                      p-3 sm:p-5 transform -skew-x-12 font-p5-display text-xs sm:text-base italic transition-all border-[3px] border-black shadow-[5px_5px_0_black]
-                      ${theme === t ? 'bg-white text-black scale-110 z-10 shadow-[8px_8px_0_#D80000]' : 'bg-black text-white border-white/20 hover:bg-[#D80000] hover:-translate-y-1'}
+                      p-3 sm:p-5 italic font-p5-display transition-all transform shadow-[6px_6px_0_#000] p5-border border-[3px]
+                      ${theme === t
+                        ? 'bg-[#D80000] text-white scale-110 !shadow-[10px_10px_0_white] -rotate-2 border-white'
+                        : 'bg-black text-white border-white/10 hover:bg-white hover:text-black hover:-translate-y-1'}
                     `}
                   >
-                    <span className="transform skew-x-12 block">{t.toUpperCase()}</span>
+                    <span className="text-xs sm:text-lg">{t.toUpperCase()}</span>
                   </motion.button>
                 ))}
-              </motion.div>
-            )}
-
-            {activeSection === 'options' && (
-              <motion.div
-                key="options"
-                initial={{ opacity: 0, y: 50, skewY: 5 }}
-                animate={{ opacity: 1, y: 0, skewY: 0 }}
-                exit={{ opacity: 0, y: -50, skewY: -5 }}
-                className="w-full bg-white text-black p-6 sm:p-10 transform -skew-x-6 shadow-[16px_16px_0_black] p5-border space-y-5"
-              >
-                <div className="flex justify-between items-end border-b-4 border-black pb-2 group">
-                  <span className="font-p5-display text-2xl sm:text-4xl italic group-hover:text-[#D80000] transition-colors">HEART_SYNC</span>
-                  <span className="font-black text-xs sm:text-sm text-[#D80000] animate-pulse">STABLE</span>
-                </div>
-                <div className="flex justify-between items-end border-b-4 border-black pb-2 group">
-                  <span className="font-p5-display text-2xl sm:text-4xl italic group-hover:text-[#D80000] transition-colors">COGNITION</span>
-                  <span className="font-black text-xs sm:text-sm text-[#D80000]">ENHANCED</span>
-                </div>
-                <div className="pt-4 flex justify-center">
-                  <div className="w-16 h-16 bg-black transform rotate-45 flex items-center justify-center animate-spin-slow">
-                    <div className="w-10 h-10 bg-[#D80000] transform rotate-0"></div>
-                  </div>
-                </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
 
-      {/* Footer Decoration */}
-      <div className="absolute bottom-10 left-10 hidden sm:block">
-        <div className="font-p5-display text-white/5 text-4xl italic tracking-widest">TAKE_YOUR_HEART</div>
+      {/* Decorative Brand Elements */}
+      <div className="absolute top-10 left-10 text-white/10 font-black text-[12rem] italic leading-none pointer-events-none -z-10 tracking-tighter">01</div>
+      <div className="absolute bottom-10 right-10 flex flex-col items-end pointer-events-none opacity-20 italic">
+        <span className="font-p5-display text-4xl sm:text-7xl tracking-tighter text-white">THIEVE_SYNC</span>
+        <span className="text-[10px] font-black tracking-[0.8em] text-[#D80000]">V_1.21-PHANTOM</span>
       </div>
     </div>
   );

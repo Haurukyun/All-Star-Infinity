@@ -531,31 +531,22 @@ export const DanganronpaMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> 
       <div className="z-20 w-full max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-16">
 
         {/* Title Section */}
-        <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-2">
+        <div className="flex flex-col items-center lg:items-start text-center lg:text-left space-y-2 relative">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
-          >
-            <div className="w-8 h-1 bg-[#ff00ff]"></div>
-            <span className="text-[10px] tracking-[0.5em] text-[#ff00ff] font-black">ULTIMATE_DECISION_MAKER</span>
-          </motion.div>
-
-          <motion.h1
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-white drop-shadow-[5px_5px_0_#ff00ff] italic"
+            className="relative"
           >
-            DANGAN<span className="text-[#ff00ff]">RONPA</span>
-          </motion.h1>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5 }}
-            className="text-[8px] sm:text-[10px] uppercase tracking-[0.8em] font-bold"
-          >
-            Execution Overhaul • v3.0
+            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-black tracking-tighter text-white drop-shadow-[5px_5px_0_#ff00ff] italic relative z-10">
+              DANGAN<span className="text-[#00ffff]">RONPA</span>
+            </h1>
+            {/* V3 Style Distorted Overlays */}
+            <div className="absolute -inset-1 bg-[#ff00ff] opacity-20 blur-sm -skew-x-12 animate-pulse"></div>
+            <div className="absolute top-1/2 left-0 w-full h-1 bg-white/40 -skew-y-2 z-20"></div>
           </motion.div>
+          <div className="bg-[#ff00ff] text-white text-[10px] sm:text-xs font-bold px-3 py-1 rotate-[-2deg] mt-[-10px] z-30 shadow-[4px_4px_0_#000]">
+            ULTIMATE_DECISION_MAKER_v3
+          </div>
         </div>
 
         {/* Menu Section */}

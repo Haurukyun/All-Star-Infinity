@@ -495,10 +495,27 @@ export const MinecraftMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }>
   const [activeSection, setActiveSection] = React.useState<'gamemodes' | 'themes' | null>(null);
   const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
 
+  const SPLASH_TEXTS = ["AWESOME!", "BLOCKY!", "PHANTOM!", "OBSIDIAN!", "CRAFTY!", "SLEEK!"];
+  const [splash, setSplash] = React.useState(SPLASH_TEXTS[0]);
+
+  React.useEffect(() => {
+    setSplash(SPLASH_TEXTS[Math.floor(Math.random() * SPLASH_TEXTS.length)]);
+  }, []);
+
   return (
     <div className="h-full w-full flex flex-col items-center justify-center p-4 bg-[#1a1a1a] font-['VT323'] text-white relative overflow-hidden select-none">
-      {/* Blocky Background Pattern */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000), linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000)', backgroundSize: '60px 60px', backgroundPosition: '0 0, 30px 30px' }}></div>
+      {/* Animated Panorama (Moving Pixel Noise) */}
+      <div className="absolute inset-0 z-0">
+        <motion.div
+          className="absolute inset-[-10%] opacity-20"
+          style={{
+            backgroundImage: 'url("https://www.transparenttextures.com/patterns/black-linen.png"), linear-gradient(45deg, #1a1a1a 25%, #2a2a2a 25%, #2a2a2a 50%, #1a1a1a 50%, #1a1a1a 75%, #2a2a2a 75%, #2a2a2a 100%)',
+            backgroundSize: '100px 100px'
+          }}
+          animate={{ x: [-20, 20], y: [-20, 20] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "linear", repeatType: "reverse" }}
+        />
+      </div>
 
       {/* Floating Pixel Clouds */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -521,41 +538,51 @@ export const MinecraftMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }>
 
       <div className="z-10 flex flex-col items-center w-full max-w-sm gap-12">
         {/* Title Section */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center relative">
           <motion.h1
-            className="text-6xl sm:text-8xl font-bold tracking-widest text-[#55FF55] drop-shadow-[6px_6px_0_#2e2e2e]"
+            className="text-7xl sm:text-9xl font-bold tracking-widest text-white"
             initial={{ y: -50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
+            style={{
+              textShadow: '8px 8px 0px #373737, 12px 12px 0px #000'
+            }}
           >
             MINECRAFT
           </motion.h1>
-          <div className="bg-[#373737] px-4 py-1 -mt-2 border-2 border-[#1e1e1e] shadow-[4px_4px_0_#000]">
-            <span className="text-yellow-400 text-sm tracking-[0.3em]">PHANTOM EDITION</span>
-          </div>
+
+          {/* Bouncy Splash Text */}
+          <motion.div
+            className="absolute -bottom-4 -right-8 sm:-right-12 bg-transparent text-yellow-400 text-xl sm:text-2xl font-black drop-shadow-[2px_2px_0_#000] rotate-[-15deg]"
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+          >
+            {splash}
+          </motion.div>
         </div>
 
         {/* Menu Buttons */}
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-6 w-full px-4">
           <motion.button
-            whileHover={{ scale: 1.02, brightness: 1.2 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setView('game')}
-            className="relative group h-16 w-full"
+            className="relative h-16 w-full group"
           >
-            {/* Layered Block Style */}
-            <div className="absolute inset-0 bg-[#7c7c7c] border-b-4 border-r-4 border-[#373737] border-t-4 border-l-4 border-[#bababa]"></div>
-            <div className="absolute inset-0 bg-[#7c7c7c] group-hover:bg-[#55FF55] opacity-0 group-hover:opacity-10 transition-colors"></div>
-            <span className="relative z-10 text-3xl font-bold drop-shadow-[2px_2px_0_#373737] group-hover:text-[#55FF55]">SINGLEPLAYER</span>
+            {/* 3D-effect borders */}
+            <div className="absolute inset-0 bg-[#7c7c7c] border-t-[4px] border-l-[4px] border-[#bababa] border-b-[4px] border-r-[4px] border-[#373737] shadow-[4px_4px_0_#000]"></div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+            <span className="relative z-10 text-3xl font-bold drop-shadow-[2px_2px_0_#373737]">PLAY GAME</span>
           </motion.button>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setActiveSection(activeSection === 'themes' ? null : 'themes')}
-            className="relative group h-16 w-full"
+            className="relative h-16 w-full group"
           >
-            <div className="absolute inset-0 bg-[#7c7c7c] border-b-4 border-r-4 border-[#373737] border-t-4 border-l-4 border-[#bababa]"></div>
-            <span className="relative z-10 text-3xl font-bold drop-shadow-[2px_2px_0_#373737]">MULTIPLAYER</span>
+            <div className="absolute inset-0 bg-[#7c7c7c] border-t-[4px] border-l-[4px] border-[#bababa] border-b-[4px] border-r-[4px] border-[#373737] shadow-[4px_4px_0_#000]"></div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+            <span className="relative z-10 text-3xl font-bold drop-shadow-[2px_2px_0_#373737]">THEMES</span>
           </motion.button>
 
           <AnimatePresence>
