@@ -24,6 +24,19 @@ export const DEFAULT_PROMPTS: GamePrompt[] = [
 
   // VULGAR DARES
   { id: '12', type: 'Dare', intensity: Intensity.VULGAR, text: 'Remove one article of clothing.', penalty: 'Remove two articles of clothing' },
+
+  // NHIE SOFT
+  { id: '13', type: 'NeverHaveIEver', intensity: Intensity.SOFT, text: 'Never have I ever faked being sick to skip work/school.', penalty: 'Confess your worst excuse' },
+  { id: '14', type: 'NeverHaveIEver', intensity: Intensity.SOFT, text: 'Never have I ever used someone else\'s toothbrush.', penalty: 'Take a sip' },
+  { id: '15', type: 'NeverHaveIEver', intensity: Intensity.SOFT, text: 'Never have I ever snooped through someone\'s phone.', penalty: 'Let the group see your last text' },
+
+  // NHIE HOT
+  { id: '16', type: 'NeverHaveIEver', intensity: Intensity.HOT, text: 'Never have I ever had a crush on a friend\'s partner.', penalty: 'Take two sips' },
+  { id: '17', type: 'NeverHaveIEver', intensity: Intensity.HOT, text: 'Never have I ever ghosted someone after a first date.', penalty: 'Text your ex or take a shot' },
+
+  // NHIE VULGAR
+  { id: '18', type: 'NeverHaveIEver', intensity: Intensity.VULGAR, text: 'Never have I ever hooked up in a public place.', penalty: 'Take a shot' },
+  { id: '19', type: 'NeverHaveIEver', intensity: Intensity.VULGAR, text: 'Never have I ever sent a spicy photo to the wrong person.', penalty: 'Take a shot' },
 ];
 
 export const getRandomPrompt = (type: PromptType, intensity: Intensity): GamePrompt => {

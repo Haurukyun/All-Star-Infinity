@@ -18,10 +18,16 @@ export enum Theme {
   ANIMAL_CROSSING = 'Animal Crossing',
   SKYRIM = 'Skyrim',
   SONIC = 'Sonic',
-  SANRIO = 'Sanrio'
+  SANRIO = 'Sanrio',
+  CYBERPUNK = 'Cyberpunk'
 }
 
-export type PromptType = 'Truth' | 'Dare';
+export enum GameMode {
+  TRUTH_OR_DARE = 'TruthOrDare',
+  NEVER_HAVE_I_EVER = 'NeverHaveIEver'
+}
+
+export type PromptType = 'Truth' | 'Dare' | 'NeverHaveIEver';
 
 export interface GamePrompt {
   id: string;

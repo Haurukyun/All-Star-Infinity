@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameLogic } from '../hooks/useGameLogic';
-import { Intensity, Theme } from '../types';
+import { Intensity, Theme, GameMode } from '../types';
 import { getThemeDefinition } from '../themes';
 
 interface UnifiedGameProps {
@@ -11,6 +11,7 @@ interface UnifiedGameProps {
 const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
     const {
         activeTab,
+        gameMode,
         intensity, setIntensity,
         prompt, setPrompt,
         handleDraw,
@@ -25,6 +26,12 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         removePromptFromEditingDeck,
         generateId
     } = logic;
+
+    useEffect(() => {
+        if (gameMode === GameMode.NEVER_HAVE_I_EVER && intensity && !prompt) {
+            handleDraw('NeverHaveIEver');
+        }
+    }, [gameMode, intensity, prompt, handleDraw]);
 
     const themeDef = getThemeDefinition(theme);
 
@@ -111,8 +118,17 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 <p className="text-sm italic opacity-80">{prompt?.penalty}</p>
             </div>
             <div className="grid grid-cols-2 gap-4 mt-8">
-                <button onClick={() => setPrompt(null)} className="theme-button p-4 text-xl">DONE</button>
-                <button onClick={() => handleDraw(prompt!.type)} className="theme-button theme-button-alt p-4 text-xl">REROLL</button>
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <>
+                        <button onClick={() => { setIntensity(null); setPrompt(null); }} className="theme-button p-4 text-xl">DONE</button>
+                        <button onClick={() => handleDraw('NeverHaveIEver')} className="theme-button theme-button-alt p-4 text-xl">NEXT</button>
+                    </>
+                ) : (
+                    <>
+                        <button onClick={() => setPrompt(null)} className="theme-button p-4 text-xl">DONE</button>
+                        <button onClick={() => handleDraw(prompt!.type)} className="theme-button theme-button-alt p-4 text-xl">REROLL</button>
+                    </>
+                )}
             </div>
         </motion.div>
     );
@@ -134,12 +150,23 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             {!intensity && !prompt ? (
                                 themeDef.IntensitySelector ? <themeDef.IntensitySelector logic={logic} /> : <DefaultIntensitySelector />
                             ) : !prompt ? (
-                                themeDef.PromptTypeSelector ? <themeDef.PromptTypeSelector logic={logic} /> : <DefaultPromptTypeSelector />
+                                gameMode === GameMode.NEVER_HAVE_I_EVER ? null : (
+                                    themeDef.PromptTypeSelector ? <themeDef.PromptTypeSelector logic={logic} /> : <DefaultPromptTypeSelector />
+                                )
                             ) : (
                                 themeDef.PromptLayout && themeDef.PlayButton ? (
                                     <themeDef.PromptLayout logic={logic}>
-                                        <themeDef.PlayButton label="DONE" onClick={() => setPrompt(null)} isPrimary={true} />
-                                        <themeDef.PlayButton label="REROLL" onClick={() => handleDraw(prompt!.type)} isPrimary={false} />
+                                        {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                                            <>
+                                                <themeDef.PlayButton label="DONE" onClick={() => { setIntensity(null); setPrompt(null); }} isPrimary={true} />
+                                                <themeDef.PlayButton label="NEXT" onClick={() => handleDraw('NeverHaveIEver')} isPrimary={false} />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <themeDef.PlayButton label="DONE" onClick={() => setPrompt(null)} isPrimary={true} />
+                                                <themeDef.PlayButton label="REROLL" onClick={() => handleDraw(prompt!.type)} isPrimary={false} />
+                                            </>
+                                        )}
                                     </themeDef.PromptLayout>
                                 ) : themeDef.PromptDisplay ? (
                                     <themeDef.PromptDisplay logic={logic} />

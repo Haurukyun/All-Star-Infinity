@@ -265,10 +265,17 @@ export const SanrioPromptLayout: React.FC<{ children: React.ReactNode; logic: an
     <div className="h-full flex flex-col justify-center space-y-6">
       <motion.div initial={{ scale: 0.8, y: 50, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="sanrio-panel text-center flex flex-col items-center p-8">
         <div className="text-5xl mb-4 bg-white w-20 h-20 rounded-full flex items-center justify-center border-4 border-[#FF69B4] shadow-sm">
-          {prompt?.type === 'Truth' ? '🌸' : '🔥'}
+          {prompt?.type === 'Truth' ? '🌸' : (prompt?.type === 'NeverHaveIEver' ? '🤫' : '🔥')}
         </div>
         <h2 className="text-3xl font-black text-[#FF69B4] mb-6 uppercase tracking-wider">{prompt?.type}</h2>
         <p className="text-2xl text-[#7B4B94] font-black leading-snug">"{prompt?.text}"</p>
+
+        {prompt?.penalty && (
+          <div className="mt-8 pt-6 border-t-[3px] border-dashed border-[#FFB6C1] w-full">
+            <h4 className="text-lg font-black text-[#FF69B4] tracking-widest uppercase mb-2">🎈 Penalty 🎈</h4>
+            <p className="text-xl text-[#7B4B94] font-bold opacity-80">{prompt.penalty}</p>
+          </div>
+        )}
       </motion.div>
 
       <div className="flex flex-col gap-4 mt-8">

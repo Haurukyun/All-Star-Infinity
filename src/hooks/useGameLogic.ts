@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from 'react';
-import { Intensity, PromptType, GamePrompt, CustomDeck, Theme } from '../types';
+import { Intensity, PromptType, GamePrompt, CustomDeck, Theme, GameMode } from '../types';
 import { getRandomPrompt, DEFAULT_PROMPTS } from '../services/localPrompts';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
 export const useGameLogic = () => {
   const [activeTab, setActiveTab] = useState('play');
+  const [gameMode, setGameMode] = useState<GameMode | null>(null);
   const [intensity, setIntensity] = useState<Intensity | null>(null);
   const [prompt, setPrompt] = useState<GamePrompt | null>(null);
   const [history, setHistory] = useState<GamePrompt[]>([]);
@@ -122,6 +123,7 @@ export const useGameLogic = () => {
 
   return {
     activeTab, setActiveTab,
+    gameMode, setGameMode,
     intensity, setIntensity,
     prompt, setPrompt,
     history, setHistory,

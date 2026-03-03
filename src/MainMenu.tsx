@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Theme } from './types';
+import { Theme, GameMode } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
 import { getThemeDefinition } from './themes';
 
 const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
-  const { theme, setTheme, hasExplicitlySelectedTheme } = logic;
+  const { theme, setTheme, hasExplicitlySelectedTheme, setGameMode } = logic;
+  const [isSelectingMode, setIsSelectingMode] = useState(false);
   const activeTheme = theme || Theme.SONIC;
   const themeDef = getThemeDefinition(activeTheme);
   const MenuComponent = themeDef.MenuComponent;
@@ -57,6 +58,24 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
     );
   }
 
+  // Intercept normal "play" actions for legacy MenuComponents
+  const wrappedLogic = {
+    ...logic,
+    setView: (v: 'menu' | 'game') => {
+      if (v === 'game') setIsSelectingMode(true);
+      else logic.setView(v);
+    }
+  };
+
+  const genericModeOverlay = (
+    <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-8 space-y-6">
+      <h2 className="text-4xl text-white font-black italic tracking-widest uppercase">SELECT GAMEMODE</h2>
+      <button onClick={() => { setGameMode(GameMode.TRUTH_OR_DARE); logic.setView('game'); }} className="w-full max-w-sm bg-white text-black p-4 text-2xl font-bold uppercase transition hover:scale-105 active:scale-95">TRUTH OR DARE</button>
+      <button onClick={() => { setGameMode(GameMode.NEVER_HAVE_I_EVER); logic.setView('game'); }} className="w-full max-w-sm bg-white text-black p-4 text-2xl font-bold uppercase transition hover:scale-105 active:scale-95">NEVER HAVE I EVER</button>
+      <button onClick={() => setIsSelectingMode(false)} className="mt-8 text-white/50 text-sm hover:text-white transition uppercase tracking-widest">[ GO BACK ]</button>
+    </div>
+  );
+
   return (
     <div className="h-screen w-screen overflow-hidden">
       <AnimatePresence mode="wait">
@@ -69,11 +88,24 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
         >
           {MenuLayout && MenuButton ? (
             <MenuLayout logic={logic}>
-              <MenuButton label="START ADVENTURE" onClick={() => logic.setView('game')} isPrimary={true} />
-              <MenuButton label="THEMES" onClick={() => setTheme(Theme.NONE)} isPrimary={false} />
+              {!isSelectingMode ? (
+                <>
+                  <MenuButton label="START ADVENTURE" onClick={() => setIsSelectingMode(true)} isPrimary={true} />
+                  <MenuButton label="THEMES" onClick={() => setTheme(Theme.NONE)} isPrimary={false} />
+                </>
+              ) : (
+                <>
+                  <MenuButton label="TRUTH OR DARE" onClick={() => { setGameMode(GameMode.TRUTH_OR_DARE); logic.setView('game'); }} isPrimary={true} />
+                  <MenuButton label="NEVER HAVE I EVER" onClick={() => { setGameMode(GameMode.NEVER_HAVE_I_EVER); logic.setView('game'); }} isPrimary={true} />
+                  <MenuButton label="GO BACK" onClick={() => setIsSelectingMode(false)} isPrimary={false} />
+                </>
+              )}
             </MenuLayout>
           ) : (
-            <MenuComponent logic={logic} />
+            <>
+              <MenuComponent logic={wrappedLogic} />
+              {isSelectingMode && genericModeOverlay}
+            </>
           )}
         </motion.div>
       </AnimatePresence>
