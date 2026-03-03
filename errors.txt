@@ -1,0 +1,30 @@
+RESTORATION PROJECT/rn-app/App.tsx(3,34): error TS2307: Cannot find module 'react-native' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/App.tsx(4,34): error TS2307: Cannot find module 'react-native-safe-area-context' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/AnimalCrossingApp.tsx(3,75): error TS2307: Cannot find module 'react-native' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/AnimalCrossingApp.tsx(4,43): error TS2307: Cannot find module 'react-native-reanimated' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/components/Layout.tsx(3,75): error TS2307: Cannot find module 'react-native' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/components/Layout.tsx(4,30): error TS2307: Cannot find module 'react-native-safe-area-context' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/components/Layout.tsx(5,32): error TS2307: Cannot find module 'expo-linear-gradient' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/components/Layout.tsx(12,8): error TS2307: Cannot find module 'react-native-reanimated' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/components/ThemedMenus.tsx(2,51): error TS2307: Cannot find module 'react-native' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/MainMenu.tsx(3,63): error TS2307: Cannot find module 'react-native' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/MainMenu.tsx(10,8): error TS2307: Cannot find module 'react-native-reanimated' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/PersonaApp.tsx(3,75): error TS2307: Cannot find module 'react-native' or its corresponding type declarations.
+RESTORATION PROJECT/rn-app/src/PersonaApp.tsx(12,8): error TS2307: Cannot find module 'react-native-reanimated' or its corresponding type declarations.
+RESTORATION PROJECT/services/geminiService.ts(3,51): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+RESTORATION PROJECT/services/localPrompts.ts(2,51): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+RESTORATION PROJECT/src/SanrioApp.tsx(350,57): error TS2339: Property 'SANRIO' does not exist on type 'typeof Theme'.
+rn-app/src/components/Layout.tsx(37,46): error TS2345: Argument of type '() => { transform: ({ translateX: number; translateY?: undefined; } | { translateY: number; translateX?: undefined; })[]; }' is not assignable to parameter of type '() => DefaultStyle'.
+  Type '{ transform: ({ translateX: number; translateY?: undefined; } | { translateY: number; translateX?: undefined; })[]; }' is not assignable to type 'DefaultStyle'.
+    Type '{ transform: ({ translateX: number; translateY?: undefined; } | { translateY: number; translateX?: undefined; })[]; }' is not assignable to type 'ImageStyle'.
+      Types of property 'transform' are incompatible.
+        Type '({ translateX: number; translateY?: undefined; } | { translateY: number; translateX?: undefined; })[]' is not assignable to type 'string | readonly (({ skewX: AnimatableStringValue; } & { rotate?: never; translateY?: never; translateX?: never; scale?: never; scaleX?: never; scaleY?: never; rotateX?: never; rotateY?: never; rotateZ?: never; skewY?: never; perspective?: never; matrix?: never; }) | ... 11 more ... | ({ ...; } & { ...; }))[]'.
+          Type '({ translateX: number; translateY?: undefined; } | { translateY: number; translateX?: undefined; })[]' is not assignable to type 'readonly (({ skewX: AnimatableStringValue; } & { rotate?: never; translateY?: never; translateX?: never; scale?: never; scaleX?: never; scaleY?: never; rotateX?: never; rotateY?: never; rotateZ?: never; skewY?: never; perspective?: never; matrix?: never; }) | ... 11 more ... | ({ ...; } & { ...; }))[]'.
+            Type '{ translateX: number; translateY?: undefined; } | { translateY: number; translateX?: undefined; }' is not assignable to type '({ skewX: AnimatableStringValue; } & { rotate?: never; translateY?: never; translateX?: never; scale?: never; scaleX?: never; scaleY?: never; rotateX?: never; rotateY?: never; rotateZ?: never; skewY?: never; perspective?: never; matrix?: never; }) | ... 11 more ... | ({ ...; } & { ...; })'.
+              Type '{ translateX: number; translateY?: undefined; }' is not assignable to type '({ skewX: AnimatableStringValue; } & { rotate?: never; translateY?: never; translateX?: never; scale?: never; scaleX?: never; scaleY?: never; rotateX?: never; rotateY?: never; rotateZ?: never; skewY?: never; perspective?: never; matrix?: never; }) | ... 11 more ... | ({ ...; } & { ...; })'.
+                Type '{ translateX: number; translateY?: undefined; }' is not assignable to type '{ matrix: AnimatableNumericValue[]; } & { skewX?: never; rotate?: never; translateY?: never; translateX?: never; scale?: never; scaleX?: never; scaleY?: never; rotateX?: never; rotateY?: never; rotateZ?: never; skewY?: never; perspective?: never; }'.
+                  Property 'matrix' is missing in type '{ translateX: number; translateY?: undefined; }' but required in type '{ matrix: AnimatableNumericValue[]; }'.
+rn-app/src/MainMenu.tsx(87,17): error TS2322: Type '{ children: any; key: any; entering: FadeIn; exiting: FadeOut; style: AbsoluteFillStyle; }' is not assignable to type 'Omit<AnimatedProps<Readonly<ViewProps>>, "ref"> & { ref?: any; }'.
+  Property 'key' does not exist on type 'Omit<AnimatedProps<Readonly<ViewProps>>, "ref"> & { ref?: any; }'.
+services/geminiService.ts(3,51): error TS2307: Cannot find module '../types' or its corresponding type declarations.
+services/localPrompts.ts(2,51): error TS2307: Cannot find module '../types' or its corresponding type declarations.

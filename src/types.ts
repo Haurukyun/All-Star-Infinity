@@ -20,7 +20,9 @@ export enum Theme {
   SONIC = 'Sonic',
   SANRIO = 'Sanrio',
   CYBERPUNK = 'Cyberpunk',
-  UNDERTALE = 'Undertale'
+  UNDERTALE = 'Undertale',
+  FALLOUT = 'Fallout',
+  HAZBIN = 'Hazbin'
 }
 
 export enum GameMode {

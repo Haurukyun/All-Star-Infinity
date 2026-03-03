@@ -30,18 +30,41 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
           </h1>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6 max-h-[60vh] overflow-y-auto px-4 py-4 custom-scrollbar">
-            {Object.values(Theme).filter(t => t !== Theme.NONE).map((t) => (
-              <motion.button
-                key={t}
-                whileHover={{ scale: 1.05, rotate: -2, backgroundColor: '#D80000', color: '#fff' }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setTheme(t)}
-                className="bg-white text-black p-4 sm:p-6 font-bold border-4 border-black shadow-[4px_4px_0_#D80000] uppercase italic tracking-widest transition-all text-sm sm:text-base leading-tight min-h-[80px]"
-                style={{ transform: 'skewX(-10deg)' }}
-              >
-                {t}
-              </motion.button>
-            ))}
+            {Object.values(Theme).filter(t => t !== Theme.NONE).map((t) => {
+              // Map each theme to its distinct CSS font family definition
+              const getThemeFont = (theme: Theme) => {
+                switch (theme) {
+                  case Theme.PERSONA: return "'Edo', 'Edo SZ', sans-serif";
+                  case Theme.MINECRAFT: return "'Minecraft', 'Courier New', monospace";
+                  case Theme.DANGANRONPA: return "'Courier New', monospace";
+                  case Theme.OMORI: return "'Gloria Hallelujah', cursive";
+                  case Theme.KIRBY: return "'Titan One', 'Fredoka One', cursive";
+                  case Theme.POKEMON: return "'Press Start 2P', monospace";
+                  case Theme.ANIMAL_CROSSING: return "'FinkHeavy', 'Arial Rounded MT Bold', sans-serif";
+                  case Theme.SKYRIM: return "'Cinzel', serif";
+                  case Theme.SONIC: return "'Archivo Black', sans-serif";
+                  case Theme.SANRIO: return "'Cherry Bomb One', cursive";
+                  case Theme.CYBERPUNK: return "'Share Tech Mono', monospace";
+                  case Theme.UNDERTALE: return "'DotGothic16', monospace";
+                  case Theme.FALLOUT: return "'Share Tech Mono', monospace";
+                  case Theme.HAZBIN: return "'Fascinate Inline', cursive";
+                  default: return "'Bangers', cursive";
+                }
+              };
+
+              return (
+                <motion.button
+                  key={t}
+                  whileHover={{ scale: 1.05, rotate: -2, backgroundColor: '#D80000', color: '#fff' }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setTheme(t)}
+                  className="bg-white text-black p-4 sm:p-6 font-bold border-4 border-black shadow-[4px_4px_0_#D80000] uppercase tracking-widest transition-all text-sm sm:text-base leading-tight min-h-[80px]"
+                  style={{ transform: 'skewX(-10deg)', fontFamily: getThemeFont(t) }}
+                >
+                  {t}
+                </motion.button>
+              )
+            })}
           </div>
         </motion.div>
 

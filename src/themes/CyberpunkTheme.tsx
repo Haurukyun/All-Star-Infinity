@@ -422,6 +422,9 @@ export const CyberpunkThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         [Theme.SONIC]: 'SONIC MANIA',
         [Theme.SANRIO]: 'SANRIO',
         [Theme.CYBERPUNK]: 'CYBERPUNK 2077',
+            [Theme.UNDERTALE]: 'UNDERTALE',
+            [Theme.FALLOUT]: 'FALLOUT',
+            [Theme.HAZBIN]: 'HAZBIN HOTEL',
     };
     return (
         <div className="space-y-6">

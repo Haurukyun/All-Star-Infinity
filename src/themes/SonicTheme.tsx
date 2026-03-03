@@ -338,6 +338,9 @@ export const SonicThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         [Theme.SKYRIM]: 'SKYRIM',
         [Theme.SONIC]: 'SONIC MANIA',
         [Theme.SANRIO]: 'SANRIO',
+            [Theme.UNDERTALE]: 'UNDERTALE',
+            [Theme.FALLOUT]: 'FALLOUT',
+            [Theme.HAZBIN]: 'HAZBIN HOTEL',
     };
     return (
         <div className="space-y-8 mt-2">

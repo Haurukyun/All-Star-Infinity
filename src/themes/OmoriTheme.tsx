@@ -65,6 +65,7 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                     padding: 24px;
                     box-shadow: 8px 8px 0px #000;
                     animation: sketchy 3s ease-in-out infinite;
+                    color: #000 !important;
                 }
                 .omori-header {
                     font-family: 'Gloria Hallelujah', cursive;
@@ -283,6 +284,10 @@ export const OmoriThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 <button onClick={() => setTheme(Theme.SKYRIM)} className="omori-button py-6 text-xl">SKYRIM</button>
                 <button onClick={() => setTheme(Theme.SONIC)} className="omori-button py-6 text-xl">SONIC MANIA</button>
                 <button onClick={() => setTheme(Theme.SANRIO)} className="omori-button py-6 text-xl">SWEET WORLD</button>
+                <button onClick={() => setTheme(Theme.CYBERPUNK)} className="omori-button py-6 text-xl">NIGHT CITY</button>
+                <button onClick={() => setTheme(Theme.UNDERTALE)} className="omori-button py-6 text-xl">THE UNDERGROUND</button>
+                <button onClick={() => setTheme(Theme.FALLOUT)} className="omori-button py-6 text-xl">THE WASTELAND</button>
+                <button onClick={() => setTheme(Theme.HAZBIN)} className="omori-button py-6 text-xl">PENTAGRAM CITY</button>
             </div>
         </motion.div>
     );

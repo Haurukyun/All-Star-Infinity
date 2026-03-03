@@ -11,6 +11,8 @@ import { SkyrimTheme } from './SkyrimTheme';
 import { SanrioTheme } from './SanrioTheme';
 import { CyberpunkTheme } from './CyberpunkTheme';
 import { UndertaleTheme } from './UndertaleTheme';
+import { FalloutTheme } from './FalloutTheme';
+import { HazbinTheme } from './HazbinTheme';
 
 export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.SONIC]: SonicTheme,
@@ -25,6 +27,8 @@ export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.SANRIO]: SanrioTheme,
     [Theme.CYBERPUNK]: CyberpunkTheme,
     [Theme.UNDERTALE]: UndertaleTheme,
+    [Theme.FALLOUT]: FalloutTheme,
+    [Theme.HAZBIN]: HazbinTheme,
 };
 
 export const getThemeDefinition = (theme: Theme): ThemeDefinition => {
