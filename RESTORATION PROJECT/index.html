@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PHANTOM: OBSIDIAN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rubik:ital,wght@0,300..900;1,300..900&family=VT323&family=Special+Elite&family=Orbitron:wght@400..900&family=Gloria+Hallelujah&family=Single+Day&family=Sniglet:wght@400;800&family=Fredoka+One&family=Cherry+Bomb+One&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --p5-red: #D80000;
+            --p5-black: #080808;
+            --p5-white: #FFFFFF;
+            --mc-green: #55FF55;
+            --mc-dark: #1e1e1e;
+            --mc-border: #373737;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: var(--p5-black);
+            /* Deep gradient to replace plain black */
+            background-image: 
+                radial-gradient(circle at 50% 50%, #1a0000 0%, #080808 100%);
+            color: var(--p5-white);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            font-size: 13px; /* Scaled down from 14px */
+        }
+
+        /* Utility for font toggle */
+        .use-easy-font .font-p5-display {
+            font-family: 'Rubik', sans-serif !important;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .font-p5-display { font-family: 'Bangers', cursive; }
+
+        /* Kinetic Text Vibration */
+        @keyframes vibrate {
+            0% { transform: translate(0); }
+            25% { transform: translate(1px, -1px); }
+            50% { transform: translate(-1px, 1px); }
+            75% { transform: translate(1px, 1px); }
+            100% { transform: translate(0); }
+        }
+
+        .vibrate-hover:hover {
+            animation: vibrate 0.1s linear infinite;
+        }
+
+        /* Star Field Background */
+        .star-field {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.15;
+            animation: moveStar linear infinite;
+        }
+
+        @keyframes moveStar {
+            from { transform: translateY(110vh) translateX(-10vw) scale(0.5); }
+            to { transform: translateY(-10vh) translateX(10vw) scale(1.2); }
+        }
+
+        /* Halftone Pattern Background */
+        .halftone {
+            background-image: radial-gradient(circle, rgba(216,0,0,0.1) 1px, transparent 1px);
+            background-size: 12px 12px;
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            animation: halftoneDrift 60s linear infinite;
+        }
+
+        @keyframes halftoneDrift {
+            from { background-position: 0 0; }
+            to { background-position: 100px 100px; }
+        }
+
+        /* P5 Menu Button Style */
+        .p5-btn {
+            position: relative;
+            background: var(--p5-white);
+            color: var(--p5-black);
+            font-weight: 900;
+            text-transform: uppercase;
+            padding: 0.4rem 1.5rem;
+            transform: skew(-15deg);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            box-shadow: 0 0 0 3px black;
+            font-size: 0.9rem;
+            backface-visibility: hidden;
+        }
+
+        .p5-btn:hover {
+            background: var(--p5-red);
+            color: var(--p5-white);
+            transform: skew(-15deg) scale(1.05);
+            box-shadow: 6px 6px 0px rgba(0,0,0,1);
+        }
+
+        ::-webkit-scrollbar { width: 0px; }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@google/genai": "https://esm.sh/@google/genai@^1.38.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "framer-motion": "https://esm.sh/framer-motion@^12.29.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body id="body-root">
+    <div class="star-field" id="starField"></div>
+    <div class="halftone"></div>
+    <div id="root"></div>
+
+    <script>
+        // Generate random moving stars with variations
+        const starField = document.getElementById('starField');
+        const starCount = 20;
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            const size = Math.random() * 6 + 2; // Smaller, sharper stars
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDuration = `${Math.random() * 30 + 30}s`;
+            star.style.animationDelay = `${Math.random() * -30}s`;
+            starField.appendChild(star);
+        }
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

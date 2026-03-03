@@ -1,130 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Theme } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
-import { PersonaMenu } from './PersonaApp';
-import { MinecraftMenu } from './MinecraftApp';
-import { DanganronpaMenu } from './DanganronpaApp';
-import { OmoriMenu } from './OmoriApp';
-import { KirbyMenu } from './KirbyApp';
-import { PokemonMenu } from './PokemonApp';
-import { AnimalCrossingMenu } from './AnimalCrossingApp';
-import { SkyrimMenu } from './SkyrimApp';
+import { getThemeDefinition } from './themes';
 
 const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
   const { theme, setTheme, hasExplicitlySelectedTheme } = logic;
-  const [showcaseIndex, setShowcaseIndex] = useState(0);
-  const [isIdle, setIsIdle] = useState(true);
-  const idleTimerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const activeTheme = theme || Theme.SONIC;
+  const themeDef = getThemeDefinition(activeTheme);
+  const MenuComponent = themeDef.MenuComponent;
 
-  const themes = Object.values(Theme).filter(t => t !== Theme.NONE);
-
-  const resetIdleTimer = React.useCallback(() => {
-    setIsIdle(false);
-    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    idleTimerRef.current = setTimeout(() => {
-      setIsIdle(true);
-    }, 5000); // 5 seconds of no input before resuming showcase
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('mousedown', resetIdleTimer);
-    window.addEventListener('touchstart', resetIdleTimer);
-    window.addEventListener('keydown', resetIdleTimer);
-
-    // Initial timer
-    idleTimerRef.current = setTimeout(() => {
-      setIsIdle(true);
-    }, 5000);
-
-    return () => {
-      window.removeEventListener('mousedown', resetIdleTimer);
-      window.removeEventListener('touchstart', resetIdleTimer);
-      window.removeEventListener('keydown', resetIdleTimer);
-      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
-    };
-  }, [resetIdleTimer]);
-
-  // Showcase Mode: Cycle through themes if none selected and idle
-  useEffect(() => {
-    if (!hasExplicitlySelectedTheme && isIdle) {
-      const interval = setInterval(() => {
-        setShowcaseIndex((prev) => (prev + 1) % themes.length);
-      }, 5000); // Cycle every 5 seconds
-      return () => clearInterval(interval);
-    }
-  }, [hasExplicitlySelectedTheme, themes.length, isIdle]);
-
-  // Apply the showcase theme if in showcase mode
-  useEffect(() => {
-    if (!hasExplicitlySelectedTheme) {
-      setTheme(themes[showcaseIndex], false);
-    }
-  }, [showcaseIndex, hasExplicitlySelectedTheme, setTheme, themes]);
-
-  const renderThemedMenu = () => {
-    switch (theme) {
-      case Theme.PERSONA:
-        return <PersonaMenu logic={logic} />;
-      case Theme.MINECRAFT:
-        return <MinecraftMenu logic={logic} />;
-      case Theme.DANGANRONPA:
-        return <DanganronpaMenu logic={logic} />;
-      case Theme.OMORI:
-        return <OmoriMenu logic={logic} />;
-      case Theme.KIRBY:
-        return <KirbyMenu logic={logic} />;
-      case Theme.POKEMON:
-        return <PokemonMenu logic={logic} />;
-      case Theme.ANIMAL_CROSSING:
-        return <AnimalCrossingMenu logic={logic} />;
-      case Theme.SKYRIM:
-        return <SkyrimMenu logic={logic} />;
-      default:
-        return <PersonaMenu logic={logic} />;
-    }
-  };
-
-  return (
-    <div className="h-[100dvh] w-screen overflow-hidden flex flex-col items-center justify-center relative bg-black">
-      <AnimatePresence mode="wait">
+  // Show theme selection if no theme is explicitly selected yet
+  if (!hasExplicitlySelectedTheme) {
+    return (
+      <div className="h-screen w-screen bg-black flex flex-col items-center justify-center p-4 sm:p-8 overflow-hidden font-['Bangers'] select-none">
+        <style>{`
+                    @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+                `}</style>
         <motion.div
-          key={theme}
-          initial={{ opacity: 0, scale: 1.2, rotate: -2, filter: 'blur(20px)' }}
-          animate={{ opacity: 1, scale: 1, rotate: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, scale: 0.8, rotate: 2, filter: 'blur(20px)' }}
-          transition={{ 
-            duration: 1.5, 
-            ease: [0.22, 1, 0.36, 1],
-            opacity: { duration: 1 },
-            filter: { duration: 1 }
-          }}
-          className="absolute inset-0 w-full h-full"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="z-10 text-center space-y-8 sm:space-y-12 w-full max-w-6xl"
         >
-          {renderThemedMenu()}
-        </motion.div>
-      </AnimatePresence>
+          <h1 className="text-5xl sm:text-8xl font-black italic text-white tracking-tighter uppercase leading-none">
+            SELECT YOUR <span className="text-[#D80000]">REALM</span>
+          </h1>
 
-      {!hasExplicitlySelectedTheme && (
-        <div className="absolute bottom-12 left-0 w-full z-[100] flex flex-col items-center gap-3 pointer-events-none">
-          <div className="flex gap-2 mb-2">
-            {themes.map((_, i) => (
-              <motion.div
-                key={i}
-                className={`h-1 rounded-full transition-all duration-500 ${i === showcaseIndex ? 'w-8 bg-white' : 'w-2 bg-white/20'}`}
-              />
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6 max-h-[60vh] overflow-y-auto px-4 py-4 custom-scrollbar">
+            {Object.values(Theme).filter(t => t !== Theme.NONE).map((t) => (
+              <motion.button
+                key={t}
+                whileHover={{ scale: 1.05, rotate: -2, backgroundColor: '#D80000', color: '#fff' }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setTheme(t)}
+                className="bg-white text-black p-4 sm:p-6 font-bold border-4 border-black shadow-[4px_4px_0_#D80000] uppercase italic tracking-widest transition-all text-sm sm:text-base leading-tight min-h-[80px]"
+                style={{ transform: 'skewX(-10deg)' }}
+              >
+                {t}
+              </motion.button>
             ))}
           </div>
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-black/40 backdrop-blur-xl border border-white/10 px-8 py-3 rounded-xl text-[10px] font-black tracking-[0.5em] text-white uppercase shadow-2xl"
-          >
-            SHOWCASE: {theme.replace('_', ' ')}
-          </motion.div>
-          <p className="text-white/30 text-[8px] uppercase tracking-[0.3em] font-medium">TAP ANY THEME TO EXPLORE</p>
+        </motion.div>
+
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_center,#fff_1px,transparent_0)] bg-[length:40px_40px]"></div>
         </div>
-      )}
+
+        <style>{`
+                    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #D80000; border-radius: 10px; }
+                `}</style>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen w-screen overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTheme}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="h-full w-full"
+        >
+          <MenuComponent logic={logic} />
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 export enum Intensity {
   SOFT = 'SOFT',
   HOT = 'HOT',
@@ -14,7 +16,9 @@ export enum Theme {
   KIRBY = 'Kirby',
   POKEMON = 'Pokemon',
   ANIMAL_CROSSING = 'Animal Crossing',
-  SKYRIM = 'Skyrim'
+  SKYRIM = 'Skyrim',
+  SONIC = 'Sonic',
+  SANRIO = 'Sanrio'
 }
 
 export type PromptType = 'Truth' | 'Dare';
@@ -33,4 +37,23 @@ export interface CustomDeck {
   description: string;
   prompts: GamePrompt[];
   isCustom: boolean;
+}
+export interface ThemeDefinition {
+  id: Theme;
+  name: string;
+  cssVars: Record<string, string>;
+  styles?: string;
+  MenuComponent: React.ComponentType<{ logic: any }>;
+  // Slot-based overrides for unique theme visuals
+  LayoutComponent?: React.ComponentType<{ children: React.ReactNode; activeTab: string; setActiveTab: (tab: string) => void; logic: any }>;
+  PlayScreen?: React.ComponentType<{ logic: any }>;
+  DecksScreen?: React.ComponentType<{ logic: any }>;
+  HistoryScreen?: React.ComponentType<{ logic: any }>;
+  SettingsScreen?: React.ComponentType<{ logic: any }>;
+  ThemesScreen?: React.ComponentType<{ logic: any }>;
+  // Internal sub-slots for the default Play screen
+  IntensitySelector?: React.ComponentType<{ logic: any }>;
+  PromptTypeSelector?: React.ComponentType<{ logic: any }>;
+  PromptDisplay?: React.ComponentType<{ logic: any }>;
+  tabLabels?: Record<string, string>;
 }

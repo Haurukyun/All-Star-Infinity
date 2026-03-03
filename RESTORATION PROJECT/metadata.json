@@ -1,0 +1,8 @@
+{
+  "name": "PHANTOM: OBSIDIAN",
+  "description": "Steal their hearts and strip their filters. A Persona 5 inspired Truth or Dare engine for the bold and the shameless.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
