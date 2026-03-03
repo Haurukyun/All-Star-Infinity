@@ -43,8 +43,10 @@ export interface ThemeDefinition {
   name: string;
   cssVars: Record<string, string>;
   styles?: string;
-  MenuComponent: React.ComponentType<{ logic: any }>;
+  MenuComponent?: React.ComponentType<{ logic: any }>;
   // Slot-based overrides for unique theme visuals
+  MenuLayout?: React.ComponentType<{ children: React.ReactNode; logic: any }>;
+  MenuButton?: React.ComponentType<{ label: string; onClick: () => void; isPrimary?: boolean }>;
   LayoutComponent?: React.ComponentType<{ children: React.ReactNode; activeTab: string; setActiveTab: (tab: string) => void; logic: any }>;
   PlayScreen?: React.ComponentType<{ logic: any }>;
   DecksScreen?: React.ComponentType<{ logic: any }>;
@@ -55,5 +57,7 @@ export interface ThemeDefinition {
   IntensitySelector?: React.ComponentType<{ logic: any }>;
   PromptTypeSelector?: React.ComponentType<{ logic: any }>;
   PromptDisplay?: React.ComponentType<{ logic: any }>;
+  PromptLayout?: React.ComponentType<{ children: React.ReactNode; logic: any }>;
+  PlayButton?: React.ComponentType<{ label: string; onClick: () => void; isPrimary?: boolean }>;
   tabLabels?: Record<string, string>;
 }

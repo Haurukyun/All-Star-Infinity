@@ -202,76 +202,87 @@ export const SanrioLayout: React.FC<{ children: React.ReactNode; activeTab: stri
   );
 };
 
-export const SanrioPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
-  const { intensity, setIntensity, prompt, handleDraw } = logic;
-
-  if (prompt) {
-    return (
-      <div className="h-full flex flex-col justify-center space-y-6">
-        <motion.div initial={{ scale: 0.8, y: 50, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="sanrio-panel text-center flex flex-col items-center p-8">
-          <div className="text-5xl mb-4 bg-white w-20 h-20 rounded-full flex items-center justify-center border-4 border-[#FF69B4] shadow-sm">{prompt.type === 'Truth' ? '🌸' : '🔥'}</div>
-          <h2 className="text-3xl font-black text-[#FF69B4] mb-6 uppercase tracking-wider">{prompt.type}</h2>
-          <p className="text-2xl text-[#7B4B94] font-black leading-snug">"{prompt.text}"</p>
-        </motion.div>
-
-        <div className="flex flex-col gap-4 mt-8">
-          <button onClick={() => setIntensity(null)} className="sanrio-button yellow w-full py-5 text-xl">
-            <span>NEW VISITOR 🎁</span>
-          </button>
-          <div className="flex gap-4">
-            <button className="sanrio-button pink flex-1 py-4 text-xs opacity-50" disabled>MORE INFO</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
+export const SanrioIntensitySelector: React.FC<{ logic: any }> = ({ logic }) => {
+  const { setIntensity } = logic;
   return (
     <div className="h-full flex flex-col justify-center space-y-6">
       <h2 className="sanrio-title text-3xl text-center mb-2">FRIENDSHIP LEVEL</h2>
-      {!intensity ? (
-        <div className="space-y-4">
-          {STAGES.map((ObjectDef: any) => {
-            return (
-              <button
-                key={ObjectDef.id}
-                onClick={() => setIntensity(ObjectDef.id as Intensity)}
-                className="w-full relative overflow-hidden sanrio-panel hover:scale-105 transition-transform flex items-center p-4 group border-4 border-white border-l-[#FF69B4] border-l-8"
-                style={{ borderLeftColor: ObjectDef?.secondary || '#FF69B4' }}
-              >
-                <div className="text-5xl mr-5 bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-sm drop-shadow-sm">{ObjectDef?.icon}</div>
-                <div className="text-left flex-1">
-                  <h3 className="text-2xl font-black mb-1 drop-shadow-sm" style={{ color: ObjectDef?.secondary }}>{ObjectDef?.title}</h3>
-                  <p className="text-[#A188A6] font-bold text-sm tracking-widest">{ObjectDef?.desc}</p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      ) : (
-        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-5">
-          <div className="sanrio-panel text-center">
-            <div className="inline-block bg-[#FFB3D9] text-[#D81B60] font-black px-4 py-1 rounded-full text-xs mb-4 tracking-widest uppercase shadow-sm">
-              {STAGES.find(s => s.id === intensity)?.title}
-            </div>
-            <h3 className="text-2xl font-black text-[#7B4B94] mb-8">CHOOSE ACTIVITY</h3>
-            <div className="flex gap-4">
-              <button onClick={() => handleDraw('Truth')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
-                <span className="text-4xl">🌸</span>
-                TRUTH
-              </button>
-              <button onClick={() => handleDraw('Dare')} className="sanrio-button yellow flex-1 h-32 flex-col justify-center text-xl">
-                <span className="text-4xl">🔥</span>
-                DARE
-              </button>
-            </div>
-          </div>
-          <button onClick={() => setIntensity(null)} className="sanrio-button w-full h-16 opacity-70 bg-white text-[#7B4B94] shadow-sm">
-            GO BACK ↩
-          </button>
-        </motion.div>
-      )}
+      <div className="space-y-4">
+        {STAGES.map((ObjectDef: any) => {
+          return (
+            <button
+              key={ObjectDef.id}
+              onClick={() => setIntensity(ObjectDef.id as Intensity)}
+              className="w-full relative overflow-hidden sanrio-panel hover:scale-105 transition-transform flex items-center p-4 group border-4 border-white border-l-[#FF69B4] border-l-8"
+              style={{ borderLeftColor: ObjectDef?.secondary || '#FF69B4' }}
+            >
+              <div className="text-5xl mr-5 bg-white rounded-full w-16 h-16 flex items-center justify-center shadow-sm drop-shadow-sm">{ObjectDef?.icon}</div>
+              <div className="text-left flex-1">
+                <h3 className="text-2xl font-black mb-1 drop-shadow-sm" style={{ color: ObjectDef?.secondary }}>{ObjectDef?.title}</h3>
+                <p className="text-[#A188A6] font-bold text-sm tracking-widest">{ObjectDef?.desc}</p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
+  );
+};
+
+export const SanrioPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
+  const { intensity, setIntensity, handleDraw } = logic;
+  return (
+    <div className="h-full flex flex-col justify-center space-y-6">
+      <h2 className="sanrio-title text-3xl text-center mb-2">FRIENDSHIP LEVEL</h2>
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-5">
+        <div className="sanrio-panel text-center">
+          <div className="inline-block bg-[#FFB3D9] text-[#D81B60] font-black px-4 py-1 rounded-full text-xs mb-4 tracking-widest uppercase shadow-sm">
+            {STAGES.find(s => s.id === intensity)?.title}
+          </div>
+          <h3 className="text-2xl font-black text-[#7B4B94] mb-8">CHOOSE ACTIVITY</h3>
+          <div className="flex gap-4">
+            <button onClick={() => handleDraw('Truth')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
+              <span className="text-4xl">🌸</span>
+              TRUTH
+            </button>
+            <button onClick={() => handleDraw('Dare')} className="sanrio-button yellow flex-1 h-32 flex-col justify-center text-xl">
+              <span className="text-4xl">🔥</span>
+              DARE
+            </button>
+          </div>
+        </div>
+        <button onClick={() => setIntensity(null)} className="sanrio-button w-full h-16 opacity-70 bg-white text-[#7B4B94] shadow-sm">
+          GO BACK ↩
+        </button>
+      </motion.div>
+    </div>
+  );
+};
+
+export const SanrioPromptLayout: React.FC<{ children: React.ReactNode; logic: any }> = ({ children, logic }) => {
+  const { prompt } = logic;
+  return (
+    <div className="h-full flex flex-col justify-center space-y-6">
+      <motion.div initial={{ scale: 0.8, y: 50, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} className="sanrio-panel text-center flex flex-col items-center p-8">
+        <div className="text-5xl mb-4 bg-white w-20 h-20 rounded-full flex items-center justify-center border-4 border-[#FF69B4] shadow-sm">
+          {prompt?.type === 'Truth' ? '🌸' : '🔥'}
+        </div>
+        <h2 className="text-3xl font-black text-[#FF69B4] mb-6 uppercase tracking-wider">{prompt?.type}</h2>
+        <p className="text-2xl text-[#7B4B94] font-black leading-snug">"{prompt?.text}"</p>
+      </motion.div>
+
+      <div className="flex flex-col gap-4 mt-8">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export const SanrioPlayButton: React.FC<{ label: string; onClick: () => void; isPrimary?: boolean }> = ({ label, onClick, isPrimary }) => {
+  return (
+    <button onClick={onClick} className={`sanrio-button w-full py-5 text-xl ${isPrimary ? 'yellow' : 'pink'}`}>
+      <span>{label} {isPrimary ? '🎁' : '🔄'}</span>
+    </button>
   );
 };
 
@@ -395,11 +406,37 @@ export const SanrioSettingsScreen: React.FC<{ logic: any }> = ({ logic }) => {
   );
 };
 
-export const SanrioMenu: React.FC<{ logic: any }> = ({ logic }) => {
-  const { setView } = logic;
+export const SanrioMenuLayout: React.FC<{ children: React.ReactNode; logic: any }> = ({ children }) => {
   return (
     <div className="sanrio-theme h-full w-full flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#FFB3D9] via-[#E6C3F8] to-[#FFD8B1] font-['Nunito'] text-[#7B4B94] relative overflow-hidden select-none">
-
+      <style>{`
+        .sanrio-button {
+          background: #00BCD4; /* Saturated Cyan */
+          color: white;
+          padding: 18px 32px;
+          border-radius: 9999px;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+          font-weight: 900;
+          font-size: 1.25rem;
+          border: 4px solid white;
+          box-shadow: 0 6px 0px #00838F, 0 10px 15px rgba(0, 172, 193, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          text-transform: uppercase;
+          text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+        .sanrio-button:hover {
+          transform: translateY(-4px) scale(1.02);
+          box-shadow: 0 10px 0px #00838F, 0 15px 20px rgba(0, 172, 193, 0.5);
+        }
+        .sanrio-button:active {
+          transform: translateY(4px);
+          box-shadow: 0 2px 0px #00838F;
+        }
+      `}</style>
       <div className="absolute inset-0 z-0">
         <div className="absolute top-10 left-10 text-6xl opacity-40 animate-pulse">☁️</div>
         <div className="absolute top-20 right-10 text-5xl opacity-30">☁️</div>
@@ -416,16 +453,19 @@ export const SanrioMenu: React.FC<{ logic: any }> = ({ logic }) => {
           </div>
         </motion.div>
 
-        <div className="space-y-4 w-full px-4 mt-8">
-          <button onClick={() => setView('game')} className="sanrio-button w-full py-5 text-xl">
-            START ADVENTURE
-          </button>
-          <button className="sanrio-button pink w-full py-5 text-xl">
-            TUTORIAL
-          </button>
+        <div className="space-y-4 w-full px-4 mt-12 flex flex-col items-center">
+          {children}
         </div>
       </div>
     </div>
+  );
+};
+
+export const SanrioMenuButton: React.FC<{ label: string; onClick: () => void; isPrimary?: boolean }> = ({ label, onClick, isPrimary }) => {
+  return (
+    <button onClick={onClick} className="sanrio-button w-[80%] max-w-[300px] py-5 text-xl tracking-widest text-white z-20">
+      {label}
+    </button>
   );
 };
 
@@ -433,9 +473,13 @@ export const SanrioTheme: ThemeDefinition = {
   id: Theme.SANRIO,
   name: 'Sweet Garden',
   cssVars: { '--theme-accent': '#FF69B4' },
-  MenuComponent: SanrioMenu,
+  MenuLayout: SanrioMenuLayout,
+  MenuButton: SanrioMenuButton,
   LayoutComponent: SanrioLayout,
-  PlayScreen: SanrioPlayScreen,
+  IntensitySelector: SanrioIntensitySelector,
+  PromptTypeSelector: SanrioPromptTypeSelector,
+  PromptLayout: SanrioPromptLayout,
+  PlayButton: SanrioPlayButton,
   DecksScreen: SanrioDecksScreen,
   HistoryScreen: SanrioHistoryScreen,
   SettingsScreen: SanrioSettingsScreen,

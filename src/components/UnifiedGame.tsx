@@ -136,7 +136,16 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             ) : !prompt ? (
                                 themeDef.PromptTypeSelector ? <themeDef.PromptTypeSelector logic={logic} /> : <DefaultPromptTypeSelector />
                             ) : (
-                                themeDef.PromptDisplay ? <themeDef.PromptDisplay logic={logic} /> : <DefaultPromptDisplay />
+                                themeDef.PromptLayout && themeDef.PlayButton ? (
+                                    <themeDef.PromptLayout logic={logic}>
+                                        <themeDef.PlayButton label="DONE" onClick={() => setPrompt(null)} isPrimary={true} />
+                                        <themeDef.PlayButton label="REROLL" onClick={() => handleDraw(prompt!.type)} isPrimary={false} />
+                                    </themeDef.PromptLayout>
+                                ) : themeDef.PromptDisplay ? (
+                                    <themeDef.PromptDisplay logic={logic} />
+                                ) : (
+                                    <DefaultPromptDisplay />
+                                )
                             )}
                         </>
                     )}

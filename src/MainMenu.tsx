@@ -9,6 +9,8 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
   const activeTheme = theme || Theme.SONIC;
   const themeDef = getThemeDefinition(activeTheme);
   const MenuComponent = themeDef.MenuComponent;
+  const MenuLayout = themeDef.MenuLayout;
+  const MenuButton = themeDef.MenuButton;
 
   // Show theme selection if no theme is explicitly selected yet
   if (!hasExplicitlySelectedTheme) {
@@ -65,7 +67,14 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
           exit={{ opacity: 0 }}
           className="h-full w-full"
         >
-          <MenuComponent logic={logic} />
+          {MenuLayout && MenuButton ? (
+            <MenuLayout logic={logic}>
+              <MenuButton label="START ADVENTURE" onClick={() => logic.setView('game')} isPrimary={true} />
+              <MenuButton label="THEMES" onClick={() => setTheme(Theme.NONE)} isPrimary={false} />
+            </MenuLayout>
+          ) : (
+            <MenuComponent logic={logic} />
+          )}
         </motion.div>
       </AnimatePresence>
     </div>
