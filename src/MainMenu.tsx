@@ -104,11 +104,27 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                 </>
               )}
             </MenuLayout>
-          ) : (
+          ) : MenuComponent ? (
             <>
               <MenuComponent logic={wrappedLogic} />
               {isSelectingMode && genericModeOverlay}
             </>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full w-full bg-black text-white p-8 space-y-8">
+              <h2 className="text-4xl font-black italic">FALLBACK MENU</h2>
+              {!isSelectingMode ? (
+                <>
+                  <button onClick={() => setIsSelectingMode(true)} className="bg-white text-black px-6 py-3 text-2xl font-bold">START ADVENTURE</button>
+                  <button onClick={() => setTheme(Theme.NONE)} className="bg-gray-800 text-white px-6 py-3 text-2xl font-bold">THEMES</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => { setGameMode(GameMode.TRUTH_OR_DARE); logic.setView('game'); }} className="bg-white text-black px-6 py-3 text-2xl font-bold">TRUTH OR DARE</button>
+                  <button onClick={() => { setGameMode(GameMode.NEVER_HAVE_I_EVER); logic.setView('game'); }} className="bg-white text-black px-6 py-3 text-2xl font-bold">NEVER HAVE I EVER</button>
+                  <button onClick={() => setIsSelectingMode(false)} className="bg-gray-800 text-white px-6 py-3 text-2xl font-bold">GO BACK</button>
+                </>
+              )}
+            </div>
           )}
         </motion.div>
       </AnimatePresence>

@@ -159,6 +159,13 @@ export const allThemesList: ThemeMeta[] = [
         icon: '⚡',
         font: "'Cinzel', serif",
     },
+    {
+        id: Theme.BILLY_HATCHER,
+        label: 'Billy Hatcher',
+        color: '#1873CA',
+        icon: '🥚',
+        font: "'Fredoka One', cursive",
+    },
 ];
 
 /**

@@ -26,7 +26,8 @@ export enum Theme {
   VOCALOID = 'Vocaloid',
   FNAF = 'Fnaf',
   IRUMA = 'Iruma',
-  ARCANE = 'Arcane'
+  ARCANE = 'Arcane',
+  BILLY_HATCHER = 'Billy Hatcher'
 }
 
 export enum GameMode {

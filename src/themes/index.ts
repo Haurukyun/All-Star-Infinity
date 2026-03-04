@@ -17,6 +17,7 @@ import { VocaloidTheme } from './VocaloidTheme';
 import { FnafTheme } from './FnafTheme';
 import { IrumaTheme } from './IrumaTheme';
 import { ArcaneTheme } from './ArcaneTheme';
+import { BillyHatcherTheme } from './BillyHatcherTheme';
 
 export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.SONIC]: SonicTheme,
@@ -37,6 +38,7 @@ export const themeRegistry: Record<string, ThemeDefinition> = {
     [Theme.FNAF]: FnafTheme,
     [Theme.IRUMA]: IrumaTheme,
     [Theme.ARCANE]: ArcaneTheme,
+    [Theme.BILLY_HATCHER]: BillyHatcherTheme,
 };
 
 export const getThemeDefinition = (theme: Theme): ThemeDefinition => {
