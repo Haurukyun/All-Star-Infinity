@@ -4,6 +4,7 @@ import MainMenu from './MainMenu';
 import { useGameLogic } from './hooks/useGameLogic';
 import Layout from './components/Layout';
 import { getThemeDefinition } from './themes';
+import { ThemeProvider } from './theme/ThemeContext';
 
 
 const App: React.FC = () => {
@@ -17,13 +18,15 @@ const App: React.FC = () => {
   const LayoutComponent = themeDef.LayoutComponent || Layout;
 
   return (
-    <LayoutComponent
-      activeTab={logic.activeTab}
-      setActiveTab={logic.setActiveTab}
-      logic={logic}
-    >
-      <UnifiedGame logic={logic} />
-    </LayoutComponent>
+    <ThemeProvider>
+      <LayoutComponent
+        activeTab={logic.activeTab}
+        setActiveTab={logic.setActiveTab}
+        logic={logic}
+      >
+        <UnifiedGame logic={logic} />
+      </LayoutComponent>
+    </ThemeProvider>
   );
 };
 

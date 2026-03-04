@@ -3,12 +3,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useGameLogic } from '../hooks/useGameLogic';
 import { Intensity, Theme, GameMode } from '../types';
 import { getThemeDefinition } from '../themes';
+import { useTheme } from '../theme/ThemeContext';
 
 interface UnifiedGameProps {
     logic: ReturnType<typeof useGameLogic>;
 }
 
 const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
+    const { setTheme: contextSetTheme, currentThemeDefinition } = useTheme();
+
+    useEffect(() => {
+        console.log('--- THEME CONTEXT TEST ---');
+        console.log('Current context theme:', currentThemeDefinition.name);
+        // contextSetTheme(Theme.PERSONA); // Uncomment to test hard-switch
+    }, [currentThemeDefinition]);
+
     const {
         activeTab,
         gameMode,
