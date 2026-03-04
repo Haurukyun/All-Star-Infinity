@@ -1,0 +1,59 @@
+﻿
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\rn-app\sr
+c\AnimalCrossingApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\rn-app\sr
+c\PersonaApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Anima
+lCrossingApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Danga
+nronpaApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Kirby
+App.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Minec
+raftApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Omori
+App.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Perso
+naApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Pokem
+onApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Sanri
+oApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\RESTOR
+ATION PROJECT\src\Skyri
+mApp.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\rn-app
+\node_modules\expo\node
+_modules\@expo\log-box\
+app\App.tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\rn-app
+\src\AnimalCrossingApp.
+tsx
+F:\App Making\- Lab -\A
+ll-Star-Infinity\rn-app
+\src\PersonaApp.tsx
+
+
