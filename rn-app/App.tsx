@@ -17,6 +17,9 @@ const KirbyApp = ({ logic }: any) => <View />;
 const PokemonApp = ({ logic }: any) => <View />;
 const SkyrimApp = ({ logic }: any) => <View />;
 
+import { ThemeProvider } from '../src/theme/ThemeContext';
+import ThemeSelector from '../src/components/ThemeSelector';
+
 export default function App() {
     const logic = useGameLogic();
 
@@ -39,9 +42,12 @@ export default function App() {
 
     return (
         <SafeAreaProvider>
-            <View style={styles.container}>
-                {renderCurrentView()}
-            </View>
+            <ThemeProvider>
+                <View style={styles.container}>
+                    {renderCurrentView()}
+                    <ThemeSelector />
+                </View>
+            </ThemeProvider>
         </SafeAreaProvider>
     );
 }
