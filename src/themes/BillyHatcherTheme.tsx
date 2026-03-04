@@ -1,7 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const EGG_WHITE = '#FDFAF4';
 const HERO_BLUE = '#1873CA';
@@ -154,29 +156,12 @@ export const BillyLayout: React.FC<{ children: React.ReactNode; activeTab: strin
 };
 
 export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { intensity, setIntensity, prompt, setPrompt, history, activeDeckId, setActiveDeckId, customDecks, handleDraw } = logic;
+    const { intensity, setIntensity, prompt, setPrompt, history, activeDeckId, setActiveDeckId, customDecks, handleDraw, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     return (
         <AnimatePresence mode="wait">
             {!intensity && !prompt ? (
                 <motion.div key="play" initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 1.1 }} className="space-y-8 pb-10">
-                    <div className="billy-panel">
-                        <div className="flex justify-between items-center mb-6 border-b-4 border-[#eef6ff] pb-4">
-                            <h2 className="text-2xl text-[${HERO_BLUE}] text-stroke-white !text-white drop-shadow-[0_2px_0_${HERO_BLUE}]" style={{ color: 'white', WebkitTextStroke: `4px ${HERO_BLUE}` }}>CHOOSE NEST</h2>
-                            <span className="bg-[${HERO_YELLOW}] text-[${HERO_BLUE}] px-4 py-1.5 rounded-full text-sm font-black box-shadow border-4 border-white" style={{ backgroundColor: HERO_YELLOW, color: HERO_BLUE }}>{customDecks.length + 1}</span>
-                        </div>
-                        <div className="space-y-4">
-                            <button onClick={() => setActiveDeckId('default')} className={`w-full billy-btn !text-left !px-6 flex items-center gap-3 ${activeDeckId === 'default' ? 'billy-btn-yellow' : ''}`}>
-                                <span className="text-3xl filter drop-shadow-sm">🥚</span>
-                                <span className="flex-1 mt-1 font-black">GIANT EGG (DEFAULT)</span>
-                            </button>
-                            {customDecks.map((deck: any) => (
-                                <button key={deck.id} onClick={() => setActiveDeckId(deck.id)} className={`w-full billy-btn !text-left !px-6 flex items-center gap-3 ${activeDeckId === deck.id ? 'billy-btn-red' : ''}`}>
-                                    <span className="text-3xl filter drop-shadow-sm">🧺</span>
-                                    <span className="flex-1 mt-1 truncate font-black">{deck.name.toUpperCase() || 'UNNAMED NEST'}</span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
 
                     <div className="billy-panel" style={{ borderColor: HERO_RED, boxShadow: `0 12px 0 ${HERO_RED}55, inset 0 0 0 4px #fff1f1` }}>
                         <h2 className="text-2xl text-[${HERO_RED}] text-stroke-white !text-white drop-shadow-[0_2px_0_${HERO_RED}] mb-6 border-b-4 border-[#fff1f1] pb-4" style={{ color: 'white', WebkitTextStroke: `4px ${HERO_RED}` }}>HATCH DIFFICULTY</h2>
@@ -215,13 +200,58 @@ export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
                         <div>
                             <h2 className="text-4xl text-[${HERO_RED}] uppercase mb-2 font-black" style={{ color: HERO_RED }}>AN EGG APPEARS!</h2>
-                            <div className="text-xl text-[${HERO_BLUE}] font-bold" style={{ color: HERO_BLUE }}>Level: {intensity}</div>
+                            <div className="flex justify-between items-center px-4 mb-2">
+                                <div className="text-xl text-[${HERO_BLUE}] font-bold uppercase" style={{ color: HERO_BLUE }}>Level: {intensity}</div>
+                                <button
+                                    onClick={() => setIsSearchOpen(true)}
+                                    className="w-10 h-10 bg-white border-4 border-[${HERO_BLUE}] rounded-full flex items-center justify-center text-xl shadow-sm hover:bg-[${EGG_WHITE}] transition-colors"
+                                    style={{ borderColor: HERO_BLUE }}
+                                >
+                                    🔍
+                                </button>
+                            </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4 px-2 pt-4">
-                            <button onClick={() => handleDraw('Truth')} className="billy-btn billy-btn-red !text-2xl !py-6">TRUTH</button>
-                            <button onClick={() => handleDraw('Dare')} className="billy-btn billy-btn-yellow !text-2xl !py-6">DARE</button>
+                        <div className="w-full">
+                            <DeckCarousel
+                                decks={customDecks.filter(d => d.intensity === intensity)}
+                                activeDeckId={activeDeckId}
+                                onSelect={(id) => {
+                                    const deck = customDecks.find(d => d.id === id);
+                                    if (deck) setGameMode(deck.gameMode);
+                                    setActiveDeckId(id);
+                                }}
+                                accentColor={HERO_BLUE}
+                            />
                         </div>
+
+                        <div className="grid grid-cols-1 gap-4 px-2 pt-4 w-full">
+                            {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                                <button onClick={() => handleDraw('NeverHaveIEver')} className="billy-btn billy-btn-red !text-2xl !py-6">HATCH NHIE</button>
+                            ) : (
+                                <div className="grid grid-cols-2 gap-4 w-full">
+                                    <button onClick={() => handleDraw('Truth')} className="billy-btn billy-btn-red !text-2xl !py-6">TRUTH</button>
+                                    <button onClick={() => handleDraw('Dare')} className="billy-btn billy-btn-yellow !text-2xl !py-6">DARE</button>
+                                </div>
+                            )}
+                        </div>
+
+                        <DeckSearchModal
+                            isOpen={isSearchOpen}
+                            onClose={() => setIsSearchOpen(false)}
+                            decks={customDecks}
+                            activeDeckId={activeDeckId}
+                            onSelect={(id) => {
+                                const deck = customDecks.find(d => d.id === id);
+                                if (deck) {
+                                    setGameMode(deck.gameMode);
+                                    setIntensity(deck.intensity);
+                                }
+                                setActiveDeckId(id);
+                            }}
+                            gameMode={gameMode}
+                            intensity={intensity}
+                        />
                         <div className="pt-4">
                             <button onClick={() => setIntensity(null)} className="text-[${HERO_BLUE}] hover:text-[${HERO_RED}] transition-colors uppercase text-sm font-bold border-b-2 border-dotted pb-1" style={{ color: HERO_BLUE, borderColor: HERO_BLUE }}>RUN AWAY</button>
                         </div>
@@ -258,75 +288,192 @@ export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const BillyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
-                <motion.div key="decks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-6">
-                    <div className="flex justify-between items-center bg-[${EGG_WHITE}] p-6 rounded-[32px] border-[8px] border-[${HERO_BLUE}] shadow-[0_8px_0_${HERO_BLUE}44]" style={{ backgroundColor: EGG_WHITE, borderColor: HERO_BLUE, boxShadow: `0 8px 0 ${HERO_BLUE}44` }}>
-                        <h2 className="text-3xl text-white text-stroke-blue !text-white ml-2 mt-1 drop-shadow-[2px_2px_0_${HERO_BLUE}]" style={{ color: 'white', WebkitTextStroke: `4px ${HERO_BLUE}` }}>YOUR NESTS</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="bg-[${HERO_RED}] text-white px-6 py-3 rounded-full font-black border-4 border-white shadow-[0_6px_0_#b3001b] active:translate-y-1 active:shadow-none transition-all text-xl" style={{ backgroundColor: HERO_RED }}>+ ADD</button>
-                    </div>
-
-                    <div className="space-y-4">
-                        {customDecks.length === 0 && (
-                            <div className="text-center p-12 bg-white/80 rounded-[40px] border-[8px] border-[${HERO_BLUE}] border-dashed text-[${HERO_BLUE}]" style={{ borderColor: HERO_BLUE, color: HERO_BLUE }}>
-                                <span className="text-7xl block mb-6 filter drop-shadow-md">🧺</span>
-                                <p className="text-3xl font-black">No custom nests found!</p>
+                <motion.div key="decks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-20">
+                    <div className="billy-panel !py-4" style={{ borderColor: HERO_BLUE, boxShadow: `0 8px 0 ${HERO_BLUE}44`, backgroundColor: EGG_WHITE }}>
+                        <div className="flex justify-between items-center px-2">
+                            <div>
+                                <h2 className="text-3xl font-black text-white text-stroke-blue !text-white drop-shadow-[2px_2px_0_1873CA]" style={{ WebkitTextStroke: `4px ${HERO_BLUE}` }}>YOUR NESTS</h2>
+                                <p className="text-xs text-[#1873CA] font-bold tracking-widest uppercase">Incubating custom challenges</p>
                             </div>
-                        )}
-                        {customDecks.map((deck: any) => (
-                            <div key={deck.id} className="billy-panel !py-5 flex items-center justify-between gap-4">
-                                <div className="w-20 h-20 bg-[${HERO_YELLOW}] rounded-full flex shrink-0 items-center justify-center text-4xl border-[6px] border-white shadow-sm" style={{ backgroundColor: HERO_YELLOW }}>🧺</div>
-                                <div className="flex-1 min-w-0">
-                                    <div className="text-2xl text-[${HERO_BLUE}] truncate mt-1 font-black" style={{ color: HERO_BLUE }}>{deck.name || 'UNNAMED NEST'}</div>
-                                    <div className="text-base text-white bg-[${HERO_RED}] rounded-lg px-3 py-1 inline-block font-bold mt-1 shadow-sm border-2 border-[${HERO_RED}]" style={{ backgroundColor: HERO_RED, borderColor: HERO_RED }}>{deck.prompts.length} EGGS</div>
-                                </div>
-                                <div className="flex flex-col gap-2 shrink-0">
-                                    <button onClick={() => setEditingDeck(deck)} className="bg-[${SPOT_BLUE}] text-white w-24 py-2 rounded-full text-sm font-black border-[4px] border-[#1873CA] shadow-[0_4px_0_#1873CA] active:translate-y-[4px] active:shadow-none" style={{ backgroundColor: SPOT_BLUE }}>EDIT</button>
-                                    <button onClick={() => deleteDeck(deck.id)} className="bg-[${HERO_RED}] text-white w-24 py-2 rounded-full text-sm font-black border-[4px] border-[#b3001b] shadow-[0_4px_0_#b3001b] active:translate-y-[4px] active:shadow-none" style={{ backgroundColor: HERO_RED }}>TOSS</button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </motion.div>
-            ) : (
-                <motion.div key="editing" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="fixed inset-0 z-[100] bg-[${HERO_BLUE}] p-4 flex flex-col font-['Fredoka_One'] pt-[env(safe-area-inset-top)]" style={{ backgroundColor: HERO_BLUE }}>
-                    <div className="flex justify-between items-center mb-6 pt-4 bg-[${EGG_WHITE}] p-5 rounded-[32px] border-[8px] border-white shadow-lg" style={{ backgroundColor: EGG_WHITE }}>
-                        <h2 className="text-2xl text-[${HERO_BLUE}] mt-1 ml-2 font-black" style={{ color: HERO_BLUE }}>EDIT NEST</h2>
-                        <div className="flex gap-2">
-                            <button onClick={() => setEditingDeck(null)} className="bg-gray-200 text-gray-600 px-5 py-2.5 rounded-full font-black border-[4px] border-gray-300">CANCEL</button>
-                            <button onClick={() => saveDeck(editingDeck)} className="bg-[${HERO_RED}] text-white px-8 py-2.5 rounded-full font-black border-[4px] border-[#b3001b] shadow-[0_4px_0_#b3001b]" style={{ backgroundColor: HERO_RED }}>SAVE</button>
+                            <button
+                                onClick={() => setEditingDeck({
+                                    id: generateId(),
+                                    name: '',
+                                    description: '',
+                                    prompts: [],
+                                    isCustom: true,
+                                    intensity: logic.intensity || Intensity.SOFT,
+                                    gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                                })}
+                                className="bg-[#E81E3B] text-white px-6 py-3 rounded-full font-black border-4 border-white shadow-[0_6px_0_#b3001b] active:translate-y-1 active:shadow-none transition-all text-xl"
+                            >
+                                + ADD
+                            </button>
                         </div>
                     </div>
 
-                    <div className="billy-panel mb-6">
-                        <input type="text" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="Nest Name" className="w-full bg-[#f1f8ff] p-5 rounded-[20px] border-[6px] border-[#c0deff] text-2xl outline-none focus:border-[${HERO_YELLOW}] focus:bg-white mb-4 font-black" style={{ borderFocusColor: HERO_YELLOW }} />
-                        <input type="text" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="Description" className="w-full bg-[#f1f8ff] p-4 rounded-[20px] border-[6px] border-[#c0deff] text-lg outline-none focus:border-[${HERO_YELLOW}] focus:bg-white font-bold" />
-                    </div>
-
-                    <div className="flex justify-between items-center mb-4 px-2">
-                        <h3 className="text-3xl text-white text-stroke-blue !text-[${HERO_YELLOW}] drop-shadow-md" style={{ color: HERO_YELLOW, WebkitTextStroke: `4px ${HERO_BLUE}` }}>EGGS ({editingDeck.prompts.length})</h3>
-                        <button onClick={addNewPromptToEditingDeck} className="bg-white text-[${HERO_BLUE}] px-6 py-3 rounded-full font-black border-[6px] border-[${HERO_YELLOW}] shadow-[0_6px_0_#ccaa00]" style={{ color: HERO_BLUE, borderColor: HERO_YELLOW }}>+ EGG</button>
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto space-y-5 pb-12 no-scrollbar px-1">
-                        {editingDeck.prompts.map((p: any) => (
-                            <div key={p.id} className="bg-white p-5 rounded-[32px] border-[8px] border-[${HERO_YELLOW}] relative" style={{ borderColor: HERO_YELLOW }}>
-                                <button onClick={() => removePromptFromEditingDeck(p.id)} className="absolute -top-4 -right-4 w-10 h-10 bg-[${HERO_RED}] text-white rounded-full border-[4px] border-white shadow-md flex items-center justify-center font-black text-lg z-10" style={{ backgroundColor: HERO_RED }}>X</button>
-                                <div className="flex gap-3 mb-4">
-                                    <select value={p.type} onChange={e => updatePromptInEditingDeck(p.id, { type: e.target.value as any })} className="p-3 border-[4px] border-[#eef6ff] rounded-[16px] outline-none bg-[#f8fbff] text-base font-black flex-1 text-[${HERO_BLUE}]" style={{ color: HERO_BLUE }}>
-                                        <option value="Truth">TRUTH</option>
-                                        <option value="Dare">DARE</option>
-                                    </select>
-                                    <select value={p.intensity} onChange={e => updatePromptInEditingDeck(p.id, { intensity: e.target.value as any })} className="p-3 border-[4px] border-[#eef6ff] rounded-[16px] outline-none bg-[#f8fbff] text-base font-black flex-1 text-[${HERO_BLUE}]" style={{ color: HERO_BLUE }}>
-                                        {Object.values(Intensity).map(int => <option key={int} value={int}>{int}</option>)}
-                                    </select>
-                                </div>
-                                <textarea value={p.text} onChange={e => updatePromptInEditingDeck(p.id, { text: e.target.value })} placeholder="What's the challenge?" className="w-full p-4 rounded-[16px] border-[4px] border-[#eef6ff] resize-none mb-3 outline-none focus:border-[${HERO_BLUE}] text-xl font-sans font-bold text-gray-700" rows={2} />
-                                <input type="text" value={p.penalty} onChange={e => updatePromptInEditingDeck(p.id, { penalty: e.target.value })} placeholder="Penalty if refused" className="w-full p-4 rounded-[16px] border-[4px] border-[#feeef0] text-base outline-none focus:border-[${HERO_RED}] font-sans font-bold text-gray-700" />
+                    <div className="space-y-6 overflow-y-auto no-scrollbar max-h-[calc(100dvh-300px)]">
+                        {customDecks.length === 0 ? (
+                            <div className="text-center p-12 bg-white/80 rounded-[40px] border-[8px] border-[#1873CA] border-dashed text-[#1873CA]">
+                                <span className="text-7xl block mb-6 filter drop-shadow-md">🧺</span>
+                                <p className="text-3xl font-black">NEST IS EMPTY!</p>
                             </div>
-                        ))}
+                        ) : (
+                            customDecks.map((deck: any) => (
+                                <div key={deck.id} className={`billy-panel !py-4 transition-all ${activeDeckId === deck.id ? 'border-[#F3C910] bg-[#fffdf0] scale-[1.02] shadow-[0_12px_0_#ccaa0055]' : 'opacity-80 hover:opacity-100'}`}>
+                                    <div className="flex items-center gap-4 mb-4">
+                                        <div className={`w-20 h-20 rounded-full flex shrink-0 items-center justify-center text-4xl border-[6px] border-white shadow-sm ${activeDeckId === deck.id ? 'bg-[#F3C910] animate-bounce' : 'bg-[#2B93E6]'}`}>
+                                            {activeDeckId === deck.id ? '🐣' : '🥚'}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="text-2xl text-[#1873CA] truncate font-black">{deck.name || 'UNTITLED NEST'}</div>
+                                            <div className="flex gap-2 mt-1">
+                                                <span className="text-[10px] bg-[#E81E3B] text-white rounded-lg px-2 py-0.5 font-bold shadow-sm">{deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}</span>
+                                                <span className="text-[10px] bg-[#1873CA] text-white rounded-lg px-2 py-0.5 font-bold shadow-sm">{deck.intensity}</span>
+                                                <span className="text-[10px] bg-white text-[#1873CA] border border-[#1873CA]/20 rounded-lg px-2 py-0.5 font-black">{deck.prompts.length} EGGS</span>
+                                            </div>
+                                        </div>
+                                        {activeDeckId === deck.id && (
+                                            <div className="text-[#F3C910] font-black text-xs tracking-tighter text-stroke-white" style={{ WebkitTextStroke: '2px white' }}>HATCHING!</div>
+                                        )}
+                                    </div>
+
+                                    <p className="text-sm text-[#1873CA] opacity-60 mb-6 italic line-clamp-2 h-10 px-2">{deck.description || 'No nest details provided.'}</p>
+
+                                    <div className="flex gap-3 px-1">
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`flex-1 py-3 rounded-full text-base font-black border-[4px] transition-all ${activeDeckId === deck.id ? 'bg-[#F3C910] border-white text-white shadow-[0_4px_0_#ccaa00]' : 'bg-[#1873CA] border-[#1873CA] text-white shadow-[0_4px_0_#0e58a0] opacity-70 hover:opacity-100'}`}
+                                        >
+                                            {activeDeckId === deck.id ? 'ACTIVE' : 'CHOOSE'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className="px-6 py-3 bg-[#2B93E6] text-white rounded-full text-base font-black border-[4px] border-[#1873CA] shadow-[0_4px_0_#1873CA]">EDIT</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="px-5 py-3 bg-[#E81E3B] text-white rounded-full text-base font-black border-[4px] border-[#b3001b] shadow-[0_4px_0_#b3001b]">TOSS</button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </motion.div>
+            ) : (
+                <motion.div key="editing" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col h-full space-y-6 pb-20">
+                    <div className="billy-panel space-y-6 !bg-white">
+                        <div className="space-y-2">
+                            <label className="text-sm font-black text-[#1873CA] tracking-widest pl-2">NEST NAME</label>
+                            <input
+                                className="w-full bg-[#f1f8ff] text-4xl font-black text-[#1873CA] focus:outline-none placeholder-[#1873CA]/20 border-b-8 border-[#1873CA] pb-2 px-4 rounded-2xl transition-all focus:border-[#F3C910]"
+                                value={editingDeck.name}
+                                onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                placeholder="ENTER NAME..."
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-black text-[#1873CA] tracking-widest pl-2">NEST DESCRIPTION</label>
+                            <textarea
+                                className="w-full bg-[#f1f8ff] text-lg font-bold text-[#1873CA]/80 focus:outline-none border-b-4 border-[#1873CA]/20 pb-2 px-4 rounded-2xl resize-none h-20 placeholder-[#1873CA]/10"
+                                value={editingDeck.description}
+                                onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                placeholder="What's inside this nest?"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-[#1873CA] tracking-widest pl-2">PROTOCOL</label>
+                                <select
+                                    value={editingDeck.gameMode}
+                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
+                                    className="w-full bg-[#1873CA] text-white p-4 rounded-2xl border-4 border-[#1873CA] outline-none font-black text-lg cursor-pointer shadow-[0_4px_0_#0e58a0]"
+                                >
+                                    <option value={GameMode.TRUTH_OR_DARE}>TRUTH/DARE</option>
+                                    <option value={GameMode.NEVER_HAVE_I_EVER}>NHIE MODE</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-[#1873CA] tracking-widest pl-2">INTENSITY</label>
+                                <select
+                                    value={editingDeck.intensity}
+                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
+                                    className="w-full bg-[#F3C910] text-[#1873CA] p-4 rounded-2xl border-4 border-[#F3C910] outline-none font-black text-lg cursor-pointer shadow-[0_4px_0_#ccaa00]"
+                                >
+                                    <option value={Intensity.SOFT}>MORNING (SOFT)</option>
+                                    <option value={Intensity.HOT}>CRACKED (HOT)</option>
+                                    <option value={Intensity.VULGAR}>CROWING (VULGAR)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 flex flex-col min-h-0 bg-[#1873CA]/10 rounded-[40px] p-6 border-[6px] border-[#1873CA]/20 border-dashed">
+                        <div className="flex justify-between items-center mb-6 px-2">
+                            <h3 className="text-3xl font-black text-[#1873CA] drop-shadow-sm">EGGS <span className="text-[#E81E3B]">({editingDeck.prompts.length})</span></h3>
+                            <button
+                                onClick={addNewPromptToEditingDeck}
+                                className="bg-white text-[#1873CA] px-6 py-3 rounded-full font-black border-[4px] border-[#F3C910] shadow-[0_4px_0_#ccaa00] active:translate-y-1 transition-all"
+                            >
+                                + ADD EGGS
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto space-y-6 no-scrollbar pr-2">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="bg-white p-6 rounded-[32px] border-[6px] border-[#F3C910] relative group hover:scale-[1.01] transition-transform">
+                                    <button
+                                        onClick={() => logic.removePromptFromEditingDeck(p.id)}
+                                        className="absolute -top-3 -right-3 w-10 h-10 bg-[#E81E3B] text-white rounded-full border-[4px] border-white shadow-md flex items-center justify-center font-black text-xl hover:scale-110 transition-all z-10"
+                                    >
+                                        ×
+                                    </button>
+                                    <div className="flex gap-4 mb-4">
+                                        <select
+                                            className="flex-1 bg-[#f1f8ff] text-[#1873CA] font-black p-3 rounded-xl border-4 border-[#1873CA]/10 outline-none"
+                                            value={p.type}
+                                            onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                        >
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                            ) : (
+                                                <option value="NeverHaveIEver">NHIE</option>
+                                            )}
+                                        </select>
+                                        <div className="flex-1 bg-[#f1f8ff] text-[#1873CA] font-black p-3 rounded-xl border-4 border-[#1873CA]/10 flex items-center justify-center opacity-50 italic text-sm">
+                                            {editingDeck.intensity}
+                                        </div>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent text-[#1873CA] focus:outline-none text-2xl font-black italic resize-none h-24 placeholder-[#1873CA]/10 leading-tight"
+                                        value={p.text}
+                                        onChange={e => logic.updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Write your challenge..."
+                                    />
+                                    <div className="mt-3">
+                                        <input
+                                            type="text"
+                                            value={p.penalty}
+                                            onChange={e => logic.updatePromptInEditingDeck(p.id, 'penalty', e.target.value)}
+                                            placeholder="PENALTY IF REFUSED..."
+                                            className="w-full bg-[#fff1f1] text-[#E81E3B] font-bold p-3 rounded-xl border-4 border-[#E81E3B]/10 outline-none placeholder-[#E81E3B]/20 text-sm"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-4 border-t-8 border-[#1873CA]/10">
+                        <button onClick={() => setEditingDeck(null)} className="flex-1 py-5 text-2xl font-black text-[#1873CA] bg-white border-4 border-[#1873CA] rounded-full shadow-[0_6px_0_#0e58a0] active:translate-y-1">ABORT</button>
+                        <button
+                            onClick={() => saveDeck(editingDeck)}
+                            className="flex-2 py-5 text-3xl font-black bg-[#E81E3B] text-white border-4 border-white rounded-full shadow-[0_8px_0_#b3001b] hover:scale-[1.03] active:translate-y-1 transition-all px-12"
+                        >
+                            SAVE NEST!
+                        </button>
                     </div>
                 </motion.div>
             )}

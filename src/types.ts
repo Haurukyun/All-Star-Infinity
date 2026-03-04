@@ -51,6 +51,9 @@ export interface CustomDeck {
   description: string;
   prompts: GamePrompt[];
   isCustom: boolean;
+  intensity: Intensity;
+  gameMode: GameMode;
+  isFavorite?: boolean;
 }
 export interface ThemeDefinition {
   id: Theme;

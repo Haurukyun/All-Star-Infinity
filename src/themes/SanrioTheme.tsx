@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
   { id: Intensity.SOFT, title: 'HELLO KITTY', desc: 'SWEET GARDEN', color: '#B3E5FC', secondary: '#29B6F6', icon: '🎀' },
@@ -231,31 +233,79 @@ export const SanrioIntensitySelector: React.FC<{ logic: any }> = ({ logic }) => 
 };
 
 export const SanrioPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-  const { intensity, setIntensity, handleDraw } = logic;
+  const { intensity, setIntensity, handleDraw, activeDeckId, setActiveDeckId, customDecks, setGameMode, gameMode } = logic;
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
   return (
-    <div className="h-full flex flex-col justify-center space-y-6">
-      <h2 className="sanrio-title text-3xl text-center mb-2">FRIENDSHIP LEVEL</h2>
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-5">
+    <div className="h-full flex flex-col justify-center space-y-4">
+      <div className="w-full">
+        <div className="flex justify-between items-center mb-2 px-4">
+          <span className="text-xs font-black text-[#FF69B4] tracking-widest uppercase">SELECT OUTFIT</span>
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="w-10 h-10 bg-white border-4 border-[#FF69B4] rounded-full flex items-center justify-center text-xl shadow-sm hover:scale-110 transition-transform"
+          >
+            🔍
+          </button>
+        </div>
+        <DeckCarousel
+          decks={customDecks.filter(d => d.intensity === intensity)}
+          activeDeckId={activeDeckId}
+          onSelect={(id) => {
+            const deck = customDecks.find(d => d.id === id);
+            if (deck) setGameMode(deck.gameMode);
+            setActiveDeckId(id);
+          }}
+          accentColor="#FF69B4"
+        />
+      </div>
+
+      <h2 className="sanrio-title text-3xl text-center">LEVEL: {intensity}</h2>
+
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-4">
         <div className="sanrio-panel text-center">
-          <div className="inline-block bg-[#FFB3D9] text-[#D81B60] font-black px-4 py-1 rounded-full text-xs mb-4 tracking-widest uppercase shadow-sm">
-            {STAGES.find(s => s.id === intensity)?.title}
-          </div>
-          <h3 className="text-2xl font-black text-[#7B4B94] mb-8">CHOOSE ACTIVITY</h3>
+          <h3 className="text-xl font-black text-[#7B4B94] mb-6">CHOOSE ACTIVITY</h3>
           <div className="flex gap-4">
-            <button onClick={() => handleDraw('Truth')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
-              <span className="text-4xl">🌸</span>
-              TRUTH
-            </button>
-            <button onClick={() => handleDraw('Dare')} className="sanrio-button yellow flex-1 h-32 flex-col justify-center text-xl">
-              <span className="text-4xl">🔥</span>
-              DARE
-            </button>
+            {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+              <button onClick={() => handleDraw('NeverHaveIEver')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
+                <span className="text-4xl">🤫</span>
+                CONFESS
+              </button>
+            ) : (
+              <>
+                <button onClick={() => handleDraw('Truth')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
+                  <span className="text-4xl">🌸</span>
+                  TRUTH
+                </button>
+                <button onClick={() => handleDraw('Dare')} className="sanrio-button yellow flex-1 h-32 flex-col justify-center text-xl">
+                  <span className="text-4xl">🔥</span>
+                  DARE
+                </button>
+              </>
+            )}
           </div>
         </div>
-        <button onClick={() => setIntensity(null)} className="sanrio-button w-full h-16 opacity-70 bg-white text-[#7B4B94] shadow-sm">
+        <button onClick={() => setIntensity(null)} className="sanrio-button w-full h-14 bg-white text-[#7B4B94] shadow-sm text-sm border-2">
           GO BACK ↩
         </button>
       </motion.div>
+
+      <DeckSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        decks={customDecks}
+        activeDeckId={activeDeckId}
+        onSelect={(id) => {
+          const deck = customDecks.find(d => d.id === id);
+          if (deck) {
+            setGameMode(deck.gameMode);
+            setIntensity(deck.intensity);
+          }
+          setActiveDeckId(id);
+        }}
+        gameMode={gameMode}
+        intensity={intensity}
+      />
     </div>
   );
 };
@@ -295,54 +345,141 @@ export const SanrioPlayButton: React.FC<{ label: string; onClick: () => void; is
 };
 
 export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-  const { customDecks, activeDeckId, setActiveDeckId, editingDeck, setEditingDeck, saveDeck } = logic;
+  const { customDecks, activeDeckId, setActiveDeckId, editingDeck, setEditingDeck, saveDeck, generateId, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
 
   return (
     <AnimatePresence mode="wait">
       {!editingDeck ? (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-          <h2 className="sanrio-title text-3xl text-center mb-6">WARDROBE</h2>
+        <motion.div key="list" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="sanrio-title text-3xl">WARDROBE</h2>
+            <button
+              onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+              className="bg-white text-[#FF69B4] px-4 py-2 rounded-full font-black text-xs border-4 border-[#FF69B4] shadow-sm hover:scale-105 active:scale-95 transition-all"
+            >
+              + NEW LOOK
+            </button>
+          </div>
           <div className="space-y-4">
-            {customDecks.map((deck: any) => (
-              <div key={deck.id} className="sanrio-panel flex items-center p-5">
-                <div className="flex-1 text-left">
-                  <h3 className="text-xl font-black text-[#7B4B94] mb-1">{deck.name}</h3>
-                  <div className="text-xs text-[#A188A6] font-bold tracking-widest border border-[#E1BEE7] bg-[#FFF0F5] inline-block px-2 py-1 rounded-full">
-                    {deck.prompts.length} ITEMS
+            {customDecks.length === 0 ? (
+              <div className="sanrio-panel py-16 text-center text-[#A188A6] font-bold italic border-dashed border-[#E1BEE7]">No outfits in your closet...</div>
+            ) : (
+              customDecks.map((deck: any) => (
+                <div key={deck.id} className={`sanrio-panel flex items-center p-5 group transition-all ${activeDeckId === deck.id ? 'border-[#4DD0E1] bg-[#F0FBFC]' : ''}`}>
+                  <div className="flex-1 text-left">
+                    <h3 className="text-xl font-black text-[#7B4B94] mb-1 flex items-center gap-2">
+                      {activeDeckId === deck.id && <span className="text-sm">🌟</span>}
+                      {deck.name || 'Cozy Outfit'}
+                    </h3>
+                    <div className="flex gap-2">
+                      <div className="text-[9px] text-[#A188A6] font-black tracking-widest border-2 border-[#E1BEE7] bg-white inline-block px-3 py-1 rounded-full uppercase">
+                        {deck.prompts.length} PIECES
+                      </div>
+                      <div className="text-[9px] text-white font-black tracking-widest bg-[#FFB6C1] inline-block px-3 py-1 rounded-full uppercase">
+                        {deck.intensity}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setActiveDeckId(deck.id)}
+                      className={`sanrio-button !py-2 !px-4 !text-xs !shadow-sm ${activeDeckId === deck.id ? '!bg-[#4DD0E1]' : '!bg-white !text-[#4DD0E1]'}`}
+                    >
+                      {activeDeckId === deck.id ? 'ON' : 'LOAD'}
+                    </button>
+                    <div className="flex flex-col gap-1">
+                      <button onClick={() => setEditingDeck(deck)} className="text-[#A188A6] hover:text-[#FF69B4] text-[10px] font-black uppercase tracking-tighter transition-colors">EDIT</button>
+                      <button onClick={() => logic.deleteDeck(deck.id)} className="text-[#A188A6] hover:text-red-400 text-[10px] font-black uppercase tracking-tighter transition-colors">DROP</button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setActiveDeckId(deck.id)} className={`w-14 h-8 rounded-full flex items-center p-1 transition-colors ${activeDeckId === deck.id ? 'bg-[#4DD0E1]' : 'bg-[#E0E0E0]'}`}>
-                    <div className={`w-6 h-6 bg-white rounded-full transition-transform shadow-sm ${activeDeckId === deck.id ? 'translate-x-6' : 'translate-x-0'}`} />
-                  </button>
-                  <button onClick={() => setEditingDeck(deck)} className="sanrio-button px-4 py-2 text-sm bg-white text-[#7B4B94] shadow-sm hover:scale-105 active:translate-y-1">EDIT</button>
-                </div>
-              </div>
-            ))}
-            <button onClick={() => setEditingDeck({ id: 'new', name: 'New Preset', prompts: [] })} className="sanrio-button pink w-full h-16 text-lg mt-4">
-              + NEW OUTFIT
-            </button>
+              ))
+            )}
           </div>
         </motion.div>
       ) : (
-        <div className="space-y-4">
-          <input
-            type="text"
-            value={editingDeck.name}
-            onChange={(e) => setEditingDeck({ ...editingDeck, name: e.target.value })}
-            className="w-full text-2xl font-black text-[#7B4B94] bg-white border-4 border-white shadow-[0_4px_0_#FFB3D9] rounded-[40px] p-4 text-center focus:outline-none"
-          />
-          <div className="sanrio-panel p-4 shadow-inner bg-[#F8F9FA] min-h-[40vh] border-none shadow-[inset_0_4px_10px_rgba(0,0,0,0.1)]">
-            <div className="text-center text-[#A188A6] font-bold py-10">OUTFIT CONTENTS HERE</div>
+        <motion.div key="editor" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="space-y-6">
+          <div className="relative">
+            <div className="absolute -top-6 -right-2 text-4xl animate-bounce">🎀</div>
+            <input
+              type="text"
+              value={editingDeck.name}
+              onChange={(e) => setEditingDeck({ ...editingDeck, name: e.target.value })}
+              className="w-full text-2xl font-black text-[#7B4B94] bg-white border-4 border-white shadow-[0_6px_0_#FFB3D9] rounded-[40px] p-6 text-center focus:outline-none focus:shadow-[0_8px_0_#FFB3D9] transition-all"
+              placeholder="NAME YOUR STYLE..."
+            />
           </div>
-          <div className="flex gap-4">
-            <button onClick={() => setEditingDeck(null)} className="sanrio-button flex-1 bg-white text-[#7B4B94] shadow-sm">CANCEL</button>
-            <button onClick={() => saveDeck(editingDeck)} className="sanrio-button yellow flex-1 text-lg">SAVE IT</button>
+
+          <div className="sanrio-panel p-6 space-y-6">
+            <textarea
+              value={editingDeck.description}
+              onChange={(e) => setEditingDeck({ ...editingDeck, description: e.target.value })}
+              className="w-full bg-[#FAFAFA] rounded-[30px] p-4 text-sm font-bold text-[#7B4B94] h-24 outline-none resize-none border-4 border-transparent focus:border-[#F8BBD0] transition-colors shadow-inner"
+              placeholder="Describe this magical look..."
+            />
+
+            <div className="flex gap-4">
+              <div className="flex-1 space-y-1">
+                <label className="text-[10px] font-black text-[#FF69B4] pl-4 uppercase tracking-widest">Adventure Type</label>
+                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-white border-4 border-[#F8BBD0] rounded-full p-3 text-xs font-black text-[#7B4B94] outline-none appearance-none text-center cursor-pointer">
+                  <option value="TruthOrDare">PARTY (T/D)</option>
+                  <option value="NeverHaveIEver">GOSSIP (NHIE)</option>
+                </select>
+              </div>
+              <div className="flex-1 space-y-1">
+                <label className="text-[10px] font-black text-[#FF69B4] pl-4 uppercase tracking-widest">Sweetness</label>
+                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-white border-4 border-[#F8BBD0] rounded-full p-3 text-xs font-black text-[#7B4B94] outline-none appearance-none text-center cursor-pointer">
+                  <option value="SOFT">GARDEN</option>
+                  <option value="HOT">BERRY</option>
+                  <option value="VULGAR">GOTHIC</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t-4 border-[#FFF0F5]">
+              <div className="flex justify-between items-center px-2">
+                <span className="font-black text-[#7B4B94] text-lg">ACCESSORIES ({editingDeck.prompts.length})</span>
+                <button onClick={addNewPromptToEditingDeck} className="bg-[#FF69B4] text-white px-4 py-2 rounded-full font-black text-[10px] border-4 border-white shadow-sm hover:scale-110 active:scale-95 transition-all uppercase">+ ADD PIECE</button>
+              </div>
+
+              <div className="max-h-[35vh] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                {editingDeck.prompts.map((p: any) => (
+                  <div key={p.id} className="bg-white border-4 border-[#FFF0F5] rounded-[25px] p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow relative group">
+                    <div className="flex items-center gap-3">
+                      <select
+                        className="bg-[#FCE4EC] text-[#D81B60] text-[10px] font-black rounded-full px-4 py-1.5 outline-none border-2 border-transparent focus:border-[#F8BBD0] transition-all"
+                        value={p.type}
+                        onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                      >
+                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                          <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                        ) : (
+                          <option value="NeverHaveIEver">NHIE</option>
+                        )}
+                      </select>
+                      <div className="text-[9px] font-black text-[#FF69B4] opacity-50 uppercase tracking-tighter px-2 border-l-2 border-[#FFF0F5]">{editingDeck.intensity}</div>
+                      <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#FFB6C1] hover:text-[#FF69B4] font-black text-2xl transition-colors ml-auto leading-none">×</button>
+                    </div>
+                    <textarea
+                      className="w-full text-sm font-bold text-[#7B4B94] outline-none px-2 bg-transparent border-b-2 border-dashed border-[#FFF0F5] focus:border-[#FFB6C1] py-1 resize-none italic"
+                      value={p.text}
+                      onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                      placeholder="Write your magical prompt..."
+                      rows={1}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      )
-      }
-    </AnimatePresence >
+
+          <div className="flex gap-4 pt-4 relative z-50">
+            <button onClick={() => setEditingDeck(null)} className="sanrio-button flex-1 !bg-white !text-[#BCAAA4] !shadow-none !border-[#F5F5F5] uppercase tracking-widest text-sm">Cancel</button>
+            <button onClick={() => saveDeck(editingDeck)} className="sanrio-button yellow flex-1 text-lg tracking-widest">GLOW UP!</button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

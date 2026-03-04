@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'TOPSIDE (PILTOVER)', desc: 'CITY OF PROGRESS', color: '#c79b3b' },
@@ -213,35 +215,89 @@ export const ArcaneIntensitySelector: React.FC<{ logic: any }> = ({ logic }) => 
 };
 
 export const ArcanePromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { handleDraw, setIntensity } = logic;
-    return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full justify-center space-y-8 sm:space-y-12 p-4 max-w-4xl mx-auto w-full">
-            <h2 className="text-3xl sm:text-4xl text-center font-bold text-[#00ffcc] drop-shadow-[0_0_5px_rgba(0,255,204,0.5)] tracking-wider">INITIATE SEQUENCE</h2>
+    const { handleDraw, setIntensity, intensity, customDecks, activeDeckId, setActiveDeckId, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-                <button
-                    onClick={() => handleDraw('Truth')}
-                    className="aspect-square bg-[#1a1c23]/80 arcane-piltover-gold hover:bg-[#c79b3b]/10 transition-all flex flex-col justify-center items-center p-6 sm:p-8 group relative overflow-hidden"
-                >
-                    <div className="absolute -right-4 -top-4 w-24 h-24 border-2 border-[#c79b3b]/20 rounded-full"></div>
-                    <div className="text-4xl sm:text-5xl mb-4 sm:mb-6 text-[#c79b3b] group-hover:scale-110 transition-transform">⚖</div>
-                    <span className="text-3xl sm:text-4xl font-bold tracking-widest text-[#c79b3b]">TRUTH</span>
-                    <span className="arcane-text-body text-white/60 mt-2 sm:mt-4 tracking-widest uppercase text-xs sm:text-sm">COUNCIL INTERROGATION</span>
-                </button>
-                <button
-                    onClick={() => handleDraw('Dare')}
-                    className="aspect-square bg-[#0a1118]/80 arcane-shimmer-glow hover:bg-[#9000ff]/10 transition-all flex flex-col justify-center items-center p-6 sm:p-8 group relative overflow-hidden"
-                >
-                    <div className="absolute -left-4 -bottom-4 w-32 h-32 border-4 border-[#9000ff]/10 rounded-full"></div>
-                    <div className="text-4xl sm:text-5xl mb-4 sm:mb-6 text-[#9000ff] group-hover:scale-110 transition-transform drop-shadow-[0_0_10px_#9000ff]">⚠</div>
-                    <span className="text-3xl sm:text-4xl font-bold tracking-widest text-[#9000ff] drop-shadow-[0_0_5px_#9000ff]">DARE</span>
-                    <span className="arcane-text-body text-white/60 mt-2 sm:mt-4 tracking-widest uppercase text-xs sm:text-sm">UNDERCITY SURVIVAL</span>
-                </button>
+    return (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full justify-center space-y-4 p-4 max-w-4xl mx-auto w-full">
+            <div className="w-full mb-4">
+                <div className="flex justify-between items-center mb-2 px-2">
+                    <span className="arcane-text-body text-[#c79b3b] font-bold text-xs tracking-widest uppercase">SELECT BLUEPRINT</span>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="w-10 h-10 bg-[#1a1c23] border border-[#c79b3b] flex items-center justify-center shadow-[0_0_10px_rgba(199,155,59,0.2)] hover:bg-[#c79b3b]/10 hover:shadow-[0_0_15px_#c79b3b] transition-all"
+                    >
+                        🔍
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#c79b3b"
+                />
             </div>
 
-            <button onClick={() => setIntensity(null)} className="arcane-text-body font-bold text-xl uppercase tracking-widest text-white/50 hover:text-white transition-colors">
+            <h2 className="text-3xl sm:text-4xl text-center font-bold text-[#00ffcc] drop-shadow-[0_0_5px_rgba(0,255,204,0.5)] tracking-wider">INITIATE SEQUENCE: {intensity}</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button
+                        onClick={() => handleDraw('NeverHaveIEver')}
+                        className="col-span-1 md:col-span-2 bg-[#1a1c23]/80 arcane-hextech-glow hover:bg-[#00ffcc]/10 transition-all flex flex-col justify-center items-center py-8 group relative overflow-hidden"
+                    >
+                        <div className="text-4xl sm:text-5xl mb-2 text-[#00ffcc] group-hover:scale-110 transition-transform">💎</div>
+                        <span className="text-3xl sm:text-4xl font-bold tracking-widest text-[#00ffcc]">I HAVE NEVER...</span>
+                        <span className="arcane-text-body text-white/60 mt-2 tracking-widest uppercase text-xs">UNDERCITY CONFESSIONS</span>
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => handleDraw('Truth')}
+                            className="bg-[#1a1c23]/80 arcane-piltover-gold hover:bg-[#c79b3b]/10 transition-all flex flex-col justify-center items-center p-6 sm:p-8 group relative overflow-hidden"
+                        >
+                            <div className="absolute -right-4 -top-4 w-24 h-24 border-2 border-[#c79b3b]/20 rounded-full"></div>
+                            <div className="text-4xl sm:text-5xl mb-4 sm:mb-6 text-[#c79b3b] group-hover:scale-110 transition-transform">⚖</div>
+                            <span className="text-3xl sm:text-4xl font-bold tracking-widest text-[#c79b3b]">TRUTH</span>
+                            <span className="arcane-text-body text-white/60 mt-2 sm:mt-4 tracking-widest uppercase text-xs sm:text-sm">COUNCIL INTERROGATION</span>
+                        </button>
+                        <button
+                            onClick={() => handleDraw('Dare')}
+                            className="bg-[#0a1118]/80 arcane-shimmer-glow hover:bg-[#9000ff]/10 transition-all flex flex-col justify-center items-center p-6 sm:p-8 group relative overflow-hidden"
+                        >
+                            <div className="absolute -left-4 -bottom-4 w-32 h-32 border-4 border-[#9000ff]/10 rounded-full"></div>
+                            <div className="text-4xl sm:text-5xl mb-4 sm:mb-6 text-[#9000ff] group-hover:scale-110 transition-transform drop-shadow-[0_0_10px_#9000ff]">⚠</div>
+                            <span className="text-3xl sm:text-4xl font-bold tracking-widest text-[#9000ff] drop-shadow-[0_0_5px_#9000ff]">DARE</span>
+                            <span className="arcane-text-body text-white/60 mt-2 sm:mt-4 tracking-widest uppercase text-xs sm:text-sm">UNDERCITY SURVIVAL</span>
+                        </button>
+                    </>
+                )}
+            </div>
+
+            <button onClick={() => setIntensity(null)} className="arcane-text-body font-bold text-xl uppercase tracking-widest text-white/50 hover:text-white transition-colors text-center">
                 Cancel Sequence
             </button>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -296,27 +352,117 @@ export const ArcanePlayButton: React.FC<{ label: string; onClick: () => void; is
 };
 
 export const ArcaneDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, activeDeckId, setActiveDeckId } = logic;
+    const { customDecks, activeDeckId, setActiveDeckId, setEditingDeck, editingDeck, generateId, deleteDeck, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
     return (
-        <div className="space-y-6 p-4 max-w-4xl mx-auto w-full">
-            <h2 className="text-4xl font-bold text-[#c79b3b] tracking-wider border-b border-[#c79b3b]/30 pb-4 mb-8">SCHEMATICS LIST</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {customDecks.map((deck: any) => (
-                    <button
-                        key={deck.id}
-                        onClick={() => setActiveDeckId(deck.id)}
-                        className={`text-left p-6 bg-[#1a1c23] transition-all flex flex-col ${activeDeckId === deck.id ? 'arcane-hextech-glow' : 'border border-white/10 hover:border-[#c79b3b]'}`}
-                    >
-                        <h3 className="text-2xl font-bold text-white mb-2 tracking-wider">{deck.name}</h3>
-                        <p className="arcane-text-body text-lg text-white/60 mb-6 h-12 overflow-hidden">{deck.description}</p>
-                        <div className="flex justify-between items-center w-full mt-auto arcane-text-body font-bold tracking-widest uppercase">
-                            <span className="text-[#c79b3b]">{deck.prompts.length} FILES</span>
-                            {activeDeckId === deck.id && <span className="text-[#00ffcc]">CONNECTED</span>}
+        <AnimatePresence mode="wait">
+            {!editingDeck ? (
+                <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pt-4">
+                    <div className="flex justify-between items-end border-b-2 border-[#c79b3b]/30 pb-4 mb-8">
+                        <h2 className="text-4xl font-bold text-[#c79b3b] tracking-wider">SCHEMATICS</h2>
+                        <button
+                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            className="bg-[#c79b3b] text-[#1a1c23] px-4 py-2 font-bold text-sm tracking-widest hover:brightness-110"
+                        >
+                            + NEW BLUEPRINT
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {customDecks.map((deck: any) => (
+                            <div
+                                key={deck.id}
+                                className={`text-left p-6 bg-[#1a1c23] transition-all flex flex-col ${activeDeckId === deck.id ? 'arcane-hextech-glow' : 'border border-white/10 hover:border-[#c79b3b]'}`}
+                            >
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="text-2xl font-bold text-white tracking-wider">{deck.name || 'UNNAMED'}</h3>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setEditingDeck(deck)} className="text-[#00ffcc] text-xs font-bold hover:underline">REFINE</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="text-[#9000ff] text-xs font-bold hover:underline">SCRAP</button>
+                                    </div>
+                                </div>
+                                <p className="arcane-text-body text-lg text-white/60 mb-6 h-12 overflow-hidden">{deck.description}</p>
+                                <div className="flex justify-between items-center w-full mt-auto arcane-text-body font-bold tracking-widest uppercase">
+                                    <span className="text-[#c79b3b]">{deck.prompts.length} FILES</span>
+                                    <button
+                                        onClick={() => setActiveDeckId(deck.id)}
+                                        className={`px-3 py-1 text-[10px] border ${activeDeckId === deck.id ? 'bg-[#00ffcc] text-[#0a1118] border-[#00ffcc]' : 'text-white/40 border-white/20'}`}
+                                    >
+                                        {activeDeckId === deck.id ? 'CONNECTED' : 'CONNECT'}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+            ) : (
+                <motion.div key="editor" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 pt-4 bg-[#1a1c23] p-6 arcane-hextech-glow">
+                    <h2 className="text-3xl font-bold text-[#00ffcc] tracking-widest uppercase border-b border-[#00ffcc]/20 pb-2">BLUEPRINT EDITOR</h2>
+                    <div className="space-y-4">
+                        <input
+                            className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-3 text-white arcane-text-body font-bold outline-none focus:border-[#c79b3b]"
+                            value={editingDeck.name}
+                            onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                            placeholder="DESIGNATION"
+                        />
+                        <textarea
+                            className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-3 text-white arcane-text-body font-bold outline-none focus:border-[#c79b3b] h-24"
+                            value={editingDeck.description}
+                            onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                            placeholder="OBJECTIVE"
+                        />
+                        <div className="flex gap-4">
+                            <div className="flex-1 flex flex-col gap-1">
+                                <label className="text-[10px] text-[#c79b3b] font-bold">MODE</label>
+                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-2 text-[#00ffcc] font-bold outline-none">
+                                    <option value="TruthOrDare">TRUTH/DARE</option>
+                                    <option value="NeverHaveIEver">NHIE</option>
+                                </select>
+                            </div>
+                            <div className="flex-1 flex flex-col gap-1">
+                                <label className="text-[10px] text-[#c79b3b] font-bold">INTENSITY</label>
+                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-2 text-[#9000ff] font-bold outline-none">
+                                    <option value="SOFT">SOFT</option>
+                                    <option value="HOT">HOT</option>
+                                    <option value="VULGAR">VULGAR</option>
+                                </select>
+                            </div>
                         </div>
-                    </button>
-                ))}
-            </div>
-        </div>
+
+                        <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="p-4 border border-white/10 bg-[#0a1118] space-y-3 relative group">
+                                    <div className="flex justify-between items-center">
+                                        <select
+                                            className="bg-[#1a1c23] text-[#00ffcc] text-[10px] font-bold border border-white/10 px-2 py-1 outline-none"
+                                            value={p.type}
+                                            onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                        >
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                            ) : (
+                                                <option value="NeverHaveIEver">NHIE</option>
+                                            )}
+                                        </select>
+                                        <span className="text-[10px] font-bold bg-[#c79b3b]/10 text-[#c79b3b] px-2 py-1">{editingDeck.intensity}</span>
+                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#9000ff] hover:text-white font-bold">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent border-b border-white/10 text-white arcane-text-body font-bold p-1 outline-none focus:border-[#00ffcc] resize-none"
+                                        value={p.text}
+                                        onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="INPUT CONTENT..."
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={addNewPromptToEditingDeck} className="w-full py-3 border border-dashed border-[#00ffcc]/50 text-[#00ffcc] font-bold transition-all hover:bg-[#00ffcc]/5">+ ADD COMPONENT</button>
+                        <div className="flex gap-4">
+                            <button onClick={() => setEditingDeck(null)} className="flex-1 py-3 text-white/50 font-bold hover:text-white">DISCARD</button>
+                            <button onClick={() => saveDeck(editingDeck)} className="flex-1 py-3 bg-[#00ffcc] text-[#0a1118] font-black tracking-widest uppercase">FINALIZE</button>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 };
 

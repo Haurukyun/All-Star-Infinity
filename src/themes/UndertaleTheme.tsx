@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: '* Easy', desc: 'No one gets hurt.', color: '#ffffff' },
@@ -138,35 +140,73 @@ export const UndertaleIntensitySelector: React.FC<{ logic: any }> = ({ logic }) 
 };
 
 export const UndertalePromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { handleDraw, setIntensity } = logic;
+    const { handleDraw, setIntensity, intensity, customDecks, activeDeckId, setActiveDeckId, setGameMode, gameMode } = logic;
     const [hoveredType, setHoveredType] = useState<string | null>(null);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     return (
-        <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full items-center justify-center">
-            <div className="w-full max-w-2xl ut-border p-8 text-2xl mb-12 min-h-[120px]">
+        <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full items-center justify-center space-y-8">
+            <div className="w-full max-w-2xl">
+                <div className="flex justify-between items-center mb-4 px-2">
+                    <span className="text-xl">* SELECT ITEM</span>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="w-10 h-10 border-4 border-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                    >
+                        🔍
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#ff0000"
+                />
+            </div>
+
+            <div className="w-full max-w-2xl ut-border p-8 text-2xl min-h-[120px]">
                 * A wild prompt appears!<br />
+                * Difficulty: {intensity}<br />
                 * What will you do?
             </div>
 
             <div className="grid grid-cols-2 gap-x-24 gap-y-8 pl-8">
-                <button
-                    onMouseEnter={() => setHoveredType('Truth')}
-                    onMouseLeave={() => setHoveredType(null)}
-                    onClick={() => handleDraw('Truth')}
-                    className="text-left text-3xl relative flex items-center"
-                >
-                    <span className={`absolute -left-10 text-[#ff0000] ${hoveredType === 'Truth' ? 'opacity-100' : 'opacity-0'}`}>♥</span>
-                    * Truth
-                </button>
-                <button
-                    onMouseEnter={() => setHoveredType('Dare')}
-                    onMouseLeave={() => setHoveredType(null)}
-                    onClick={() => handleDraw('Dare')}
-                    className="text-left text-3xl relative flex items-center"
-                >
-                    <span className={`absolute -left-10 text-[#ff0000] ${hoveredType === 'Dare' ? 'opacity-100' : 'opacity-0'}`}>♥</span>
-                    * Dare
-                </button>
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button
+                        onMouseEnter={() => setHoveredType('NeverHaveIEver')}
+                        onMouseLeave={() => setHoveredType(null)}
+                        onClick={() => handleDraw('NeverHaveIEver')}
+                        className="text-left text-3xl relative flex items-center col-span-2"
+                    >
+                        <span className={`absolute -left-10 text-[#ff0000] ${hoveredType === 'NeverHaveIEver' ? 'opacity-100' : 'opacity-0'}`}>♥</span>
+                        * Never Have I Ever
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onMouseEnter={() => setHoveredType('Truth')}
+                            onMouseLeave={() => setHoveredType(null)}
+                            onClick={() => handleDraw('Truth')}
+                            className="text-left text-3xl relative flex items-center"
+                        >
+                            <span className={`absolute -left-10 text-[#ff0000] ${hoveredType === 'Truth' ? 'opacity-100' : 'opacity-0'}`}>♥</span>
+                            * Truth
+                        </button>
+                        <button
+                            onMouseEnter={() => setHoveredType('Dare')}
+                            onMouseLeave={() => setHoveredType(null)}
+                            onClick={() => handleDraw('Dare')}
+                            className="text-left text-3xl relative flex items-center"
+                        >
+                            <span className={`absolute -left-10 text-[#ff0000] ${hoveredType === 'Dare' ? 'opacity-100' : 'opacity-0'}`}>♥</span>
+                            * Dare
+                        </button>
+                    </>
+                )}
                 <button
                     onMouseEnter={() => setHoveredType('Abort')}
                     onMouseLeave={() => setHoveredType(null)}
@@ -177,6 +217,23 @@ export const UndertalePromptTypeSelector: React.FC<{ logic: any }> = ({ logic })
                     * Spare (Go Back)
                 </button>
             </div>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -224,50 +281,163 @@ export const UndertalePlayButton: React.FC<{ label: string; onClick: () => void;
 };
 
 export const UndertaleDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
                 <div className="space-y-6 h-full flex flex-col">
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-4xl">* INVENTORY</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="text-2xl hover:text-[#ff0000]">* NEW ITEM</button>
+                    <div className="flex justify-between items-end mb-4 border-b-4 border-white pb-2">
+                        <div>
+                            <h2 className="text-4xl tracking-tighter">* INVENTORY</h2>
+                            <p className="text-sm text-gray-500 mt-1">* 8 slots available.</p>
+                        </div>
+                        <button
+                            onClick={() => setEditingDeck({
+                                id: generateId(),
+                                name: '',
+                                description: '',
+                                prompts: [],
+                                isCustom: true,
+                                intensity: logic.intensity || Intensity.SOFT,
+                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                            })}
+                            className="text-2xl hover:text-[#ff0000] transition-colors"
+                        >
+                            * NEW_ITEM
+                        </button>
                     </div>
-                    <div className="grid grid-cols-1 gap-4 overflow-y-auto custom-scrollbar pr-4">
-                        {customDecks.map((deck: any) => (
-                            <div key={deck.id} className="ut-border p-6 flex justify-between items-center group hover:border-[#ff9900]">
-                                <div><h3 className="text-3xl">* {deck.name}</h3><p className="text-xl text-gray-500 mt-2">({deck.prompts.length} pages)</p></div>
-                                <div className="flex gap-6">
-                                    <button onClick={() => setEditingDeck(deck)} className="text-2xl hover:text-white text-gray-500">USE</button>
-                                    <button onClick={() => deleteDeck(deck.id)} className="text-2xl hover:text-[#ff0000] text-gray-500">DROP</button>
-                                </div>
+
+                    <div className="grid grid-cols-1 gap-4 overflow-y-auto custom-scrollbar pr-4 flex-1">
+                        {customDecks.length === 0 ? (
+                            <div className="py-20 text-center opacity-30 italic text-2xl">
+                                * (It's an empty box.)
                             </div>
-                        ))}
+                        ) : (
+                            customDecks.map((deck: any) => (
+                                <div key={deck.id} className={`ut-border p-6 flex flex-col gap-4 group transition-all ${activeDeckId === deck.id ? 'border-[#ff0000]' : 'hover:border-[#ff9900]'}`}>
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className={`text-3xl ${activeDeckId === deck.id ? 'text-[#ff0000]' : 'text-white'}`}>
+                                                {activeDeckId === deck.id && <span className="mr-4 animate-pulse">♥</span>}
+                                                * {deck.name || 'NULL'}
+                                            </h3>
+                                            <div className="flex gap-4 text-sm text-gray-500 mt-1 ml-8">
+                                                <span>[{deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}]</span>
+                                                <span>[{deck.intensity}]</span>
+                                                <span>({deck.prompts.length} pages)</span>
+                                            </div>
+                                        </div>
+                                        {activeDeckId === deck.id && <span className="text-[#ff0000] text-sm font-bold tracking-widest mt-2">ACTIVE</span>}
+                                    </div>
+
+                                    <p className="text-lg text-gray-400 ml-8 italic leading-snug line-clamp-2">{deck.description || '* No description provided.'}</p>
+
+                                    <div className="flex gap-8 ml-8 mt-2">
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`text-2xl transition-colors ${activeDeckId === deck.id ? 'text-[#00ff00]' : 'text-gray-500 hover:text-white'}`}
+                                        >
+                                            {activeDeckId === deck.id ? '* EQUIPPED' : '* EQUIP'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className="text-2xl hover:text-[#ff9900] text-gray-500 transition-colors">* INFO</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="text-2xl hover:text-[#ff0000] text-gray-500 transition-colors ml-auto">* DROP</button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col h-full space-y-6">
-                    <input className="w-full bg-transparent text-4xl focus:outline-none border-b-4 border-white pb-2" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="* Enter item name..." />
+                <div className="flex flex-col h-full space-y-6 pb-4">
+                    <div className="space-y-6 ut-border p-6 bg-black">
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-500 block">* ITEM_NAME</label>
+                            <input
+                                className="w-full bg-transparent text-4xl focus:outline-none border-b-4 border-white pb-1 placeholder:opacity-20 translate-x-2"
+                                value={editingDeck.name}
+                                onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                placeholder="Enter name..."
+                            />
+                        </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-4">
-                        {editingDeck.prompts.map((p: any) => (
-                            <div key={p.id} className="ut-border p-4 flex flex-col gap-4">
-                                <div className="flex justify-between items-center border-b-2 border-gray-700 pb-2">
-                                    <select className="bg-black text-white text-xl outline-none" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                        <option>Truth</option><option>Dare</option><option>NeverHaveIEver</option>
-                                    </select>
-                                    <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#ff0000] text-2xl">X</button>
-                                </div>
-                                <textarea className="w-full bg-transparent text-white focus:outline-none text-2xl resize-none h-32" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="* Write lore here..." />
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-500 block">* LORE_DESCRIPTION</label>
+                            <textarea
+                                className="w-full bg-transparent text-2xl focus:outline-none border-b-4 border-white pb-1 resize-none h-20 placeholder:opacity-20 translate-x-2"
+                                value={editingDeck.description}
+                                onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                placeholder="Enter lore..."
+                            />
+                        </div>
+
+                        <div className="flex gap-8">
+                            <div className="flex-1 space-y-2">
+                                <label className="text-sm text-gray-500 block">* ACTION_PROTOCOL</label>
+                                <select
+                                    value={editingDeck.gameMode}
+                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
+                                    className="bg-transparent text-white border-b-4 border-white pb-1 text-2xl outline-none w-full cursor-pointer hover:border-[#ff9900] transition-colors"
+                                >
+                                    <option className="bg-black" value={GameMode.TRUTH_OR_DARE}>TRUTH_OR_DARE</option>
+                                    <option className="bg-black" value={GameMode.NEVER_HAVE_I_EVER}>NHIE_PROTOCOL</option>
+                                </select>
                             </div>
-                        ))}
+                            <div className="flex-1 space-y-2">
+                                <label className="text-sm text-gray-500 block">* DIFFICULTY_SETTING</label>
+                                <select
+                                    value={editingDeck.intensity}
+                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
+                                    className="bg-transparent text-white border-b-4 border-white pb-1 text-2xl outline-none w-full cursor-pointer hover:border-[#ff9900] transition-colors"
+                                >
+                                    <option className="bg-black" value={Intensity.SOFT}>* EASY (SOFT)</option>
+                                    <option className="bg-black" value={Intensity.HOT}>* NORMAL (HOT)</option>
+                                    <option className="bg-black" value={Intensity.VULGAR}>* HARD (VULGAR)</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <button onClick={addNewPromptToEditingDeck} className="text-2xl py-4 border-4 border-dashed border-gray-600 hover:border-white w-full">* Add Page</button>
+                    <div className="flex-1 flex flex-col min-h-0">
+                        <div className="flex justify-between items-center mb-4 px-2">
+                            <h3 className="text-3xl font-bold tracking-tighter text-white">* PAGES ({editingDeck.prompts.length})</h3>
+                            <button onClick={addNewPromptToEditingDeck} className="text-2xl hover:text-[#00ff00] transition-colors">* ADD_PAGE</button>
+                        </div>
 
-                    <div className="flex justify-between mt-4">
-                        <button onClick={() => setEditingDeck(null)} className="text-3xl text-gray-500 hover:text-white">* CANCEL</button>
-                        <button onClick={() => saveDeck(editingDeck)} className="text-3xl text-[#ff0000] hover:text-white">* SAVE ITEM</button>
+                        <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-4">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="ut-border p-5 space-y-4 bg-black/50 group hover:border-white transition-colors">
+                                    <div className="flex justify-between items-center border-b-2 border-gray-800 pb-2">
+                                        <div className="flex gap-6 items-center">
+                                            <select
+                                                className="bg-black text-white text-xl outline-none border-none cursor-pointer hover:text-[#ff9900]"
+                                                value={p.type}
+                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option value="Truth">* Truth</option><option value="Dare">* Dare</option></>
+                                                ) : (
+                                                    <option value="NeverHaveIEver">* NHIE</option>
+                                                )}
+                                            </select>
+                                            <div className="text-lg text-gray-600 italic">[{editingDeck.intensity}]</div>
+                                        </div>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#ff0000] text-2xl hover:scale-125 transition-transform">X</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent text-white focus:outline-none text-2xl resize-none h-24 placeholder:opacity-20"
+                                        value={p.text}
+                                        onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="* Something happened..."
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-4 border-t-4 border-white">
+                        <button onClick={() => setEditingDeck(null)} className="text-3xl text-gray-500 hover:text-white transition-colors">* CANCEL</button>
+                        <button onClick={() => saveDeck(editingDeck)} className="text-3xl text-[#ff0000] hover:text-[#00ff00] transition-colors">* SAVE_ITEM</button>
                     </div>
                 </div>
             )}

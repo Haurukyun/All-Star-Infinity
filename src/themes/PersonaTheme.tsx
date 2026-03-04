@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const P5_VARIANTS = {
     initial: { opacity: 0, x: -30, skewX: -5, scale: 1.02 },
@@ -195,36 +197,17 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
         history,
         activeDeckId, setActiveDeckId,
         customDecks,
-        handleDraw
+        handleDraw,
+        setGameMode,
+        gameMode
     } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     return (
         <AnimatePresence mode="wait">
             {!intensity && !prompt ? (
-                <motion.div key="intensity" variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="space-y-4 pt-1">
-                    <div className="relative mb-1 transform -skew-x-12 bg-white text-black px-3 py-1 sm:px-5 sm:py-1.5 inline-block border-[2px] border-black z-10 shadow-[3px_3px_0_black]">
-                        <h2 className="font-p5-display text-lg sm:text-2xl tracking-tighter transform skew-x-12 uppercase italic">Select Source</h2>
-                    </div>
-                    <div className="flex flex-col gap-1.5 sm:gap-2 mb-4 sm:mb-6">
-                        <button
-                            onClick={() => setActiveDeckId('default')}
-                            className={`p-2 sm:p-3 text-left border-[2px] border-black transition-all transform -skew-x-6 group shadow-[3px_3px_0_black] ${activeDeckId === 'default' ? 'bg-white text-black translate-x-0.5 translate-y-0.5 shadow-none' : 'bg-black text-white border-white/20 opacity-60'}`}
-                        >
-                            <span className="font-p5-display text-lg sm:text-xl transform skew-x-6 block italic">★ PHANTOM DEFAULT</span>
-                        </button>
-                        {customDecks.map((deck: any) => (
-                            <button
-                                key={deck.id}
-                                onClick={() => setActiveDeckId(deck.id)}
-                                className={`p-2 sm:p-3 text-left border-[2px] border-black transition-all transform -skew-x-6 group shadow-[3px_3px_0_black] ${activeDeckId === deck.id ? 'bg-white text-black translate-x-0.5 translate-y-0.5 shadow-none' : 'bg-black text-white border-white/20 opacity-60'}`}
-                            >
-                                <span className="font-p5-display text-lg sm:text-xl transform skew-x-6 block italic">{deck.name.toUpperCase()}</span>
-                                <span className="block text-[7px] sm:text-[9px] opacity-60 font-bold tracking-widest mt-0.5 transform skew-x-6">{deck.prompts.length} CARDS FORGED</span>
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="relative mb-2 transform skew-x-12 bg-[#D80000] text-white px-3 py-1 sm:px-5 sm:py-1.5 inline-block border-[2px] border-black z-10 shadow-[3px_3px_0_black]">
+                <motion.div key="intensity" variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="space-y-4 pt-4">
+                    <div className="relative mb-2 transform -skew-x-12 bg-[#D80000] text-white px-3 py-1 sm:px-5 sm:py-1.5 inline-block border-[2px] border-black z-10 shadow-[3px_3px_0_black]">
                         <h2 className="font-p5-display text-lg sm:text-2xl tracking-tighter transform -skew-x-12 uppercase italic">Select Target</h2>
                     </div>
                     <div className="flex flex-col gap-2 sm:gap-3">
@@ -248,23 +231,73 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             ) : !prompt ? (
-                <motion.div key="choice" variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center gap-6 sm:gap-8 pt-4 sm:pt-6">
-                    <div className="text-center relative">
+                <motion.div key="choice" variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center gap-4 pt-1">
+                    <div className="w-full mb-6">
+                        <div className="flex justify-between items-center mb-2 px-4">
+                            <div className="bg-white text-black px-3 py-0.5 transform -skew-x-12 border-2 border-black shadow-[2px_2px_0_black]">
+                                <h3 className="font-p5-display text-xs tracking-widest transform skew-x-12 uppercase italic">Select Source</h3>
+                            </div>
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className="w-8 h-8 bg-black text-white border-2 border-white flex items-center justify-center shadow-[2px_2px_0_black] hover:bg-[#D80000] transition-colors vibrate-hover"
+                            >
+                                🔍
+                            </button>
+                        </div>
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={(id) => {
+                                const deck = customDecks.find(d => d.id === id);
+                                if (deck) setGameMode(deck.gameMode);
+                                setActiveDeckId(id);
+                            }}
+                            accentColor="#D80000"
+                        />
+                    </div>
+
+                    <div className="text-center relative mb-4">
                         <div className="absolute -inset-4 bg-white/5 blur-xl rounded-full"></div>
                         <p className="font-p5-display text-sm sm:text-base text-[#D80000] tracking-widest relative z-10">MISSION_PARAMS</p>
                         <h2 className="font-p5-display text-3xl sm:text-5xl text-white italic tracking-tighter drop-shadow-[3px_3px_0px_#D80000] relative z-10 uppercase">
                             {intensity}
                         </h2>
                     </div>
+
                     <div className="grid grid-cols-1 gap-3 sm:gap-4 w-full px-2 sm:px-4">
-                        <motion.button onClick={() => handleDraw('Truth')} whileHover={{ scale: 1.02, rotate: -1, x: -2 }} className="bg-white text-black p-3 sm:p-4 transform -skew-x-12 p5-border font-p5-display text-xl sm:text-2xl italic text-left">
-                            <span className="transform skew-x-12 block">THE TRUTH</span>
-                        </motion.button>
-                        <motion.button onClick={() => handleDraw('Dare')} whileHover={{ scale: 1.02, rotate: 1, x: 2 }} className="bg-[#D80000] text-white p-3 sm:p-4 transform skew-x-12 p5-border font-p5-display text-xl sm:text-2xl italic text-right">
-                            <span className="transform -skew-x-12 block">THE ACTION</span>
-                        </motion.button>
+                        {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                            <motion.button onClick={() => handleDraw('NeverHaveIEver')} whileHover={{ scale: 1.02, rotate: -1, x: -2 }} className="bg-white text-black p-3 sm:p-4 transform -skew-x-12 p5-border font-p5-display text-xl sm:text-2xl italic text-left">
+                                <span className="transform skew-x-12 block">I HAVE NEVER...</span>
+                            </motion.button>
+                        ) : (
+                            <>
+                                <motion.button onClick={() => handleDraw('Truth')} whileHover={{ scale: 1.02, rotate: -1, x: -2 }} className="bg-white text-black p-3 sm:p-4 transform -skew-x-12 p5-border font-p5-display text-xl sm:text-2xl italic text-left">
+                                    <span className="transform skew-x-12 block">THE TRUTH</span>
+                                </motion.button>
+                                <motion.button onClick={() => handleDraw('Dare')} whileHover={{ scale: 1.02, rotate: 1, x: 2 }} className="bg-[#D80000] text-white p-3 sm:p-4 transform skew-x-12 p5-border font-p5-display text-xl sm:text-2xl italic text-right">
+                                    <span className="transform -skew-x-12 block">THE ACTION</span>
+                                </motion.button>
+                            </>
+                        )}
                         <button onClick={() => setIntensity(null)} className="mt-2 sm:mt-4 font-black text-white/40 uppercase tracking-[0.4em] text-[7px] sm:text-[9px] hover:text-[#D80000] transition-colors vibrate-hover">[ ABORT MISSION ]</button>
                     </div>
+
+                    <DeckSearchModal
+                        isOpen={isSearchOpen}
+                        onClose={() => setIsSearchOpen(false)}
+                        decks={customDecks}
+                        activeDeckId={activeDeckId}
+                        onSelect={(id) => {
+                            const deck = customDecks.find(d => d.id === id);
+                            if (deck) {
+                                setGameMode(deck.gameMode);
+                                setIntensity(deck.intensity);
+                            }
+                            setActiveDeckId(id);
+                        }}
+                        gameMode={gameMode}
+                        intensity={intensity}
+                    />
                 </motion.div>
             ) : (
                 <motion.div key="prompt" variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="relative mt-1 sm:mt-2">
@@ -295,7 +328,7 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
     return (
         <AnimatePresence mode="wait">
@@ -304,8 +337,16 @@ export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="flex justify-between items-end mb-2">
                         <h2 className="font-p5-display text-4xl sm:text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000] vibrate-hover cursor-default">FORGE</h2>
                         <button
-                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })}
-                            className="bg-white text-black px-4 py-1.5 border-[3px] border-black transform -skew-x-12 font-p5-display text-lg sm:text-xl italic shadow-[4px_4px_0_black] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all"
+                            onClick={() => setEditingDeck({
+                                id: generateId(),
+                                name: '',
+                                description: '',
+                                prompts: [],
+                                isCustom: true,
+                                intensity: logic.intensity || Intensity.SOFT,
+                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                            })}
+                            className="bg-white text-black px-4 py-1.5 border-[3px] border-black transform -skew-x-12 font-p5-display text-lg sm:text-xl italic shadow-[4px_4px_0_black] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all hover:bg-[#D80000] hover:text-white"
                         >
                             + NEW
                         </button>
@@ -315,12 +356,23 @@ export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <div className="py-12 text-center opacity-20 italic font-p5-display text-xl sm:text-2xl">NO_CUSTOM_DECKS</div>
                         ) : (
                             customDecks.map((deck: any) => (
-                                <div key={deck.id} className="p-3 sm:p-4 bg-white text-black border-[3px] border-black transform -skew-x-6 relative group shadow-[4px_4px_0_black]">
-                                    <h3 className="font-p5-display text-xl sm:text-2xl mb-0.5">{deck.name || 'UNTITLED'}</h3>
-                                    <p className="text-[8px] sm:text-[10px] font-bold opacity-60 mb-2 sm:mb-3 uppercase tracking-wider line-clamp-1">{deck.description || 'NO DESCRIPTION'}</p>
+                                <div key={deck.id} className={`p-3 sm:p-4 border-[3px] transform -skew-x-6 relative group shadow-[4px_4px_0_black] transition-all ${activeDeckId === deck.id ? 'bg-[#D80000] text-white border-white' : 'bg-white text-black border-black'}`}>
+                                    <div className="flex justify-between items-start mb-1">
+                                        <h3 className="font-p5-display text-xl sm:text-2xl">{deck.name || 'UNTITLED'}</h3>
+                                        <div className="bg-black text-white px-2 py-0.5 text-[7px] font-black transform skew-x-12 border border-white/20">
+                                            {deck.intensity} | {deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}
+                                        </div>
+                                    </div>
+                                    <p className={`text-[8px] sm:text-[10px] font-bold mb-2 sm:mb-3 uppercase tracking-wider line-clamp-1 ${activeDeckId === deck.id ? 'opacity-80' : 'opacity-60'}`}>{deck.description || 'NO DESCRIPTION'}</p>
                                     <div className="flex gap-2">
-                                        <button onClick={() => setEditingDeck(deck)} className="px-3 py-1 bg-black text-white text-[8px] sm:text-[10px] font-black uppercase skew-x-6 hover:bg-[#D80000] transition-colors">EDIT</button>
-                                        <button onClick={() => deleteDeck(deck.id)} className="px-3 py-1 bg-[#D80000] text-white text-[8px] sm:text-[10px] font-black uppercase skew-x-6 hover:bg-black transition-colors">DELETE</button>
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`px-3 py-1 text-[8px] sm:text-[10px] font-black uppercase skew-x-6 border transition-colors ${activeDeckId === deck.id ? 'bg-white text-black border-black' : 'bg-black text-white border-white/20 hover:bg-[#D80000]'}`}
+                                        >
+                                            {activeDeckId === deck.id ? 'ACTIVE' : 'EQUIP'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className={`px-3 py-1 text-[8px] sm:text-[10px] font-black uppercase skew-x-6 border transition-colors ${activeDeckId === deck.id ? 'bg-white/20 text-white border-white/40 hover:bg-white hover:text-black' : 'bg-black text-white border-white/20 hover:bg-[#D80000]'}`}>REFORGE</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className={`px-3 py-1 text-[8px] sm:text-[10px] font-black uppercase skew-x-6 border transition-colors ml-auto ${activeDeckId === deck.id ? 'bg-black text-[#D80000] border-[#D80000]' : 'bg-[#D80000] text-white border-black hover:bg-black'}`}>DISCARD</button>
                                     </div>
                                 </div>
                             ))
@@ -329,43 +381,91 @@ export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 </motion.div>
             ) : (
                 <motion.div key="deck-editor" variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="space-y-4 sm:space-y-6 pb-24">
-                    <div className="bg-white text-black p-3 sm:p-4 border-[3px] border-black transform -skew-x-3 shadow-[4px_4px_0_black]">
-                        <label className="block text-[8px] sm:text-[10px] font-black uppercase mb-1">DECK_TITLE</label>
+                    <div className="bg-white text-black p-3 sm:p-5 border-[3px] border-black transform -skew-x-3 shadow-[6px_6px_0_black] relative">
+                        <div className="absolute -top-3 -right-3 w-8 h-8 bg-[#D80000] border-2 border-black rotate-45 flex items-center justify-center font-p5-display text-white text-xl shadow-[2px_2px_0_black]">!</div>
+
+                        <label className="block text-[8px] sm:text-[10px] font-black uppercase mb-1 tracking-widest text-[#D80000]">DATA_IDENTIFIER</label>
                         <input
-                            className="w-full bg-transparent border-b-2 border-black font-p5-display text-2xl sm:text-3xl focus:outline-none"
+                            className="w-full bg-transparent border-b-4 border-black font-p5-display text-2xl sm:text-4xl focus:outline-none mb-4"
                             value={editingDeck.name}
                             onChange={(e) => setEditingDeck({ ...editingDeck, name: e.target.value })}
                             placeholder="NAME THE OBSIDIAN..."
                         />
-                        <label className="block text-[8px] sm:text-[10px] font-black uppercase mt-3 sm:mt-4 mb-1">DESCRIPTION</label>
+
+                        <label className="block text-[8px] sm:text-[10px] font-black uppercase mb-1 tracking-widest text-[#D80000]">MANIFESTO</label>
                         <textarea
-                            className="w-full bg-transparent border-b-2 border-black text-[10px] sm:text-xs font-bold focus:outline-none"
+                            className="w-full bg-black/5 p-2 text-[10px] sm:text-xs font-bold focus:outline-none focus:bg-white transition-colors border-2 border-transparent focus:border-black min-h-[60px]"
                             value={editingDeck.description}
                             onChange={(e) => setEditingDeck({ ...editingDeck, description: e.target.value })}
-                            placeholder="WHAT IS THE PURPOSE OF THIS DECK?"
+                            placeholder="WHAT IS THE PURPOSE OF THIS REBELLION?"
                         />
-                    </div>
-                    <div className="space-y-3 sm:space-y-4">
-                        <div className="flex justify-between items-center">
-                            <h3 className="font-p5-display text-xl sm:text-2xl text-white">PROMPTS ({editingDeck.prompts.length})</h3>
-                            <button onClick={addNewPromptToEditingDeck} className="bg-[#D80000] text-white px-3 py-1 border-[2px] border-black transform skew-x-12 font-p5-display text-sm sm:text-base italic shadow-[2px_2px_0_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all">+ ADD PROMPT</button>
+
+                        <div className="flex gap-4 mt-6">
+                            <div className="flex-1 group">
+                                <label className="block text-[8px] sm:text-[10px] font-black uppercase mb-1 tracking-widest text-[#D80000]">STRATEGY</label>
+                                <div className="relative">
+                                    <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-black text-white font-p5-display text-xl sm:text-2xl border-none p-2 skew-x-[-12deg] focus:outline-none appearance-none cursor-pointer hover:bg-[#D80000] transition-colors">
+                                        <option value={GameMode.TRUTH_OR_DARE}>PHANTOM (T/D)</option>
+                                        <option value={GameMode.NEVER_HAVE_I_EVER}>GOSSIP (NHIE)</option>
+                                    </select>
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white font-bold">▼</div>
+                                </div>
+                            </div>
+                            <div className="flex-1 group">
+                                <label className="block text-[8px] sm:text-[10px] font-black uppercase mb-1 tracking-widest text-[#D80000]">THREAT_LVL</label>
+                                <div className="relative">
+                                    <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-black text-white font-p5-display text-xl sm:text-2xl border-none p-2 skew-x-[-12deg] focus:outline-none appearance-none cursor-pointer hover:bg-[#D80000] transition-colors">
+                                        <option value={Intensity.SOFT}>CASUAL</option>
+                                        <option value={Intensity.HOT}>MODEL</option>
+                                        <option value={Intensity.VULGAR}>EXPOSURE</option>
+                                    </select>
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white font-bold">▼</div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="space-y-3 sm:space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center border-b-4 border-white pb-2 px-2 transform skew-x-[-15deg]">
+                            <h3 className="font-p5-display text-2xl sm:text-3xl text-white italic transform skew-x-[15deg]">BULLETS ({editingDeck.prompts.length})</h3>
+                            <button onClick={addNewPromptToEditingDeck} className="bg-white text-black px-4 py-1.5 border-[3px] border-black transform skew-x-[15deg] font-p5-display text-base sm:text-xl italic shadow-[4px_4px_0_#D80000] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all hover:bg-[#D80000] hover:text-white">+ ADD</button>
+                        </div>
+
+                        <div className="space-y-3 sm:space-y-4 max-h-[45vh] overflow-y-auto pr-2 custom-scrollbar">
                             {editingDeck.prompts.map((p: any) => (
-                                <div key={p.id} className="bg-white/10 p-3 sm:p-4 border-l-4 border-[#D80000] space-y-2">
-                                    <div className="flex gap-2">
-                                        <select className="bg-black text-white text-[8px] sm:text-[10px] font-bold p-1 border border-white/20" value={p.type} onChange={(e) => updatePromptInEditingDeck(p.id, 'type', e.target.value)}><option>Truth</option><option>Dare</option></select>
-                                        <select className="bg-black text-white text-[8px] sm:text-[10px] font-bold p-1 border border-white/20" value={p.intensity} onChange={(e) => updatePromptInEditingDeck(p.id, 'intensity', e.target.value)}><option value={Intensity.SOFT}>SOFT</option><option value={Intensity.HOT}>HOT</option><option value={Intensity.VULGAR}>VULGAR</option></select>
-                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="ml-auto text-[#D80000] font-black text-[8px] sm:text-[10px]">REMOVE</button>
+                                <div key={p.id} className="bg-white p-3 sm:p-4 border-[3px] border-black transform -skew-x-2 shadow-[3px_3px_0_black] relative group">
+                                    <div className="flex gap-2 mb-2">
+                                        <select
+                                            className="bg-black text-white text-[9px] font-black p-1 px-3 border-2 border-transparent focus:border-[#D80000] outline-none skew-x-6 appearance-none"
+                                            value={p.type}
+                                            onChange={(e) => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value)}
+                                        >
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                            ) : (
+                                                <option value="NeverHaveIEver">NHIE</option>
+                                            )}
+                                        </select>
+                                        <div className="bg-[#f0f0f0] text-black text-[9px] font-black p-1 px-3 border-2 border-black flex items-center skew-x-6">
+                                            {editingDeck.intensity}
+                                        </div>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="ml-auto text-black/30 hover:text-[#D80000] font-black text-2xl leading-none transition-colors">×</button>
                                     </div>
-                                    <input className="w-full bg-transparent border-b border-white/20 text-xs sm:text-sm italic py-1 focus:outline-none focus:border-white" value={p.text} onChange={(e) => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="PROMPT TEXT..." />
+                                    <textarea
+                                        className="w-full bg-transparent border-b-2 border-black/10 focus:border-black text-sm italic font-bold py-1 focus:outline-none resize-none px-1"
+                                        value={p.text}
+                                        onChange={(e) => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="INPUT COGNITIVE DATA..."
+                                        rows={2}
+                                    />
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="flex gap-2 sm:gap-3">
-                        <button onClick={() => setEditingDeck(null)} className="bg-black text-white px-4 py-2 border-[2px] border-white/20 transform -skew-x-12 font-p5-display text-lg sm:text-xl italic w-1/2 shadow-[4px_4px_0_rgba(255,255,255,0.1)] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">CANCEL</button>
-                        <button onClick={() => saveDeck(editingDeck)} className="bg-white text-black px-4 py-2 border-[2px] border-black transform skew-x-12 font-p5-display text-lg sm:text-xl italic w-1/2 shadow-[4px_4px_0_black] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all">SAVE</button>
+
+                    <div className="flex gap-4 sticky bottom-4 z-50">
+                        <button onClick={() => setEditingDeck(null)} className="bg-black text-white px-6 py-3 border-[3px] border-white transform -skew-x-12 font-p5-display text-2xl italic flex-1 shadow-[6px_6px_0_rgba(216,0,0,0.8)] hover:bg-[#D80000] transition-colors active:translate-x-1 active:translate-y-1 active:shadow-none">CANCEL</button>
+                        <button onClick={() => saveDeck(editingDeck)} className="bg-white text-black px-6 py-3 border-[3px] border-black transform skew-x-12 font-p5-display text-2xl italic flex-1 shadow-[6px_6px_0_#D80000] hover:bg-[#D80000] hover:text-white transition-colors active:translate-x-1 active:translate-y-1 active:shadow-none">FINALIZE</button>
                     </div>
                 </motion.div>
             )}

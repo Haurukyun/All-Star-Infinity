@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'EASY MODE', desc: 'SLOW TEMPO', color: '#39C5BB' },
@@ -155,34 +157,87 @@ export const VocaloidIntensitySelector: React.FC<{ logic: any }> = ({ logic }) =
 };
 
 export const VocaloidPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { handleDraw, setIntensity } = logic;
+    const { handleDraw, setIntensity, intensity, customDecks, activeDeckId, setActiveDeckId, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+
     return (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col h-full justify-center space-y-6 sm:space-y-8 px-4 sm:px-0">
+            <div className="w-full max-w-2xl mx-auto">
+                <div className="flex justify-between items-center mb-4 px-2">
+                    <span className="text-xs font-black tracking-[3px] text-[#39C5BB]">SELECT TRACKLIST</span>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="w-8 h-8 rounded-lg border-2 border-[#39C5BB] flex items-center justify-center text-[#39C5BB] hover:bg-[#39C5BB] hover:text-[#111] transition-all vocaloid-glow"
+                    >
+                        🔍
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#39C5BB"
+                />
+            </div>
+
             <div className="text-center">
-                <div className="inline-block px-4 py-1 bg-[#39C5BB] text-[#111] font-bold rounded-full text-xs tracking-widest mb-4">MODE SELECTED</div>
+                <div className="inline-block px-4 py-1 bg-[#39C5BB] text-[#111] font-bold rounded-full text-xs tracking-widest mb-4 uppercase">{intensity} MODE ACTIVE</div>
                 <h2 className="text-3xl sm:text-4xl text-white font-black drop-shadow-[0_0_5px_rgba(57,197,187,0.8)]">CHOOSE TRACK</h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button
-                    onClick={() => handleDraw('Truth')}
-                    className="p-4 sm:p-8 text-xl sm:text-2xl font-bold bg-[#1a1a1a] rounded-xl border-2 border-[#39C5BB] text-[#39C5BB] hover:bg-[#39C5BB] hover:text-[#111] transition-all vocaloid-glow text-center"
-                >
-                    <div className="text-3xl sm:text-4xl mb-2 sm:mb-4">🎤</div>
-                    TRUTH TRACK
-                </button>
-                <button
-                    onClick={() => handleDraw('Dare')}
-                    className="p-4 sm:p-8 text-xl sm:text-2xl font-bold bg-[#1a1a1a] rounded-xl border-2 border-[#FF1493] text-[#FF1493] hover:bg-[#FF1493] hover:text-white transition-all vocaloid-glow-pink text-center"
-                >
-                    <div className="text-3xl sm:text-4xl mb-2 sm:mb-4">🎸</div>
-                    DARE TRACK
-                </button>
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button
+                        onClick={() => handleDraw('NeverHaveIEver')}
+                        className="p-4 sm:p-8 text-xl sm:text-2xl font-bold bg-[#1a1a1a] rounded-xl border-2 border-[#39C5BB] text-[#39C5BB] hover:bg-[#39C5BB] hover:text-[#111] transition-all vocaloid-glow text-center col-span-2"
+                    >
+                        <div className="text-3xl sm:text-4xl mb-2 sm:mb-4">🎼</div>
+                        NEVER HAVE I EVER TRACK
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => handleDraw('Truth')}
+                            className="p-4 sm:p-8 text-xl sm:text-2xl font-bold bg-[#1a1a1a] rounded-xl border-2 border-[#39C5BB] text-[#39C5BB] hover:bg-[#39C5BB] hover:text-[#111] transition-all vocaloid-glow text-center"
+                        >
+                            <div className="text-3xl sm:text-4xl mb-2 sm:mb-4">🎤</div>
+                            TRUTH TRACK
+                        </button>
+                        <button
+                            onClick={() => handleDraw('Dare')}
+                            className="p-4 sm:p-8 text-xl sm:text-2xl font-bold bg-[#1a1a1a] rounded-xl border-2 border-[#FF1493] text-[#FF1493] hover:bg-[#FF1493] hover:text-white transition-all vocaloid-glow-pink text-center"
+                        >
+                            <div className="text-3xl sm:text-4xl mb-2 sm:mb-4">🎸</div>
+                            DARE TRACK
+                        </button>
+                    </>
+                )}
             </div>
 
             <button onClick={() => setIntensity(null)} className="w-full p-4 mt-8 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-colors font-bold tracking-widest">
                 BACK TO DIFFICULTY
             </button>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -234,27 +289,177 @@ export const VocaloidPlayButton: React.FC<{ label: string; onClick: () => void; 
 };
 
 export const VocaloidDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, activeDeckId, setActiveDeckId } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
     return (
-        <div className="space-y-6 pb-20">
-            <h2 className="text-3xl font-black text-white border-b-2 border-[#39C5BB] pb-2 drop-shadow-[0_0_5px_rgba(57,197,187,0.8)]">TRACKLISTS</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {customDecks.map((deck: any) => (
-                    <div
-                        key={deck.id}
-                        onClick={() => setActiveDeckId(deck.id)}
-                        className={`p-4 rounded-xl cursor-pointer transition-all border-2 ${activeDeckId === deck.id ? 'border-[#39C5BB] bg-[#39C5BB]/10 vocaloid-glow' : 'border-white/10 hover:border-white/30 bg-[#1a1a1a]'}`}
-                    >
-                        <h3 className="font-bold text-xl text-white mb-2">{deck.name}</h3>
-                        <p className="text-sm opacity-70 mb-4 h-10 overflow-hidden line-clamp-2">{deck.description}</p>
-                        <div className="flex justify-between items-center text-xs font-bold">
-                            <span className="px-2 py-1 bg-[#FF1493] text-white rounded">{deck.prompts.length} TRACKS</span>
-                            {activeDeckId === deck.id && <span className="text-[#39C5BB]">SELECTED ▶</span>}
+        <AnimatePresence mode="wait">
+            {!editingDeck ? (
+                <div className="space-y-6 pb-20 flex flex-col h-full">
+                    <div className="flex justify-between items-end border-b-2 border-[#39C5BB] pb-4">
+                        <div>
+                            <h2 className="text-3xl font-black text-white drop-shadow-[0_0_5px_rgba(57,197,187,0.8)]">TRACKLIST_LIBRARY</h2>
+                            <p className="text-[10px] text-[#FF1493] tracking-[4px] mt-1">AVAILABLE STORAGE: 393.9 MB</p>
+                        </div>
+                        <button
+                            onClick={() => setEditingDeck({
+                                id: generateId(),
+                                name: '',
+                                description: '',
+                                prompts: [],
+                                isCustom: true,
+                                intensity: logic.intensity || Intensity.SOFT,
+                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                            })}
+                            className="px-4 py-2 bg-[#39C5BB] text-[#111] font-bold rounded-lg hover:shadow-[0_0_15px_rgba(57,197,187,0.8)] transition-all text-sm"
+                        >
+                            + NEW_TRACK
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto custom-scrollbar pr-2 flex-1 content-start">
+                        {customDecks.length === 0 ? (
+                            <div className="col-span-full py-20 text-center opacity-30 border-2 border-dashed border-white/10 rounded-2xl">
+                                <span className="text-4xl block mb-4">💿</span>
+                                NO CUSTOM TRACKS FOUND
+                            </div>
+                        ) : (
+                            customDecks.map((deck: any) => (
+                                <div
+                                    key={deck.id}
+                                    className={`p-5 rounded-2xl border-2 transition-all group flex flex-col justify-between ${activeDeckId === deck.id ? 'border-[#39C5BB] bg-[#39C5BB]/5 vocaloid-glow' : 'border-white/5 bg-[#1a1a1a] hover:border-white/20'}`}
+                                >
+                                    <div>
+                                        <div className="flex justify-between items-start mb-3">
+                                            <h3 className={`font-black text-xl truncate pr-2 ${activeDeckId === deck.id ? 'text-white' : 'text-white/80'}`}>{deck.name || 'UNTITLED_PROJ'}</h3>
+                                            {activeDeckId === deck.id && <div className="w-2 h-2 rounded-full bg-[#FF1493] animate-ping shadow-[0_0_8px_#FF1493]"></div>}
+                                        </div>
+                                        <div className="flex gap-2 text-[10px] font-bold mb-4">
+                                            <span className="px-2 py-0.5 bg-[#111] text-[#39C5BB] border border-[#39C5BB]/30 rounded">{deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}</span>
+                                            <span className="px-2 py-0.5 bg-[#111] text-[#FF1493] border border-[#FF1493]/30 rounded">{deck.intensity}</span>
+                                            <span className="px-2 py-0.5 bg-[#111] text-white/50 rounded">{deck.prompts.length} SHARDS</span>
+                                        </div>
+                                        <p className="text-sm opacity-50 italic line-clamp-2 h-10 mb-6">{deck.description || 'No project metadata provided.'}</p>
+                                    </div>
+
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`flex-1 py-2 rounded-lg font-bold text-xs transition-all ${activeDeckId === deck.id ? 'bg-[#39C5BB] text-[#111]' : 'bg-black text-[#39C5BB] border border-[#39C5BB]/50 hover:bg-[#39C5BB]/20'}`}
+                                        >
+                                            {activeDeckId === deck.id ? 'PLAYING' : 'MOUNT'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className="px-4 py-2 bg-black border border-white/10 text-white hover:border-white/40 rounded-lg text-xs font-bold transition-all">EDIT</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="px-3 py-2 bg-black border border-red-900/30 text-red-500/70 hover:bg-red-500 hover:text-white rounded-lg text-xs font-bold transition-all">DEL</button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-col h-full space-y-6 pb-20">
+                    <div className="bg-[#1a1a1a] rounded-2xl p-6 border-b-4 border-[#39C5BB] vocaloid-glow space-y-6">
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black text-[#39C5BB] tracking-[2px] opacity-70">TRACK_TITLE</label>
+                            <input
+                                className="w-full bg-transparent text-4xl font-black text-white focus:outline-none placeholder-white/10"
+                                value={editingDeck.name}
+                                onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                placeholder="ENTER_NAME..."
+                            />
+                        </div>
+
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black text-[#39C5BB] tracking-[2px] opacity-70">TRACK_LINER_NOTES</label>
+                            <textarea
+                                className="w-full bg-transparent text-lg text-white/80 focus:outline-none resize-none h-20 placeholder-white/5"
+                                value={editingDeck.description}
+                                onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                placeholder="Input project description..."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-[#39C5BB] tracking-[2px] opacity-70">SYNTH_PROTOCOL</label>
+                                <select
+                                    value={editingDeck.gameMode}
+                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
+                                    className="w-full bg-black text-[#39C5BB] p-3 rounded-lg border border-[#39C5BB]/30 focus:border-[#39C5BB] outline-none font-bold text-sm cursor-pointer"
+                                >
+                                    <option value={GameMode.TRUTH_OR_DARE}>V_TRUTH_DARE</option>
+                                    <option value={GameMode.NEVER_HAVE_I_EVER}>V_NHIE_PROT</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-[10px] font-black text-[#39C5BB] tracking-[2px] opacity-70">BPM_INTENSITY</label>
+                                <select
+                                    value={editingDeck.intensity}
+                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
+                                    className="w-full bg-black text-[#FF1493] p-3 rounded-lg border border-[#FF1493]/30 focus:border-[#FF1493] outline-none font-bold text-sm cursor-pointer"
+                                >
+                                    <option value={Intensity.SOFT}>SLOW (SOFT)</option>
+                                    <option value={Intensity.HOT}>UPBEAT (HOT)</option>
+                                    <option value={Intensity.VULGAR}>EXTREME (VULGAR)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                ))}
-            </div>
-        </div>
+
+                    <div className="flex-1 flex flex-col min-h-0 bg-[#0a0a0a] rounded-2xl p-4 border border-white/5">
+                        <div className="flex justify-between items-center mb-4 px-2">
+                            <h3 className="text-xl font-black text-white italic tracking-tighter self-end">TRACK_SEGMENTS <span className="text-[#39C5BB] ml-2">[{editingDeck.prompts.length}]</span></h3>
+                            <button
+                                onClick={addNewPromptToEditingDeck}
+                                className="px-4 py-2 border-2 border-[#39C5BB] text-[#39C5BB] hover:bg-[#39C5BB] hover:text-[#111] transition-all rounded-lg text-xs font-black shadow-[0_0_10px_rgba(57,197,187,0.2)]"
+                            >
+                                + ADD_SEGMENT
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="p-5 rounded-xl bg-[#1a1a1a] border border-white/10 group hover:border-[#39C5BB]/50 transition-all">
+                                    <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
+                                        <div className="flex gap-4 items-center">
+                                            <select
+                                                className="bg-black text-[#39C5BB] text-xs font-black rounded-md px-2 py-1 border border-[#39C5BB]/30 outline-none"
+                                                value={p.type}
+                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option value="Truth">CH_TRUTH</option><option value="Dare">CH_DARE</option></>
+                                                ) : (
+                                                    <option value="NeverHaveIEver">CH_NHIE</option>
+                                                )}
+                                            </select>
+                                            <div className="text-[10px] font-bold text-white/30 italic">[{editingDeck.intensity}]</div>
+                                        </div>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#FF1493]/50 hover:text-[#FF1493] text-xl transition-colors">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent text-white focus:outline-none text-xl font-bold italic resize-none h-20 placeholder-white/5"
+                                        value={p.text}
+                                        onChange={e => logic.updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Enter vocal lyrics..."
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-4 border-t-2 border-[#FF1493]/30">
+                        <button onClick={() => setEditingDeck(null)} className="flex-1 py-4 font-black text-[#FF1493] border-2 border-[#FF1493] hover:bg-[#FF1493] hover:text-white rounded-xl transition-all">CANCEL</button>
+                        <button
+                            onClick={() => saveDeck(editingDeck)}
+                            className="flex-2 py-4 font-black bg-[#39C5BB] text-[#111] border-2 border-[#39C5BB] rounded-xl shadow-[0_0_20px_rgba(57,197,187,0.4)] hover:shadow-[0_0_30px_rgba(57,197,187,0.7)] transition-all px-8"
+                        >
+                            EXPORT_TRACK ▶
+                        </button>
+                    </div>
+                </div>
+            )}
+        </AnimatePresence>
     );
 };
 

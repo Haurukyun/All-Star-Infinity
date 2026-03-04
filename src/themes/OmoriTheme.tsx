@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'WHITE SPACE', desc: 'CALM AND EMPTY', color: '#FFFFFF', text: '#000000' },
@@ -140,7 +142,8 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
 };
 
 export const OmoriPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { intensity, setIntensity, prompt, setPrompt, history, activeDeckId, setActiveDeckId, customDecks, handleDraw } = logic;
+    const { intensity, setIntensity, prompt, setPrompt, history, activeDeckId, setActiveDeckId, customDecks, handleDraw, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!intensity && !prompt ? (
@@ -167,16 +170,62 @@ export const OmoriPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             ) : !prompt ? (
-                <div className="flex flex-col items-center gap-8 py-12">
-                    <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center">
-                        <p className="text-sm opacity-60 mb-2">YOU ARE AT...</p>
-                        <h2 className="text-4xl font-bold">{intensity}</h2>
-                    </motion.div>
-                    <div className="grid grid-cols-1 gap-6 w-full">
-                        <button onClick={() => handleDraw('Truth')} className="omori-button text-3xl py-6">TRUTH</button>
-                        <button onClick={() => handleDraw('Dare')} className="omori-button text-3xl py-6">DARE</button>
-                        <button onClick={() => setIntensity(null)} className="text-xs opacity-40 mt-4 hover:opacity-100 transition-opacity">Go back to sleep</button>
+                <div className="flex flex-col items-center gap-6 py-4">
+                    <div className="omori-panel w-full p-4 relative">
+                        <div className="flex justify-between items-center mb-2 px-2">
+                            <h3 className="text-sm font-bold border-b border-black">MEMORIES</h3>
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className="w-8 h-8 rounded-none border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors"
+                            >
+                                🔍
+                            </button>
+                        </div>
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={(id) => {
+                                const deck = customDecks.find(d => d.id === id);
+                                if (deck) setGameMode(deck.gameMode);
+                                setActiveDeckId(id);
+                            }}
+                            accentColor="#000"
+                        />
                     </div>
+
+                    <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center">
+                        <p className="text-sm opacity-60 mb-1 leading-none">WHERE ARE YOU?</p>
+                        <h2 className="text-3xl font-bold">{intensity}</h2>
+                    </motion.div>
+
+                    <div className="grid grid-cols-1 gap-4 w-full">
+                        {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                            <button onClick={() => handleDraw('NeverHaveIEver')} className="omori-button text-2xl py-4">I HAVE NEVER...</button>
+                        ) : (
+                            <>
+                                <button onClick={() => handleDraw('Truth')} className="omori-button text-2xl py-4">TRUTH</button>
+                                <button onClick={() => handleDraw('Dare')} className="omori-button text-2xl py-4">DARE</button>
+                            </>
+                        )}
+                        <button onClick={() => setIntensity(null)} className="text-[10px] opacity-40 mt-2 hover:opacity-100 transition-opacity uppercase tracking-widest">Abandon reality</button>
+                    </div>
+
+                    <DeckSearchModal
+                        isOpen={isSearchOpen}
+                        onClose={() => setIsSearchOpen(false)}
+                        decks={customDecks}
+                        activeDeckId={activeDeckId}
+                        onSelect={(id) => {
+                            const deck = customDecks.find(d => d.id === id);
+                            if (deck) {
+                                setGameMode(deck.gameMode);
+                                setIntensity(deck.intensity);
+                            }
+                            setActiveDeckId(id);
+                        }}
+                        gameMode={gameMode}
+                        intensity={intensity}
+                    />
                 </div>
             ) : (
                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="omori-card space-y-6">
@@ -200,43 +249,108 @@ export const OmoriPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const OmoriDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
-                <>
+                <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pt-4">
                     <div className="flex justify-between items-end border-b-2 border-black pb-1">
-                        <h2 className="text-3xl">SKETCHBOOK</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="omori-button text-xs">+ NEW</button>
+                        <h2 className="text-3xl font-bold uppercase tracking-tighter italic">SKETCHBOOK</h2>
+                        <button
+                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            className="omori-button text-xs font-bold"
+                        >
+                            + NEW SKETCH
+                        </button>
                     </div>
                     <div className="space-y-4">
                         {customDecks.map((deck: any) => (
-                            <div key={deck.id} className="omori-panel p-4 flex justify-between items-center">
-                                <div><h3 className="text-xl">{deck.name || 'Untitled'}</h3><p className="text-xs opacity-60">{deck.prompts.length} drawings</p></div>
-                                <div className="flex gap-2"><button onClick={() => setEditingDeck(deck)} className="omori-button text-xs">EDIT</button><button onClick={() => deleteDeck(deck.id)} className="omori-button text-xs border-red-500 text-red-500">ERASE</button></div>
+                            <div key={deck.id} className={`omori-panel p-5 flex flex-col gap-4 ${activeDeckId === deck.id ? 'bg-black text-white' : ''}`}>
+                                <div className="flex justify-between items-start">
+                                    <h3 className={`text-2xl font-bold ${activeDeckId === deck.id ? 'text-white' : 'text-black'}`}>{deck.name || 'Untitled'}</h3>
+                                    <div className="flex gap-3">
+                                        <button onClick={() => setEditingDeck(deck)} className={`text-xs font-bold hover:underline ${activeDeckId === deck.id ? 'text-[#B088FF]' : 'text-black'}`}>RE-SKETCH</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="text-red-500 text-xs font-bold hover:underline">ERASE</button>
+                                    </div>
+                                </div>
+                                <p className={`text-sm italic opacity-60 h-10 overflow-hidden ${activeDeckId === deck.id ? 'text-white' : 'text-black'}`}>{deck.description}</p>
+                                <div className="flex justify-between items-center mt-2">
+                                    <span className={`text-[10px] font-bold uppercase tracking-widest ${activeDeckId === deck.id ? 'text-[#B088FF]' : 'text-black/40'}`}>{deck.prompts.length} SHARDS | {deck.intensity}</span>
+                                    <button
+                                        onClick={() => setActiveDeckId(deck.id)}
+                                        className={`omori-button text-[10px] py-1 px-4 ${activeDeckId === deck.id ? 'active' : ''}`}
+                                    >
+                                        {activeDeckId === deck.id ? 'STAYING' : 'WAKE UP'}
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
-                </>
+                </motion.div>
             ) : (
-                <div className="omori-panel p-6 space-y-6">
+                <motion.div key="editor" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="omori-panel p-6 space-y-6">
+                    <h2 className="text-2xl font-bold border-b-2 border-black pb-1 uppercase italic tracking-tighter">Memory Fragments</h2>
                     <div className="space-y-4">
-                        <input className="w-full border-b-2 border-black p-2 text-2xl focus:outline-none" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="NAME YOUR MEMORY" />
-                        <textarea className="w-full border-2 border-black p-2 text-sm h-24 focus:outline-none" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="WHAT HAPPENED?" />
+                        <input className="w-full border-b-2 border-black p-2 text-2xl focus:outline-none font-bold" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="A NEW MEMORY..." />
+                        <textarea className="w-full border-2 border-black p-3 text-sm h-24 focus:outline-none italic" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="Describe the dream..." />
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <label className="text-[10px] uppercase font-bold text-black/40 mb-1 block">Reality Type</label>
+                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full border-2 border-black p-2 focus:outline-none font-bold text-sm">
+                                    <option value="TruthOrDare">DREAM (T/D)</option>
+                                    <option value="NeverHaveIEver">NHIE</option>
+                                </select>
+                            </div>
+                            <div className="flex-1">
+                                <label className="text-[10px] uppercase font-bold text-black/40 mb-1 block">Dream Depth</label>
+                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full border-2 border-black p-2 focus:outline-none font-bold text-sm">
+                                    <option value="SOFT">WHITE SPACE</option>
+                                    <option value="HOT">HEADSPACE</option>
+                                    <option value="VULGAR">BLACK SPACE</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div className="space-y-4">
-                        <div className="flex justify-between items-center"><h3 className="text-xl">DRAWINGS ({editingDeck.prompts.length})</h3><button onClick={addNewPromptToEditingDeck} className="omori-button text-xs">+ ADD</button></div>
-                        <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2">
+                    <div className="space-y-4 pt-4 border-t-2 border-dashed border-black/10">
+                        <div className="flex justify-between items-center">
+                            <h3 className="text-lg font-bold">FRAGMENTS ({editingDeck.prompts.length})</h3>
+                            <button onClick={addNewPromptToEditingDeck} className="omori-button text-xs font-bold">+ ETCH</button>
+                        </div>
+                        <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
                             {editingDeck.prompts.map((p: any) => (
-                                <div key={p.id} className="omori-panel p-4 space-y-3">
-                                    <div className="flex gap-2"><select className="border border-black text-xs p-1" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}><option>Truth</option><option>Dare</option></select><button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 ml-auto font-bold">X</button></div>
-                                    <input className="w-full border-b border-black text-sm p-1 focus:outline-none" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="What is it?" />
+                                <div key={p.id} className="omori-panel p-4 space-y-3 relative group">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex gap-2">
+                                            <select
+                                                className="border border-black text-[10px] p-1 font-bold"
+                                                value={p.type}
+                                                onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                                ) : (
+                                                    <option value="NeverHaveIEver">NHIE</option>
+                                                )}
+                                            </select>
+                                            <span className="text-[10px] font-bold border border-black/20 px-2 py-1 flex items-center bg-black/5 opacity-60 rounded-sm">{editingDeck.intensity}</span>
+                                        </div>
+                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 font-bold text-lg leading-none">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full border-b border-black text-sm p-1 focus:outline-none italic resize-none bg-transparent"
+                                        value={p.text}
+                                        onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Etch your memory here..."
+                                    />
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="flex gap-3"><button onClick={() => setEditingDeck(null)} className="omori-button flex-1">CANCEL</button><button onClick={() => saveDeck(editingDeck)} className="omori-button flex-1 active">SAVE</button></div>
-                </div>
+                    <div className="flex gap-4 pt-4 border-t-2 border-black">
+                        <button onClick={() => setEditingDeck(null)} className="flex-1 text-sm font-bold opacity-40 hover:opacity-100 transition-opacity">FORGET CHANGES</button>
+                        <button onClick={() => saveDeck(editingDeck)} className="omori-button flex-1 active py-4 font-bold text-lg">ETCH FOREVER</button>
+                    </div>
+                </motion.div>
             )}
         </AnimatePresence>
     );

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'FRIEND GO!', desc: 'BREEZY', color: '#FF69B4', text: '#FFFFFF', icon: '⭐' },
@@ -218,6 +220,7 @@ export const KirbyLayout: React.FC<{ children: React.ReactNode; activeTab: strin
 
 export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { intensity, setIntensity, prompt, setPrompt, history, activeDeckId, setActiveDeckId, customDecks, handleDraw } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!intensity && !prompt ? (
@@ -267,36 +270,83 @@ export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             ) : !prompt ? (
-                <div className="flex flex-col items-center justify-center h-[60vh] relative">
+                <div className="flex flex-col items-center justify-start h-full pt-4 relative">
+                    <div className="w-full mb-6 z-20">
+                        <div className="flex justify-between items-center mb-1 px-4">
+                            <h3 className="text-xs font-bold text-white uppercase tracking-widest drop-shadow-md">FILE SELECT</h3>
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className="w-8 h-8 rounded-full bg-white/20 border-2 border-white flex items-center justify-center shadow-lg backdrop-blur-sm"
+                            >
+                                🔍
+                            </button>
+                        </div>
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={(id) => {
+                                const deck = customDecks.find(d => d.id === id);
+                                if (deck) logic.setGameMode(deck.gameMode);
+                                setActiveDeckId(id);
+                            }}
+                            accentColor="#FF69B4"
+                        />
+                    </div>
+
                     <motion.div
                         initial={{ scale: 0 }} animate={{ scale: 1 }}
-                        className="relative z-10 mb-8"
+                        className="relative z-10 mb-4"
                     >
-                        <div className="w-40 h-40 rounded-full bg-gradient-to-tr from-pink-400 to-yellow-300 p-2 animate-spin-slow shadow-[0_0_30px_rgba(255,105,180,0.6)]">
-                            <div className="w-full h-full bg-white rounded-full flex items-center justify-center border-4 border-pink-500">
-                                <span className="text-6xl animate-bounce">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-pink-400 to-yellow-300 p-1 animate-spin-slow shadow-lg">
+                            <div className="w-full h-full bg-white rounded-full flex items-center justify-center border-2 border-pink-500">
+                                <span className="text-4xl animate-bounce">
                                     {intensity === Intensity.SOFT ? '☁️' : intensity === Intensity.HOT ? '🔥' : '💀'}
                                 </span>
                             </div>
                         </div>
                     </motion.div>
 
-                    <h2 className="font-display text-4xl text-white text-stroke-sm drop-shadow-[0_4px_0_rgba(0,0,0,0.2)] mb-8 text-center">
+                    <h2 className="font-display text-2xl text-white text-stroke-sm drop-shadow-[0_2px_0_rgba(0,0,0,0.2)] mb-6 text-center">
                         {intensity}
                     </h2>
 
                     <div className="flex gap-4 w-full px-4">
-                        <button onClick={() => handleDraw('Truth')} className="flex-1 btn-story py-4 text-xl font-display text-white">
-                            TRUTH
-                        </button>
-                        <button onClick={() => handleDraw('Dare')} className="flex-1 btn-fire py-4 text-xl font-display text-white">
-                            DARE
-                        </button>
+                        {logic.gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                            <button onClick={() => handleDraw('NeverHaveIEver')} className="flex-1 btn-story py-3 text-lg font-display text-white">
+                                NHIE!
+                            </button>
+                        ) : (
+                            <>
+                                <button onClick={() => handleDraw('Truth')} className="flex-1 btn-story py-3 text-lg font-display text-white">
+                                    TRUTH
+                                </button>
+                                <button onClick={() => handleDraw('Dare')} className="flex-1 btn-fire py-3 text-lg font-display text-white">
+                                    DARE
+                                </button>
+                            </>
+                        )}
                     </div>
 
-                    <button onClick={() => setIntensity(null)} className="mt-8 bg-white/10 hover:bg-white/20 px-6 py-2 rounded-full text-sm font-bold backdrop-blur-md transition-colors">
+                    <button onClick={() => setIntensity(null)} className="mt-6 bg-white/10 hover:bg-white/20 px-6 py-2 rounded-full text-xs font-bold backdrop-blur-md transition-colors">
                         Return to Map
                     </button>
+
+                    <DeckSearchModal
+                        isOpen={isSearchOpen}
+                        onClose={() => setIsSearchOpen(false)}
+                        decks={customDecks}
+                        activeDeckId={activeDeckId}
+                        onSelect={(id) => {
+                            const deck = customDecks.find(d => d.id === id);
+                            if (deck) {
+                                logic.setGameMode(deck.gameMode);
+                                logic.setIntensity(deck.intensity);
+                            }
+                            setActiveDeckId(id);
+                        }}
+                        gameMode={logic.gameMode}
+                        intensity={intensity}
+                    />
                 </div>
             ) : (
                 <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative mt-8">
@@ -339,66 +389,115 @@ export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const KirbyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
-                <motion.div key="decks" initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="space-y-4">
-                    <div className="flex justify-between items-center mb-4">
+                <motion.div key="decks" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-4">
+                    <div className="flex justify-between items-center mb-4 border-b-4 border-white pb-2">
                         <h2 className="font-display text-3xl text-white text-stroke-sm drop-shadow-md">FILE SELECT</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold border-2 border-white shadow-lg hover:scale-105 transition-transform">
+                        <button
+                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold border-2 border-white shadow-lg hover:scale-105 transition-transform"
+                        >
                             + New File
                         </button>
                     </div>
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="grid grid-cols-1 gap-4">
                         {customDecks.length === 0 ? (
-                            <div className="text-center py-12 text-white/50 font-bold">No custom files yet!</div>
+                            <div className="text-center py-12 text-white/50 font-bold bg-white/5 rounded-3xl border-2 border-dashed border-white/20">FILE DIRECTORY EMPTY</div>
                         ) : (
                             customDecks.map((deck: any) => (
-                                <div key={deck.id} className="bg-white rounded-2xl p-1 flex items-center gap-3 shadow-lg group">
-                                    <div className="w-20 h-20 bg-gradient-to-br from-blue-300 to-blue-500 rounded-xl flex items-center justify-center text-3xl text-white shadow-inner shrink-0">
-                                        📁
+                                <div key={deck.id} className={`bg-white rounded-[30px] p-2 flex items-center gap-4 shadow-xl border-4 ${activeDeckId === deck.id ? 'border-yellow-400' : 'border-white'} transition-colors group relative overflow-hidden`}>
+                                    <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-4xl shadow-inner shrink-0 ${activeDeckId === deck.id ? 'bg-yellow-100 text-yellow-500' : 'bg-pink-100 text-pink-500'}`}>
+                                        {activeDeckId === deck.id ? '🌟' : '📁'}
                                     </div>
-                                    <div className="flex-1 py-2">
-                                        <h3 className="font-display text-xl text-blue-600 leading-none mb-1">{deck.name || 'Untitled'}</h3>
-                                        <p className="text-xs text-blue-300 font-bold">{deck.prompts.length} Cards • {deck.description?.substring(0, 20) || 'No desc'}...</p>
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="font-display text-xl text-pink-500 truncate leading-none mb-1">{deck.name || 'Untitled File'}</h3>
+                                        <p className="text-[10px] font-bold text-pink-300 uppercase tracking-widest">{deck.prompts.length} CARDS | {deck.intensity}</p>
                                     </div>
-                                    <div className="flex flex-col gap-1 pr-2">
-                                        <button onClick={() => setEditingDeck(deck)} className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-xs shadow-sm">✏️</button>
-                                        <button onClick={() => deleteDeck(deck.id)} className="w-8 h-8 bg-red-400 rounded-full flex items-center justify-center text-xs shadow-sm">🗑️</button>
+                                    <div className="flex flex-col gap-2 pr-2">
+                                        <div className="flex gap-2">
+                                            <button onClick={() => setEditingDeck(deck)} className="w-9 h-9 bg-yellow-400 rounded-full flex items-center justify-center text-sm shadow-md border-2 border-white hover:scale-110 transition-transform">✏️</button>
+                                            <button onClick={() => deleteDeck(deck.id)} className="w-9 h-9 bg-red-400 rounded-full flex items-center justify-center text-sm shadow-md border-2 border-white hover:scale-110 transition-transform">🗑️</button>
+                                        </div>
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`rounded-full py-1 text-[9px] font-black border-2 transition-all ${activeDeckId === deck.id ? 'bg-pink-500 text-white border-white scale-105' : 'bg-white text-pink-500 border-pink-100'}`}
+                                        >
+                                            {activeDeckId === deck.id ? 'READY!' : 'LOAD'}
+                                        </button>
                                     </div>
+                                    {activeDeckId === deck.id && <div className="absolute top-0 right-0 w-8 h-8 bg-yellow-400 rounded-bl-3xl flex items-center justify-center pt-1 pr-1 border-l-2 border-b-2 border-white">⭐</div>}
                                 </div>
                             ))
                         )}
                     </div>
                 </motion.div>
             ) : (
-                <div className="bg-white rounded-[30px] p-6 shadow-xl space-y-4 border-4 border-pink-300">
-                    <input className="w-full text-2xl font-display text-pink-500 border-b-4 border-pink-100 focus:border-pink-400 outline-none bg-transparent placeholder-pink-200" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="File Name" />
-                    <textarea className="w-full bg-pink-50 rounded-xl p-3 text-pink-600 font-bold text-sm h-20 outline-none resize-none" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="Description..." />
+                <motion.div key="editor" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white rounded-[40px] p-8 shadow-2xl space-y-6 border-4 border-pink-300 relative">
+                    <div className="absolute -top-6 -left-6 w-20 h-20 bg-yellow-300 rounded-full border-4 border-white flex items-center justify-center text-4xl animate-bounce">🎨</div>
+                    <div className="space-y-4">
+                        <input className="w-full text-3xl font-display text-pink-500 border-b-4 border-pink-100 focus:border-pink-400 outline-none bg-transparent placeholder-pink-200 py-2" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="MEMORY NAME..." />
+                        <textarea className="w-full bg-pink-50 rounded-2xl p-4 text-pink-600 font-bold text-sm h-24 outline-none resize-none border-2 border-pink-100 focus:border-pink-300 transition-colors" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="Describe this dream fragment..." />
 
-                    <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                            <span className="font-display text-xl text-pink-400">Cards</span>
-                            <button onClick={addNewPromptToEditingDeck} className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs font-bold">+ Add</button>
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <label className="text-[10px] font-black text-pink-300 uppercase tracking-widest pl-2 mb-1 block">Game Type</label>
+                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-white border-4 border-pink-100 rounded-2xl p-3 text-pink-500 font-display outline-none focus:border-pink-400 transition-colors">
+                                    <option value="TruthOrDare">STORY (T/D)</option>
+                                    <option value="NeverHaveIEver">NHIE</option>
+                                </select>
+                            </div>
+                            <div className="flex-1">
+                                <label className="text-[10px] font-black text-pink-300 uppercase tracking-widest pl-2 mb-1 block">Spicy Level</label>
+                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-white border-4 border-pink-100 rounded-2xl p-3 text-pink-500 font-display outline-none focus:border-pink-400 transition-colors">
+                                    <option value="SOFT">FRIEND GO!</option>
+                                    <option value="HOT">ARENA</option>
+                                    <option value="VULGAR">MELTER</option>
+                                </select>
+                            </div>
                         </div>
-                        <div className="max-h-[40vh] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t-4 border-pink-50">
+                        <div className="flex justify-between items-center">
+                            <span className="font-display text-2xl text-pink-400">STAR CARDS ({editingDeck.prompts.length})</span>
+                            <button onClick={addNewPromptToEditingDeck} className="bg-blue-400 text-white px-5 py-2 rounded-full text-xs font-black shadow-lg hover:scale-105 active:scale-95 transition-all border-2 border-white">+ NEW CARD</button>
+                        </div>
+                        <div className="max-h-[40vh] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                             {editingDeck.prompts.map((p: any) => (
-                                <div key={p.id} className="bg-white border-2 border-blue-100 rounded-xl p-2 flex gap-2 items-center shadow-sm">
-                                    <select className="bg-blue-50 text-blue-500 text-xs font-bold rounded-lg p-1 outline-none" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                        <option>Truth</option><option>Dare</option>
-                                    </select>
-                                    <input className="flex-1 text-sm font-bold text-gray-600 outline-none" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="..." />
-                                    <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-400 font-bold px-2">×</button>
+                                <div key={p.id} className="bg-white border-4 border-blue-50 rounded-3xl p-4 space-y-3 relative group shadow-sm hover:shadow-md transition-shadow">
+                                    <div className="flex items-center gap-3">
+                                        <select
+                                            className="bg-blue-50 text-blue-500 text-[10px] font-black rounded-full px-4 py-2 outline-none border-2 border-transparent focus:border-blue-200"
+                                            value={p.type}
+                                            onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                        >
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                            ) : (
+                                                <option value="NeverHaveIEver">NHIE</option>
+                                            )}
+                                        </select>
+                                        <div className="bg-blue-50 text-blue-400 text-[9px] font-black rounded-full px-3 py-1.5 flex items-center justify-center opacity-60 border border-blue-100 uppercase tracking-tighter">{editingDeck.intensity}</div>
+                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-400 font-black text-2xl hover:scale-125 transition-transform ml-auto leading-none">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full text-sm font-bold text-gray-600 outline-none px-2 bg-transparent border-b-2 border-dashed border-blue-50 focus:border-blue-200 py-1 resize-none"
+                                        value={p.text}
+                                        onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Type your card effect here..."
+                                    />
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="flex gap-2">
-                        <button onClick={() => setEditingDeck(null)} className="flex-1 bg-gray-200 text-gray-500 font-bold py-3 rounded-xl">Cancel</button>
-                        <button onClick={() => saveDeck(editingDeck)} className="flex-1 bg-pink-500 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200">Save File</button>
+                    <div className="flex gap-4 pt-4 border-t-4 border-pink-50">
+                        <button onClick={() => setEditingDeck(null)} className="flex-1 text-gray-400 font-display py-4 hover:text-gray-600 transition-colors uppercase italic tracking-widest text-sm">Cancel</button>
+                        <button onClick={() => saveDeck(editingDeck)} className="flex-[1.5] bg-pink-500 text-white font-display py-4 text-xl rounded-full shadow-xl shadow-pink-200 border-4 border-white hover:scale-105 active:scale-95 transition-all">SAVE STAR!</button>
                     </div>
-                </div>
+                </motion.div>
             )}
         </AnimatePresence>
     );

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'MODERATE', desc: 'LOW THREAT LEVEL', color: '#00f0ff', secondary: '#fcee0a', icon: '📶' },
@@ -278,22 +280,72 @@ export const CyberpunkIntensitySelector: React.FC<{ logic: any }> = ({ logic }) 
 };
 
 export const CyberpunkPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { intensity, handleDraw, setIntensity } = logic;
+    const { intensity, handleDraw, setIntensity, activeDeckId, setActiveDeckId, customDecks, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
-        <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full">
+        <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-start h-full pt-4">
+            <div className="w-full mb-8">
+                <div className="flex justify-between items-center mb-2 px-6">
+                    <h3 className="text-xs cyber-mono text-[#00f0ff] uppercase tracking-[0.2em]">Active Dataset</h3>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="cyber-button text-xs py-1 px-3 border-[#00f0ff]/50"
+                    >
+                        SCAN
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#00f0ff"
+                />
+            </div>
+
             <div className="flex gap-8 w-full max-w-2xl mb-12">
-                <button onClick={() => handleDraw('Truth')} className="cyber-panel p-8 flex-1 flex flex-col items-center group hover:border-[#00f0ff]">
-                    <span className="text-6xl mb-4 opacity-80 group-hover:opacity-100 group-hover:text-[#00f0ff]">👁️‍🗨️</span>
-                    <span className="text-3xl font-bold tracking-widest group-hover:text-[#00f0ff]">INTEGRITY</span>
-                    <span className="text-xs cyber-mono mt-2 opacity-50 block">[ TRUTH ]</span>
-                </button>
-                <button onClick={() => handleDraw('Dare')} className="cyber-panel p-8 flex-1 flex flex-col items-center group hover:border-[#fcee0a]">
-                    <span className="text-6xl mb-4 opacity-80 group-hover:opacity-100 group-hover:text-[#fcee0a]">🔥</span>
-                    <span className="text-3xl font-bold tracking-widest group-hover:text-[#fcee0a]">EXECUTION</span>
-                    <span className="text-xs cyber-mono mt-2 opacity-50 block">[ DARE ]</span>
-                </button>
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button onClick={() => handleDraw('NeverHaveIEver')} className="cyber-panel p-8 flex-1 flex flex-col items-center group hover:border-[#fcee0a]">
+                        <span className="text-6xl mb-4 opacity-80 group-hover:opacity-100 group-hover:text-[#fcee0a]">📜</span>
+                        <span className="text-3xl font-bold tracking-widest group-hover:text-[#fcee0a]">NHIE</span>
+                        <span className="text-xs cyber-mono mt-2 opacity-50 block">[ NEVER HAVE I EVER ]</span>
+                    </button>
+                ) : (
+                    <>
+                        <button onClick={() => handleDraw('Truth')} className="cyber-panel p-8 flex-1 flex flex-col items-center group hover:border-[#00f0ff]">
+                            <span className="text-6xl mb-4 opacity-80 group-hover:opacity-100 group-hover:text-[#00f0ff]">👁️‍🗨️</span>
+                            <span className="text-3xl font-bold tracking-widest group-hover:text-[#00f0ff]">INTEGRITY</span>
+                            <span className="text-xs cyber-mono mt-2 opacity-50 block">[ TRUTH ]</span>
+                        </button>
+                        <button onClick={() => handleDraw('Dare')} className="cyber-panel p-8 flex-1 flex flex-col items-center group hover:border-[#fcee0a]">
+                            <span className="text-6xl mb-4 opacity-80 group-hover:opacity-100 group-hover:text-[#fcee0a]">🔥</span>
+                            <span className="text-3xl font-bold tracking-widest group-hover:text-[#fcee0a]">EXECUTION</span>
+                            <span className="text-xs cyber-mono mt-2 opacity-50 block">[ DARE ]</span>
+                        </button>
+                    </>
+                )}
             </div>
             <button onClick={() => setIntensity(null)} className="text-[#ff003c] cyber-mono text-sm tracking-widest hover:text-[#fcee0a] transition-colors">[ ABORT PROTOCOL ]</button>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -339,51 +391,162 @@ export const CyberpunkPlayButton: React.FC<{ label: string; onClick: () => void;
 };
 
 export const CyberpunkDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
                 <div className="space-y-6">
-                    <div className="flex justify-between items-center bg-[#ff003c]/10 p-4 border-l-4 border-[#ff003c]">
-                        <h2 className="text-2xl font-bold tracking-widest text-[#ff003c]">INVENTORY</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="cyber-button text-sm cyan">CRAFT NEW</button>
+                    <div className="flex justify-between items-center bg-[#ff003c]/10 p-4 border-l-4 border-[#ff003c] relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(255,0,60,0.1)] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                        <div>
+                            <h2 className="text-2xl font-bold tracking-[0.2em] text-[#ff003c] glitch-text" data-text="INVENTORY">INVENTORY</h2>
+                            <p className="text-[10px] cyber-mono text-[#ff003c]/60 mt-0.5">LOCAL_STORAGE // DECKS.DB</p>
+                        </div>
+                        <button
+                            onClick={() => setEditingDeck({
+                                id: generateId(),
+                                name: '',
+                                description: '',
+                                prompts: [],
+                                isCustom: true,
+                                intensity: logic.intensity || Intensity.SOFT,
+                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                            })}
+                            className="cyber-button text-sm cyan hover:scale-105 transition-transform"
+                        >
+                            + CRAFT_NEW
+                        </button>
                     </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {customDecks.map((deck: any) => (
-                            <div key={deck.id} className="cyber-panel p-4 flex flex-col">
-                                <h3 className="text-2xl font-bold text-[#00f0ff] mb-1">{deck.name}</h3>
-                                <p className="text-xs cyber-mono text-[#fcee0a] mb-4">CAPACITY: {deck.prompts.length} SHARDS</p>
-                                <div className="mt-auto flex gap-2">
-                                    <button onClick={() => setEditingDeck(deck)} className="cyber-button text-xs flex-1 cyan text-center text-black">MODIFY</button>
-                                    <button onClick={() => deleteDeck(deck.id)} className="cyber-button text-xs bg-[#ff003c] !text-black flex-1 text-center">SCRAP</button>
-                                </div>
+                        {customDecks.length === 0 ? (
+                            <div className="col-span-full py-20 text-center cyber-panel border-dashed border-[#ff003c]/20">
+                                <span className="cyber-mono text-[#ff003c]/40 italic">NO DATASETS DETECTED IN STORAGE</span>
                             </div>
-                        ))}
+                        ) : (
+                            customDecks.map((deck: any) => (
+                                <div key={deck.id} className={`cyber-panel p-5 flex flex-col group transition-all duration-300 ${activeDeckId === deck.id ? 'border-[#00f0ff] bg-[#00f0ff]/5' : 'hover:border-[#fcee0a]'}`}>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 className={`text-2xl font-bold transition-colors ${activeDeckId === deck.id ? 'text-[#00f0ff]' : 'text-white'}`}>{deck.name || 'UNLABELED_DATA'}</h3>
+                                            <div className="flex gap-3 text-[10px] cyber-mono mt-0.5">
+                                                <span className="text-[#ff003c] font-black">{deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}</span>
+                                                <span className="text-[#fcee0a] font-black">{deck.intensity}</span>
+                                                <span className="text-white/40">{deck.prompts.length} SHARDS</span>
+                                            </div>
+                                        </div>
+                                        {activeDeckId === deck.id && <div className="text-[9px] bg-[#00f0ff] text-black px-2 py-0.5 font-black uppercase tracking-widest animate-pulse">ACTIVE</div>}
+                                    </div>
+
+                                    <p className="text-xs text-white/50 mb-6 line-clamp-2 h-8">{deck.description || 'No additional metadata available for this dataset.'}</p>
+
+                                    <div className="mt-auto flex gap-2">
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`cyber-button text-xs flex-1 transition-all ${activeDeckId === deck.id ? 'active' : 'group-hover:cyan'}`}
+                                        >
+                                            {activeDeckId === deck.id ? 'ONLINE' : 'BOOT'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className="cyber-button text-xs flex-1 cyan hover:cyan">MODIFY</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="w-10 cyber-button !px-0 bg-[#ff003c]/10 hover:!bg-[#ff003c] hover:!text-black transition-colors">🗑️</button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col h-full space-y-4">
-                    <input className="w-full bg-[#050505] border border-[#00f0ff]/50 p-4 text-2xl font-bold text-[#00f0ff] focus:outline-none focus:border-[#00f0ff] cyber-mono" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="DATASET_NAME" />
+                <div className="flex flex-col h-full space-y-6">
+                    <div className="cyber-panel p-6 bg-black/40">
+                        <div className="relative mb-6">
+                            <label className="absolute -top-3 left-4 bg-black px-2 text-[10px] cyber-mono text-[#00f0ff]">FILE_NAME</label>
+                            <input
+                                className="w-full bg-transparent border-2 border-[#00f0ff]/30 p-4 text-2xl font-bold text-[#00f0ff] focus:outline-none focus:border-[#00f0ff] transition-all placeholder:opacity-20"
+                                value={editingDeck.name}
+                                onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                placeholder="ENTER_DATASET_NAME..."
+                            />
+                        </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2">
-                        {editingDeck.prompts.map((p: any) => (
-                            <div key={p.id} className="cyber-panel p-4 flex flex-col gap-3">
-                                <div className="flex justify-between items-center border-b border-[#ff003c]/20 pb-2">
-                                    <select className="bg-transparent text-[#00f0ff] cyber-mono text-sm border-none outline-none font-bold" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                        <option className="bg-black">Truth</option><option className="bg-black">Dare</option><option className="bg-black">NeverHaveIEver</option>
-                                    </select>
-                                    <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#ff003c] hover:text-white">x</button>
-                                </div>
-                                <textarea className="w-full bg-transparent text-white focus:outline-none font-medium resize-none" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="Enter command..." />
+                        <div className="relative mb-6">
+                            <label className="absolute -top-3 left-4 bg-black px-2 text-[10px] cyber-mono text-[#fcee0a]">METADATA_DESCRIPTION</label>
+                            <textarea
+                                className="w-full bg-transparent border-2 border-[#fcee0a]/30 p-4 text-sm font-medium text-white/80 focus:outline-none focus:border-[#fcee0a] transition-all h-24 resize-none"
+                                value={editingDeck.description}
+                                onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                placeholder="Input shard description..."
+                            />
+                        </div>
+
+                        <div className="flex gap-6">
+                            <div className="flex-1 relative">
+                                <label className="absolute -top-3 left-4 bg-black px-2 text-[10px] cyber-mono text-[#ff003c]">MODE_PROTOCOL</label>
+                                <select
+                                    value={editingDeck.gameMode}
+                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
+                                    className="w-full bg-black border-2 border-[#ff003c]/30 p-3 text-[#ff003c] font-bold tracking-widest focus:outline-none focus:border-[#ff003c] appearance-none text-center cursor-pointer"
+                                >
+                                    <option value={GameMode.TRUTH_OR_DARE}>TRUTH_OR_DARE</option>
+                                    <option value={GameMode.NEVER_HAVE_I_EVER}>NEVER_HAVE_I_EVER</option>
+                                </select>
                             </div>
-                        ))}
+                            <div className="flex-1 relative">
+                                <label className="absolute -top-3 left-4 bg-black px-2 text-[10px] cyber-mono text-[#ff003c]">THREAT_LVL</label>
+                                <select
+                                    value={editingDeck.intensity}
+                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
+                                    className="w-full bg-black border-2 border-[#ff003c]/30 p-3 text-[#ff003c] font-bold tracking-widest focus:outline-none focus:border-[#ff003c] appearance-none text-center cursor-pointer"
+                                >
+                                    <option value={Intensity.SOFT}>MODERATE (SOFT)</option>
+                                    <option value={Intensity.HOT}>HIGH (HOT)</option>
+                                    <option value={Intensity.VULGAR}>SEVERE (VULGAR)</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <button onClick={addNewPromptToEditingDeck} className="cyber-button border-dashed w-full py-4 text-center font-bold tracking-widest">+ ADD SHARD</button>
+                    <div className="flex-1 flex flex-col min-h-0 bg-[#ff003c]/5 border border-[#ff003c]/10 p-4">
+                        <div className="flex justify-between items-center mb-4 px-2">
+                            <h3 className="text-xl font-bold tracking-tighter text-white">DATA_SHARDS ({editingDeck.prompts.length})</h3>
+                            <button onClick={addNewPromptToEditingDeck} className="cyber-button text-xs py-1.5 px-4 yellow">+ INJECT_SHARD</button>
+                        </div>
 
-                    <div className="flex gap-4 mt-2">
-                        <button onClick={() => setEditingDeck(null)} className="cyber-button flex-1 text-center">DISCARD</button>
-                        <button onClick={() => saveDeck(editingDeck)} className="cyber-button cyan flex-1 text-center font-bold">SAVE TO DB</button>
+                        <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-2">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="bg-black/80 border border-white/10 p-4 space-y-3 group hover:border-[#00f0ff]/50 transition-colors">
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex gap-2">
+                                            <select
+                                                className="bg-black text-[#00f0ff] cyber-mono text-[10px] border border-[#00f0ff]/30 px-2 py-1 outline-none font-bold"
+                                                value={p.type}
+                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                                ) : (
+                                                    <option value="NeverHaveIEver">NHIE</option>
+                                                )}
+                                            </select>
+                                            <div className="text-[#fcee0a] cyber-mono text-[9px] font-bold opacity-70 px-2 py-1 flex items-center bg-[#fcee0a]/5">LVL: {editingDeck.intensity}</div>
+                                        </div>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#ff003c] hover:text-white transition-colors p-1 leading-none text-xl">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent text-sm text-white/80 focus:outline-none font-medium border-b border-white/5 focus:border-[#00f0ff] transition-all resize-none italic px-2 py-1"
+                                        value={p.text}
+                                        onChange={e => logic.updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Enter program data..."
+                                        rows={2}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 pt-2">
+                        <button onClick={() => setEditingDeck(null)} className="cyber-button flex-1 text-center py-4">TERMINATE</button>
+                        <button onClick={() => saveDeck(editingDeck)} className="cyber-button cyan flex-1 text-center py-4 font-bold shadow-[0_0_15px_rgba(0,240,255,0.3)]">COMMIT_DATA</button>
                     </div>
                 </div>
             )}

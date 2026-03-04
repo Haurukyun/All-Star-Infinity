@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: '> LOCAL_THREAT', desc: 'RAD LEVEL: NOMINAL', color: '#21ed43' },
@@ -216,35 +218,87 @@ export const FalloutIntensitySelector: React.FC<{ logic: any }> = ({ logic }) =>
 };
 
 export const FalloutPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { handleDraw, setIntensity } = logic;
+    const { intensity, handleDraw, setIntensity, activeDeckId, setActiveDeckId, customDecks, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
-        <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full">
+        <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full pt-4">
+            <div className="w-full mb-8">
+                <div className="flex justify-between items-center mb-2 px-6">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-[#21ed43]">&gt; TARGET_DATASET</h3>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="border border-[#21ed43] text-xs py-1 px-3 hover:bg-[#21ed43] hover:text-black transition-colors"
+                    >
+                        [ SCAN ]
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#21ed43"
+                />
+            </div>
+
             <div className="pip-border p-6 mb-8 text-2xl">
-                &gt; WAITING FOR INPUT...<br />
-                &gt; SELECT DIRECTORY:
+                &gt; WAITING FOR COMMAND...<br />
+                &gt; INTENSITY: {intensity}<br />
+                &gt; SECTOR: {gameMode === GameMode.NEVER_HAVE_I_EVER ? 'NHIE' : 'TRUTH/DARE'}
             </div>
 
             <div className="space-y-4 max-w-xl mx-auto w-full">
-                <button
-                    onClick={() => handleDraw('Truth')}
-                    className="w-full text-left p-4 text-3xl border border-[#21ed43] hover:bg-[#21ed43] hover:text-black transition-colors"
-                >
-                    [ TRUTH.exe ]
-                </button>
-                <button
-                    onClick={() => handleDraw('Dare')}
-                    className="w-full text-left p-4 text-3xl border border-[#21ed43] hover:bg-[#21ed43] hover:text-black transition-colors"
-                >
-                    [ DARE.bat ]
-                </button>
-                <div className="py-4 text-center">--- OR ---</div>
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button
+                        onClick={() => handleDraw('NeverHaveIEver')}
+                        className="w-full text-left p-4 text-3xl border border-[#21ed43] hover:bg-[#21ed43] hover:text-black transition-colors"
+                    >
+                        [ NHIE.v7 ]
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => handleDraw('Truth')}
+                            className="w-full text-left p-4 text-3xl border border-[#21ed43] hover:bg-[#21ed43] hover:text-black transition-colors"
+                        >
+                            [ TRUTH.exe ]
+                        </button>
+                        <button
+                            onClick={() => handleDraw('Dare')}
+                            className="w-full text-left p-4 text-3xl border border-[#21ed43] hover:bg-[#21ed43] hover:text-black transition-colors"
+                        >
+                            [ DARE.bat ]
+                        </button>
+                    </>
+                )}
+                <div className="py-2 text-center opacity-40">-----------------</div>
                 <button
                     onClick={() => setIntensity(null)}
-                    className="w-full text-center p-4 text-3xl hover:bg-[#21ed43]/20 transition-colors"
+                    className="w-full text-center p-4 text-2xl hover:bg-[#21ed43]/20 transition-colors opacity-70"
                 >
-                    [ RETURN TO MAIN ]
+                    [ ABORT_AND_RETURN ]
                 </button>
             </div>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -288,55 +342,161 @@ export const FalloutPlayButton: React.FC<{ label: string; onClick: () => void; i
 };
 
 export const FalloutDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
                 <div className="space-y-6 flex flex-col h-full">
-                    <div className="flex justify-between items-end border-b-2 border-[#21ed43] pb-2">
-                        <h2 className="text-3xl">&gt; INVENTORY</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="text-xl hover:bg-[#21ed43] hover:text-black px-2">[ ADD ENTRY ]</button>
+                    <div className="flex justify-between items-end border-b-2 border-[#21ed43] pb-2 relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-[#21ed43]/5 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                        <div>
+                            <h2 className="text-3xl tracking-widest">&gt; INVENTORY_MANAGER</h2>
+                            <p className="text-xs opacity-60 mt-1">&gt; 38.2 GB FREE // HOLOTAPE_STORAGE</p>
+                        </div>
+                        <button
+                            onClick={() => setEditingDeck({
+                                id: generateId(),
+                                name: '',
+                                description: '',
+                                prompts: [],
+                                isCustom: true,
+                                intensity: logic.intensity || Intensity.SOFT,
+                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                            })}
+                            className="text-xl hover:bg-[#21ed43] hover:text-black px-3 py-1 transition-colors border border-[#21ed43]/50"
+                        >
+                            [ ADD_ENTRY ]
+                        </button>
                     </div>
+
                     <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 space-y-4">
-                        {customDecks.map((deck: any) => (
-                            <div key={deck.id} className="pip-border p-4 flex justify-between items-center group">
-                                <div className="flex flex-col">
-                                    <span className="text-2xl">{deck.name}</span>
-                                    <span className="text-lg opacity-60">LOC: {deck.prompts.length} ITEMS</span>
-                                </div>
-                                <div className="flex flex-col gap-2">
-                                    <button onClick={() => setEditingDeck(deck)} className="hover:bg-[#21ed43] hover:text-black px-2 text-xl">[ EDIT ]</button>
-                                    <button onClick={() => deleteDeck(deck.id)} className="hover:bg-red-500 hover:text-black px-2 text-xl text-red-400">[ DEL ]</button>
-                                </div>
+                        {customDecks.length === 0 ? (
+                            <div className="py-20 text-center opacity-30 border border-dashed border-[#21ed43]/30">
+                                &gt; NO COMPATIBLE HOLOTAPES DETECTED
                             </div>
-                        ))}
+                        ) : (
+                            customDecks.map((deck: any) => (
+                                <div key={deck.id} className={`pip-border p-5 flex flex-col group transition-all ${activeDeckId === deck.id ? 'bg-[#21ed43]/10 border-white' : 'hover:bg-[#21ed43]/5'}`}>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 className={`text-2xl font-bold ${activeDeckId === deck.id ? 'text-white' : ''}`}>&gt; {deck.name || 'UNKNOWN_DATA'}</h3>
+                                            <div className="flex gap-4 text-xs opacity-70 mt-1">
+                                                <span>PROT: {deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}</span>
+                                                <span>RAD: {deck.intensity}</span>
+                                                <span>LEN: {deck.prompts.length} SHARDS</span>
+                                            </div>
+                                        </div>
+                                        {activeDeckId === deck.id && <span className="bg-[#21ed43] text-black px-2 py-0.5 text-[10px] font-black animate-pulse">BOOTED</span>}
+                                    </div>
+
+                                    <p className="text-sm opacity-60 mb-6 italic line-clamp-2 h-10">{deck.description || 'No metadata description found for this entry.'}</p>
+
+                                    <div className="flex gap-4">
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`text-xl px-4 py-1 transition-colors border ${activeDeckId === deck.id ? 'bg-[#21ed43] text-black border-[#21ed43]' : 'border-[#21ed43]/50 hover:bg-[#21ed43] hover:text-black'}`}
+                                        >
+                                            {activeDeckId === deck.id ? '[ ONLINE ]' : '[ BOOT ]'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className="text-xl px-4 py-1 border border-[#21ed43]/50 hover:bg-[#21ed43]/20 transition-colors">[ MODIFY ]</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="text-xl px-4 py-1 ml-auto text-red-500/70 hover:text-red-500 hover:bg-red-900/20 transition-colors">[ SCRAP ]</button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col h-full space-y-6">
-                    <div className="flex items-center gap-4 border-b border-[#21ed43] pb-2">
-                        <span className="text-2xl">&gt; NAME:</span>
-                        <input className="flex-1 bg-transparent text-3xl focus:outline-none" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="Enter database name..." />
-                    </div>
+                <div className="flex flex-col h-full space-y-6 pb-2">
+                    <div className="pip-border p-6 space-y-6 bg-black/40">
+                        <div className="space-y-1">
+                            <label className="text-xs opacity-50">&gt; FILE_HEADER_IDENTIFIER</label>
+                            <input
+                                className="w-full bg-[#21ed43]/10 border border-[#21ed43]/30 p-3 text-3xl focus:outline-none focus:bg-[#21ed43]/20 transition-all"
+                                value={editingDeck.name}
+                                onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                placeholder="ENTER_DATASET_ID..."
+                            />
+                        </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-4">
-                        {editingDeck.prompts.map((p: any) => (
-                            <div key={p.id} className="border border-[#21ed43]/40 p-4">
-                                <div className="flex justify-between items-center bg-[#21ed43]/10 p-2 mb-2">
-                                    <select className="bg-black text-[#21ed43] text-xl outline-none" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                        <option>Truth</option><option>Dare</option><option>NeverHaveIEver</option>
-                                    </select>
-                                    <button onClick={() => removePromptFromEditingDeck(p.id)} className="hover:bg-[#21ed43] hover:text-black px-2">X</button>
-                                </div>
-                                <textarea className="w-full bg-transparent text-[#21ed43] focus:outline-none text-2xl resize-none h-24" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="Entry log..." />
+                        <div className="space-y-1">
+                            <label className="text-xs opacity-50">&gt; METADATA_LOG</label>
+                            <textarea
+                                className="w-full bg-transparent border border-[#21ed43]/30 p-3 text-lg focus:outline-none focus:bg-[#21ed43]/5 transition-all h-20 resize-none placeholder:opacity-20"
+                                value={editingDeck.description}
+                                onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                placeholder="Input description log..."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-1">
+                                <label className="text-xs opacity-50">&gt; EXEC_PROTOCOL</label>
+                                <select
+                                    value={editingDeck.gameMode}
+                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
+                                    className="w-full bg-black text-[#21ed43] p-3 text-xl outline-none border border-[#21ed43] cursor-pointer hover:bg-[#21ed43]/10 transition-colors appearance-none text-center"
+                                >
+                                    <option value={GameMode.TRUTH_OR_DARE}>TRUTH_OR_DARE.exe</option>
+                                    <option value={GameMode.NEVER_HAVE_I_EVER}>NHIE_SYSTEM.bat</option>
+                                </select>
                             </div>
-                        ))}
-                        <button onClick={addNewPromptToEditingDeck} className="w-full text-center py-4 border border-dashed border-[#21ed43] hover:bg-[#21ed43]/20">[ + NEW RECORD ]</button>
+                            <div className="space-y-1">
+                                <label className="text-xs opacity-50">&gt; RADIATION_LVL</label>
+                                <select
+                                    value={editingDeck.intensity}
+                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
+                                    className="w-full bg-black text-[#21ed43] p-3 text-xl outline-none border border-[#21ed43] cursor-pointer hover:bg-[#21ed43]/10 transition-colors appearance-none text-center"
+                                >
+                                    <option value={Intensity.SOFT}>LOCAL (SOFT)</option>
+                                    <option value={Intensity.HOT}>REGIONAL (HOT)</option>
+                                    <option value={Intensity.VULGAR}>GLOBAL (VULGAR)</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="flex gap-4 pt-4 border-t-2 border-[#21ed43]">
-                        <button onClick={() => setEditingDeck(null)} className="flex-1 py-2 hover:bg-[#21ed43]/20">[ ABORT ]</button>
-                        <button onClick={() => saveDeck(editingDeck)} className="flex-1 py-2 bg-[#21ed43]/20 border border-[#21ed43] hover:bg-[#21ed43] hover:text-black font-bold">[ COMMIT ]</button>
+                    <div className="flex-1 flex flex-col min-h-0">
+                        <div className="flex justify-between items-center mb-4 px-2">
+                            <h3 className="text-2xl font-bold tracking-tighter">&gt; DATA_SHARDS ({editingDeck.prompts.length})</h3>
+                            <button onClick={addNewPromptToEditingDeck} className="text-xl hover:bg-[#21ed43] hover:text-black px-4 py-1 border border-[#21ed43]/50 transition-colors">[ + INJECT ]</button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar pr-2">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="border border-[#21ed43]/30 p-4 space-y-3 bg-[#21ed43]/5 group hover:border-[#21ed43] transition-colors">
+                                    <div className="flex justify-between items-center border-b border-[#21ed43]/20 pb-2">
+                                        <div className="flex gap-4 items-center">
+                                            <select
+                                                className="bg-black text-[#21ed43] text-lg outline-none border border-[#21ed43]/30 px-2 cursor-pointer"
+                                                value={p.type}
+                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                                ) : (
+                                                    <option value="NeverHaveIEver">NHIE</option>
+                                                )}
+                                            </select>
+                                            <div className="text-sm opacity-50 tracking-widest">[RAD: {editingDeck.intensity}]</div>
+                                        </div>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-red-500/50 hover:text-red-500 transition-colors text-xl leading-none px-2 font-bold">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent text-[#21ed43] focus:outline-none text-xl resize-none h-20 placeholder:opacity-20 italic px-2"
+                                        value={p.text}
+                                        onChange={e => logic.updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Enter program data..."
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-6 pt-4 border-t-2 border-[#21ed43]">
+                        <button onClick={() => setEditingDeck(null)} className="flex-1 py-3 border border-[#21ed43]/50 hover:bg-red-900/20 hover:text-red-400 transition-colors text-2xl">[ ABORT ]</button>
+                        <button onClick={() => saveDeck(editingDeck)} className="flex-1 py-3 bg-[#21ed43]/10 border-2 border-[#21ed43] hover:bg-[#21ed43] hover:text-black font-bold text-2xl shadow-[0_0_10px_rgba(33,237,67,0.3)] transition-all">[ COMMIT_DATA ]</button>
                     </div>
                 </div>
             )}

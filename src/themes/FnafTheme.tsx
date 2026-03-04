@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'CAM 1A-SHOW STAGE', desc: 'LOW RISK', color: '#ffffff' },
@@ -218,33 +220,87 @@ export const FnafIntensitySelector: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const FnafPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { handleDraw, setIntensity } = logic;
-    return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full justify-center px-4 sm:px-12 w-full max-w-4xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-8 sm:mb-12 text-center drop-shadow-[0_0_2px_#fff]">MONITOR FEED DETECTED</h2>
+    const { handleDraw, setIntensity, intensity, customDecks, activeDeckId, setActiveDeckId, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <button
-                    onClick={() => handleDraw('Truth')}
-                    className="aspect-video fnaf-border hover:bg-white/10 transition-all flex flex-col justify-center items-center text-4xl font-bold gap-4 relative"
-                >
-                    <div className="absolute top-2 left-2 text-sm opacity-50">CAM A</div>
-                    <span>TRUTH</span>
-                    <span className="text-sm opacity-50">AUDIO ONLY AUDIO ONLY</span>
-                </button>
-                <button
-                    onClick={() => handleDraw('Dare')}
-                    className="aspect-video fnaf-border border-[#cc0000] text-[#cc0000] hover:bg-[#cc0000]/10 transition-all flex flex-col justify-center items-center text-3xl sm:text-4xl font-bold gap-4 relative"
-                >
-                    <div className="absolute top-2 left-2 text-sm opacity-50">CAM B</div>
-                    <span>DARE</span>
-                    <span className="text-sm opacity-50">VISUAL CONFIRMATION REQ</span>
-                </button>
+    return (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full justify-center px-4 sm:px-12 w-full max-w-4xl mx-auto space-y-8">
+            <div className="w-full">
+                <div className="flex justify-between items-center mb-2 px-2">
+                    <span className="text-sm opacity-50 uppercase tracking-widest">CAM DATA SOURCE</span>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="w-10 h-10 border-2 border-white/30 flex items-center justify-center hover:bg-white hover:text-black transition-all"
+                    >
+                        🔍
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#cc0000"
+                />
             </div>
 
-            <button onClick={() => setIntensity(null)} className="w-full p-6 mt-12 text-2xl text-center border border-white/30 hover:bg-white hover:text-black transition-colors">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center drop-shadow-[0_0_2px_#fff]">MONITOR FEED DETECTED: {intensity}</h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button
+                        onClick={() => handleDraw('NeverHaveIEver')}
+                        className="col-span-1 sm:col-span-2 aspect-[21/9] fnaf-border border-[#cc0000] text-[#cc0000] hover:bg-[#cc0000]/10 transition-all flex flex-col justify-center items-center text-4xl font-bold gap-4 relative"
+                    >
+                        <div className="absolute top-2 left-2 text-sm opacity-50">CAM NHIE</div>
+                        <span>I HAVE NEVER...</span>
+                        <span className="text-sm opacity-50">AUDIO LOG CONFESSION</span>
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => handleDraw('Truth')}
+                            className="aspect-video fnaf-border hover:bg-white/10 transition-all flex flex-col justify-center items-center text-4xl font-bold gap-4 relative"
+                        >
+                            <div className="absolute top-2 left-2 text-sm opacity-50">CAM A</div>
+                            <span>TRUTH</span>
+                            <span className="text-sm opacity-50">AUDIO ONLY AUDIO ONLY</span>
+                        </button>
+                        <button
+                            onClick={() => handleDraw('Dare')}
+                            className="aspect-video fnaf-border border-[#cc0000] text-[#cc0000] hover:bg-[#cc0000]/10 transition-all flex flex-col justify-center items-center text-3xl sm:text-4xl font-bold gap-4 relative"
+                        >
+                            <div className="absolute top-2 left-2 text-sm opacity-50">CAM B</div>
+                            <span>DARE</span>
+                            <span className="text-sm opacity-50">VISUAL CONFIRMATION REQ</span>
+                        </button>
+                    </>
+                )}
+            </div>
+
+            <button onClick={() => setIntensity(null)} className="w-full p-6 mt-4 text-2xl text-center border border-white/30 hover:bg-white hover:text-black transition-colors">
                 RETURN TO SYSTEM
             </button>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -294,45 +350,178 @@ export const FnafPlayButton: React.FC<{ label: string; onClick: () => void; isPr
 };
 
 export const FnafDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { activeDeckId, setActiveDeckId, customDecks, setEditingDeck, generateId } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
     return (
-        <div className="space-y-8 p-4 sm:p-8 pb-40">
-            <div className="flex justify-between items-end border-b border-white/30 pb-4">
-                <h2 className="text-4xl font-bold">DATA ARCHIVE</h2>
-                <button
-                    onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })}
-                    className="p-2 border-2 border-white hover:bg-white hover:text-black font-bold text-sm sm:text-base transition-all"
-                >
-                    + NEW SYSTEM FILE
-                </button>
-            </div>
-            <div className="grid grid-cols-1 gap-6">
-                {customDecks.length === 0 ? (
-                    <div className="py-20 text-center opacity-40 border-2 border-dashed border-white/10 text-xl font-bold italic">
-                        NO EXTERNAL DRIVE DETECTED
-                    </div>
-                ) : (
-                    customDecks.map((deck: any) => (
+        <AnimatePresence mode="wait">
+            {!editingDeck ? (
+                <div className="space-y-8 flex flex-col h-full pb-40">
+                    <div className="flex justify-between items-end border-b-2 border-white/20 pb-4 px-2">
+                        <div>
+                            <h2 className="text-4xl font-bold tracking-tighter">DATA_ARCHIVE_MGR</h2>
+                            <p className="text-sm opacity-50 font-mono mt-1">&gt; STATUS: SYSTEMS_STABLE // STORAGE: 99%</p>
+                        </div>
                         <button
-                            key={deck.id}
-                            onClick={() => setActiveDeckId(deck.id)}
-                            className={`text-left p-6 fnaf-border hover:bg-white/10 transition-all flex justify-between items-center ${activeDeckId === deck.id ? 'border-white bg-white/5 shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'border-white/20'}`}
+                            onClick={() => setEditingDeck({
+                                id: generateId(),
+                                name: '',
+                                description: '',
+                                prompts: [],
+                                isCustom: true,
+                                intensity: logic.intensity || Intensity.SOFT,
+                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                            })}
+                            className="p-3 border-2 border-white hover:bg-white hover:text-black transition-all font-bold text-lg"
                         >
-                            <div>
-                                <h3 className="text-3xl font-bold mb-2">{deck.name || 'UNNAMED_FILE'}</h3>
-                                <p className="text-xl opacity-60 mb-4">{deck.description || 'No system metadata provided.'}</p>
-                                <span className="text-sm border border-white/40 px-2 py-1">{deck.prompts.length} FILES</span>
-                            </div>
-                            {activeDeckId === deck.id ? (
-                                <div className="text-2xl border-2 border-white px-4 py-2 font-black bg-white text-black">MOUNTED</div>
-                            ) : (
-                                <div className="text-xl opacity-40 group-hover:opacity-100 transition-opacity">MOUNT DRIVE</div>
-                            )}
+                            [ CREATE_NEW_FILE ]
                         </button>
-                    ))
-                )}
-            </div>
-        </div>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 grid grid-cols-1 md:grid-cols-2 gap-8 pb-8 content-start">
+                        {customDecks.length === 0 ? (
+                            <div className="col-span-full py-20 text-center opacity-30 border-2 border-dashed border-white/10 text-3xl italic">
+                                &gt; NO_EXTERNAL_DRIVES_DETECTED
+                            </div>
+                        ) : (
+                            customDecks.map((deck: any) => (
+                                <div key={deck.id} className={`fnaf-border p-6 flex flex-col relative overflow-hidden group transition-all ${activeDeckId === deck.id ? 'border-white bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.1)]' : 'hover:bg-white/5 opacity-80 hover:opacity-100'}`}>
+                                    <div className="flex justify-between items-start mb-6">
+                                        <div>
+                                            <h3 className={`text-4xl font-bold mb-2 tracking-tighter ${activeDeckId === deck.id ? 'fnaf-flicker' : ''}`}>
+                                                {deck.name || 'UNNAMED_FILE'}
+                                            </h3>
+                                            <div className="flex gap-4 text-sm font-mono opacity-60">
+                                                <span>MODE: {deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}</span>
+                                                <span>INT: {deck.intensity}</span>
+                                                <span>LEN: {deck.prompts.length}</span>
+                                            </div>
+                                        </div>
+                                        {activeDeckId === deck.id && (
+                                            <div className="bg-white text-black text-xs px-2 py-1 font-black animate-pulse">DRIVE_MOUNTED</div>
+                                        )}
+                                    </div>
+
+                                    <p className="text-xl opacity-60 mb-8 italic line-clamp-2 h-14 border-l border-white/20 pl-4">{deck.description || 'No system metadata provided for this archive.'}</p>
+
+                                    <div className="mt-auto flex gap-4">
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`flex-1 py-3 text-2xl font-bold transition-all border ${activeDeckId === deck.id ? 'bg-white text-black border-white' : 'border-white/50 text-white hover:bg-white hover:text-black'}`}
+                                        >
+                                            {activeDeckId === deck.id ? 'UNMOUNT' : 'MOUNT'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className="px-6 py-3 border border-white/20 text-white/70 hover:border-white hover:text-white transition-all text-xl font-bold">EDIT</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="px-4 py-3 bg-[#4a0000]/30 text-[#cc0000] hover:bg-[#cc0000] hover:text-white transition-all text-xl font-bold border border-[#cc0000]/30">WIPE</button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            ) : (
+                <div className="flex flex-col h-full space-y-8 pb-40 max-w-4xl mx-auto w-full">
+                    <div className="space-y-8 fnaf-border p-8 bg-black/40">
+                        <div className="space-y-2">
+                            <label className="text-xl opacity-50 tracking-widest">&gt; FILE_HEADER</label>
+                            <input
+                                className="w-full bg-transparent text-6xl font-black text-white focus:outline-none placeholder-white/10 border-b-2 border-white/20 pb-4 transition-all focus:border-white"
+                                value={editingDeck.name}
+                                onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                placeholder="ENTER_FILENAME_HERE..."
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xl opacity-50 tracking-widest">&gt; METADATA_DESC</label>
+                            <textarea
+                                className="w-full bg-transparent text-2xl font-mono text-white/80 focus:outline-none border-b border-white/10 pb-4 resize-none h-24 placeholder-white/5"
+                                value={editingDeck.description}
+                                onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                placeholder="Add system description for this archive..."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-12">
+                            <div className="space-y-2">
+                                <label className="text-xl opacity-50 tracking-widest">&gt; SYSTEM_MODE</label>
+                                <select
+                                    value={editingDeck.gameMode}
+                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
+                                    className="w-full bg-black text-white p-4 border-2 border-white/30 focus:border-white outline-none font-bold text-2xl cursor-pointer"
+                                >
+                                    <option value={GameMode.TRUTH_OR_DARE}>CAM_TRUTH_DARE</option>
+                                    <option value={GameMode.NEVER_HAVE_I_EVER}>CAM_NHIE_LOGS</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-xl opacity-50 tracking-widest">&gt; RISK_INTENSITY</label>
+                                <select
+                                    value={editingDeck.intensity}
+                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
+                                    className="w-full bg-black text-[#cc0000] p-4 border-2 border-[#cc0000]/30 focus:border-[#cc0000] outline-none font-bold text-2xl cursor-pointer"
+                                >
+                                    <option value={Intensity.SOFT}>LOW_RISK (SOFT)</option>
+                                    <option value={Intensity.HOT}>MED_RISK (HOT)</option>
+                                    <option value={Intensity.VULGAR}>MAX_SEC (VULGAR)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex-1 flex flex-col min-h-0 bg-white/5 p-6 fnaf-border">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="text-3xl font-bold tracking-tighter">&gt; DATA_LOGS <span className="opacity-40">({editingDeck.prompts.length})</span></h3>
+                            <button
+                                onClick={addNewPromptToEditingDeck}
+                                className="px-6 py-2 border-2 border-white text-white hover:bg-white hover:text-black transition-all font-bold text-xl"
+                            >
+                                [ APPEND_LOG ]
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto space-y-8 custom-scrollbar pr-4">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="p-8 fnaf-border bg-black/60 group hover:border-white transition-all relative">
+                                    <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
+                                        <div className="flex gap-6 items-center">
+                                            <select
+                                                className="bg-black text-white text-2xl font-bold rounded px-4 py-1 border border-white/20 outline-none cursor-pointer"
+                                                value={p.type}
+                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option value="Truth">LOG_TRUTH</option><option value="Dare">LOG_DARE</option></>
+                                                ) : (
+                                                    <option value="NeverHaveIEver">LOG_NHIE</option>
+                                                )}
+                                            </select>
+                                            <div className="text-xl font-mono text-white/30 italic">[{editingDeck.intensity}]</div>
+                                        </div>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#cc0000]/50 hover:text-[#cc0000] text-4xl transition-all">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent text-white focus:outline-none text-3xl font-mono leading-relaxed resize-none h-32 placeholder-white/5"
+                                        value={p.text}
+                                        onChange={e => logic.updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Type manual data entry..."
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-8 pt-8 border-t-2 border-white/20">
+                        <button onClick={() => setEditingDeck(null)} className="flex-1 py-6 text-3xl font-bold border-2 border-white/30 text-white/50 hover:border-white hover:text-white transition-all">[ ABORT_CHANGES ]</button>
+                        <button
+                            onClick={() => saveDeck(editingDeck)}
+                            className="flex-2 py-6 text-4xl font-bold bg-[#cc0000] text-white border-2 border-[#cc0000] hover:bg-white hover:text-black hover:border-white transition-all px-12 fnaf-flicker"
+                        >
+                            [ OVERWRITE_SYSTEM_FILE ]
+                        </button>
+                    </div>
+                </div>
+            )}
+        </AnimatePresence>
     );
 };
 

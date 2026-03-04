@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'Welcome Lobby', desc: 'Mild eternal torment.', color: '#fffb00' },
@@ -192,25 +194,75 @@ export const HazbinIntensitySelector: React.FC<{ logic: any }> = ({ logic }) => 
 };
 
 export const HazbinPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { handleDraw, setIntensity } = logic;
+    const { intensity, handleDraw, setIntensity, activeDeckId, setActiveDeckId, customDecks, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
-        <motion.div key="type" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center h-full">
-            <h2 className="text-4xl hazbin-display mb-12 hazbin-neon-gold">PICK A CARD, ANY CARD!</h2>
+        <motion.div key="type" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-start h-full pt-4">
+            <div className="w-full mb-10 overflow-visible">
+                <div className="flex justify-between items-center mb-4 px-8">
+                    <h3 className="hazbin-display text-[#ffcc00] hazbin-neon-gold text-sm tracking-widest">Selected Grimoires</h3>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="w-10 h-10 rounded-full bg-[#1a050f] border-2 border-[#ffcc00] flex items-center justify-center shadow-[0_0_15px_rgba(255,204,0,0.4)] hover:scale-110 transition-transform"
+                    >
+                        🔍
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#ffcc00"
+                />
+            </div>
+
+            <h2 className="text-4xl hazbin-display mb-8 hazbin-neon-gold">PICK A CARD, ANY CARD!</h2>
 
             <div className="flex gap-8 w-full max-w-3xl mb-12 flex-col sm:flex-row">
-                <button onClick={() => handleDraw('Truth')} className="hazbin-panel flex-1 h-64 flex flex-col items-center justify-center group hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(229,43,80,0.6)] transition-all rounded-xl relative overflow-hidden border-4">
-                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/always-grey.png')]"></div>
-                    <span className="text-6xl mb-4 group-hover:scale-125 transition-transform">👁️</span>
-                    <span className="text-4xl hazbin-display text-white">TRUTH</span>
-                </button>
-                <button onClick={() => handleDraw('Dare')} className="hazbin-panel flex-1 h-64 flex flex-col items-center justify-center group hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(255,204,0,0.6)] transition-all rounded-xl relative overflow-hidden border-4 !border-[#ffcc00]">
-                    <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/always-grey.png')]"></div>
-                    <span className="text-6xl mb-4 group-hover:scale-125 transition-transform text-[#ffcc00]">🔥</span>
-                    <span className="text-4xl hazbin-display text-[#ffcc00] hazbin-neon-gold">DARE</span>
-                </button>
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button onClick={() => handleDraw('NeverHaveIEver')} className="hazbin-panel flex-1 h-64 flex flex-col items-center justify-center group hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(229,43,80,0.6)] transition-all rounded-xl relative overflow-hidden border-4">
+                        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/always-grey.png')]"></div>
+                        <span className="text-6xl mb-4 group-hover:scale-125 transition-transform">🍷</span>
+                        <span className="text-4xl hazbin-display text-white">NHIE</span>
+                    </button>
+                ) : (
+                    <>
+                        <button onClick={() => handleDraw('Truth')} className="hazbin-panel flex-1 h-64 flex flex-col items-center justify-center group hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(229,43,80,0.6)] transition-all rounded-xl relative overflow-hidden border-4">
+                            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/always-grey.png')]"></div>
+                            <span className="text-6xl mb-4 group-hover:scale-125 transition-transform">👁️</span>
+                            <span className="text-4xl hazbin-display text-white">TRUTH</span>
+                        </button>
+                        <button onClick={() => handleDraw('Dare')} className="hazbin-panel flex-1 h-64 flex flex-col items-center justify-center group hover:-translate-y-4 hover:shadow-[0_20px_40px_rgba(255,204,0,0.6)] transition-all rounded-xl relative overflow-hidden border-4 !border-[#ffcc00]">
+                            <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/always-grey.png')]"></div>
+                            <span className="text-6xl mb-4 group-hover:scale-125 transition-transform text-[#ffcc00]">🔥</span>
+                            <span className="text-4xl hazbin-display text-[#ffcc00] hazbin-neon-gold">DARE</span>
+                        </button>
+                    </>
+                )}
             </div>
 
             <button onClick={() => setIntensity(null)} className="text-[#ffcccb] text-xl italic hover:text-white transition-colors border-b border-transparent hover:border-white pb-1">Actually, I changed my mind...</button>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -256,54 +308,176 @@ export const HazbinPlayButton: React.FC<{ label: string; onClick: () => void; is
 };
 
 export const HazbinDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
                 <div className="space-y-8 flex flex-col h-full">
-                    <div className="flex justify-between items-center text-center px-4">
-                        <h2 className="text-4xl hazbin-display hazbin-neon-gold">THE ARCHIVES</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="py-2 px-6 rounded-full border border-[#ffcc00] text-[#ffcc00] hover:bg-[#ffcc00] hover:text-black hazbin-display">Forge Agremment</button>
+                    <div className="flex justify-between items-end border-b-2 border-[#e52b50] pb-4 px-2">
+                        <div>
+                            <h2 className="text-4xl hazbin-display hazbin-neon-gold">THE ARCHIVES</h2>
+                            <p className="text-sm italic opacity-60 mt-1 text-[#ffcccb]">Bound agreements and eternal contracts.</p>
+                        </div>
+                        <button
+                            onClick={() => setEditingDeck({
+                                id: generateId(),
+                                name: '',
+                                description: '',
+                                prompts: [],
+                                isCustom: true,
+                                intensity: logic.intensity || Intensity.SOFT,
+                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
+                            })}
+                            className="py-2 px-6 rounded-full border-2 border-[#ffcc00] text-[#ffcc00] hover:bg-[#ffcc00] hover:text-black transition-all hazbin-display shadow-[0_0_15px_rgba(255,204,0,0.3)]"
+                        >
+                            Forge New Agreement
+                        </button>
                     </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 grid grid-cols-1 md:grid-cols-2 gap-6 pb-8">
-                        {customDecks.map((deck: any) => (
-                            <div key={deck.id} className="hazbin-panel p-6 flex flex-col relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-16 h-16 bg-[#e52b50] transform rotate-45 translate-x-8 -translate-y-8 transition-transform group-hover:scale-150"></div>
-                                <h3 className="text-3xl hazbin-display text-white mb-2 relative z-10">{deck.name}</h3>
-                                <p className="text-lg text-[#ffcccb] mb-6 italic">{deck.prompts.length} contracts bound</p>
-                                <div className="mt-auto flex gap-4 relative z-10">
-                                    <button onClick={() => setEditingDeck(deck)} className="flex-1 py-2 border border-[#e52b50] text-white hover:bg-[#e52b50] transition-colors hazbin-display rounded-md">Edit</button>
-                                    <button onClick={() => deleteDeck(deck.id)} className="flex-1 py-2 bg-[#4a0011] text-[#ffcccb] hover:bg-[#ff0000] hover:text-white transition-colors hazbin-display rounded-md">Shred</button>
-                                </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-4 grid grid-cols-1 md:grid-cols-2 gap-8 pb-8 content-start">
+                        {customDecks.length === 0 ? (
+                            <div className="col-span-full py-20 text-center opacity-30 italic text-2xl hazbin-display">
+                                - NO SOULS HAVE SIGNED YET -
                             </div>
-                        ))}
+                        ) : (
+                            customDecks.map((deck: any) => (
+                                <div key={deck.id} className={`hazbin-panel p-6 flex flex-col relative overflow-hidden group transition-all ${activeDeckId === deck.id ? 'border-[#ffcc00] scale-[1.02] shadow-[0_0_30px_rgba(229,43,80,0.5)]' : 'hover:scale-[1.01]'}`}>
+                                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#e52b50]/20 transform rotate-45 translate-x-12 -translate-y-12 group-hover:bg-[#e52b50]/40 transition-colors"></div>
+
+                                    <div className="flex justify-between items-start mb-4 relative z-10">
+                                        <div>
+                                            <h3 className={`text-3xl hazbin-display mb-1 ${activeDeckId === deck.id ? 'hazbin-neon-gold' : 'text-white'}`}>{deck.name || 'Untitled Contract'}</h3>
+                                            <div className="flex gap-3 text-xs hazbin-display opacity-70">
+                                                <span className="text-[#ffcc00]">{deck.gameMode === GameMode.TRUTH_OR_DARE ? 'T/D' : 'NHIE'}</span>
+                                                <span className="text-[#e52b50]">|</span>
+                                                <span className="text-[#ffcccb]">{deck.intensity} LAYER</span>
+                                                <span className="text-[#e52b50]">|</span>
+                                                <span className="text-white">{deck.prompts.length} CLAUSES</span>
+                                            </div>
+                                        </div>
+                                        {activeDeckId === deck.id && (
+                                            <div className="bg-[#ffcc00] text-black text-[10px] px-2 py-0.5 hazbin-display tracking-tighter font-bold shadow-[0_0_10px_#ffcc00]">IN EFFECT</div>
+                                        )}
+                                    </div>
+
+                                    <p className="text-[#ffcccb] mb-8 italic line-clamp-2 h-12 text-sm leading-relaxed border-l-2 border-[#e52b50]/30 pl-3">{deck.description || 'No descriptive terms provided for this agreement.'}</p>
+
+                                    <div className="mt-auto flex gap-3 relative z-10 font-serif">
+                                        <button
+                                            onClick={() => setActiveDeckId(deck.id)}
+                                            className={`flex-1 py-2 text-sm hazbin-display transition-all rounded-md border ${activeDeckId === deck.id ? 'bg-[#ffcc00] text-black border-[#ffcc00] shadow-[0_0_15px_rgba(255,204,0,0.4)]' : 'border-[#e52b50] text-[#ffcccb] hover:bg-[#e52b50] hover:text-white'}`}
+                                        >
+                                            {activeDeckId === deck.id ? 'Signed' : 'Sign'}
+                                        </button>
+                                        <button onClick={() => setEditingDeck(deck)} className="flex-1 py-2 text-sm border border-[#e52b50]/50 text-[#ffcccb] hover:border-white hover:text-white transition-all hazbin-display rounded-md">Review</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="px-4 py-2 bg-[#4a0011]/50 text-[#e52b50] hover:bg-[#ff0000] hover:text-white transition-all hazbin-display rounded-md text-sm">Shred</button>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             ) : (
-                <div className="flex flex-col h-full space-y-6 max-w-4xl mx-auto w-full">
-                    <input className="w-full bg-transparent text-5xl font-bold italic text-center text-white focus:outline-none placeholder-[#e52b50]/50 border-b-2 border-[#e52b50] pb-4" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="Title of Agreement..." />
+                <div className="flex flex-col h-full space-y-8 max-w-4xl mx-auto w-full pb-6">
+                    <div className="space-y-6 hazbin-panel p-8">
+                        <div className="space-y-2">
+                            <label className="hazbin-display text-[#ffcc00] text-sm tracking-widest pl-2">Contract Title</label>
+                            <input
+                                className="w-full bg-transparent text-5xl font-bold italic text-white focus:outline-none placeholder-[#e52b50]/30 border-b-4 border-[#e52b50] pb-2 px-2 transition-all focus:border-[#ffcc00]"
+                                value={editingDeck.name}
+                                onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                                placeholder="Name your agreement..."
+                            />
+                        </div>
 
-                    <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-4">
-                        {editingDeck.prompts.map((p: any) => (
-                            <div key={p.id} className="hazbin-panel p-6">
-                                <div className="flex justify-between items-center mb-4 border-b border-[#e52b50]/30 pb-4">
-                                    <select className="bg-transparent text-[#ffcc00] hazbin-display text-xl outline-none" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                        <option className="bg-[#1a050f]">Truth</option><option className="bg-[#1a050f]">Dare</option><option className="bg-[#1a050f]">NeverHaveIEver</option>
-                                    </select>
-                                    <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#e52b50] hover:text-white text-2xl">✖</button>
-                                </div>
-                                <textarea className="w-full bg-transparent text-xl italic text-white focus:outline-none resize-none h-24" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="Draft the terms..." />
+                        <div className="space-y-2">
+                            <label className="hazbin-display text-[#ffcc00] text-sm tracking-widest pl-2">Preamble (Description)</label>
+                            <textarea
+                                className="w-full bg-transparent text-xl italic text-[#ffcccb] focus:outline-none border-b-2 border-[#e52b50]/50 pb-2 px-2 resize-none h-20 placeholder-[#e52b50]/20"
+                                value={editingDeck.description}
+                                onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                                placeholder="Describe the eternal consequences..."
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="space-y-2">
+                                <label className="hazbin-display text-[#ffcc00] text-sm tracking-widest pl-2">Governing Protocol</label>
+                                <select
+                                    value={editingDeck.gameMode}
+                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
+                                    className="w-full bg-[#1a050f] border-2 border-[#e52b50] p-4 text-[#ffcc00] hazbin-display text-xl focus:outline-none rounded-2xl hover:border-[#ffcc00] transition-colors appearance-none text-center cursor-pointer shadow-inner"
+                                >
+                                    <option className="bg-[#1a050f]" value={GameMode.TRUTH_OR_DARE}>Truth Or Dare</option>
+                                    <option className="bg-[#1a050f]" value={GameMode.NEVER_HAVE_I_EVER}>Never Have I Ever</option>
+                                </select>
                             </div>
-                        ))}
+                            <div className="space-y-2">
+                                <label className="hazbin-display text-[#ffcc00] text-sm tracking-widest pl-2">Intensity Layer</label>
+                                <select
+                                    value={editingDeck.intensity}
+                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
+                                    className="w-full bg-[#1a050f] border-2 border-[#e52b50] p-4 text-[#ffcc00] hazbin-display text-xl focus:outline-none rounded-2xl hover:border-[#ffcc00] transition-colors appearance-none text-center cursor-pointer shadow-inner"
+                                >
+                                    <option className="bg-[#1a050f]" value={Intensity.SOFT}>SOFT LAYER</option>
+                                    <option className="bg-[#1a050f]" value={Intensity.HOT}>HOT LAYER</option>
+                                    <option className="bg-[#1a050f]" value={Intensity.VULGAR}>VULGAR LAYER</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
-                    <button onClick={addNewPromptToEditingDeck} className="w-full py-6 mt-4 border-2 border-dashed border-[#e52b50] text-[#e52b50] hover:bg-[#e52b50]/10 hover:text-white hazbin-display text-2xl transition-all rounded-xl">
-                        + Add Clause
-                    </button>
+                    <div className="flex-1 flex flex-col min-h-0 bg-black/20 rounded-3xl p-4 border border-[#e52b50]/20">
+                        <div className="flex justify-between items-center mb-6 px-4">
+                            <h3 className="text-3xl hazbin-display text-white hazbin-neon-gold">Binding Clauses ({editingDeck.prompts.length})</h3>
+                            <button
+                                onClick={addNewPromptToEditingDeck}
+                                className="py-2 px-6 border-2 border-[#ffcc00] text-[#ffcc00] hover:bg-[#ffcc00] hover:text-black transition-all hazbin-display rounded-full text-lg shadow-[0_0_10px_rgba(255,204,0,0.2)]"
+                            >
+                                + Add Clause
+                            </button>
+                        </div>
 
-                    <div className="flex gap-6 pt-6">
-                        <button onClick={() => setEditingDeck(null)} className="flex-1 py-4 text-xl hazbin-display rounded-full border border-[#e52b50] hover:bg-white/5">Rip it up</button>
-                        <button onClick={() => saveDeck(editingDeck)} className="flex-1 py-4 text-xl hazbin-display rounded-full bg-[#e52b50] text-white hover:bg-[#ff0055] border-2 border-[#ffcc00] shadow-[0_0_15px_#e52b50]">Sign in Blood</button>
+                        <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-4">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="hazbin-panel p-6 bg-[#1a050f]/50 border-2 group hover:border-white transition-colors">
+                                    <div className="flex justify-between items-center mb-4 border-b border-[#e52b50]/30 pb-4">
+                                        <div className="flex gap-6 items-center">
+                                            <select
+                                                className="bg-transparent text-[#ffcc00] hazbin-display text-2xl outline-none cursor-pointer hover:text-white transition-colors"
+                                                value={p.type}
+                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option className="bg-[#1a050f]" value="Truth">Truth</option><option className="bg-[#1a050f]" value="Dare">Dare</option></>
+                                                ) : (
+                                                    <option className="bg-[#1a050f]" value="NeverHaveIEver">NHIE</option>
+                                                )}
+                                            </select>
+                                            <div className="text-[#ffcc00] hazbin-display text-xl opacity-40 italic">[{editingDeck.intensity}]</div>
+                                        </div>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#e52b50] hover:text-red-500 hover:scale-125 transition-all text-3xl">✖</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent text-2xl italic text-white focus:outline-none resize-none h-28 placeholder-[#e52b50]/20"
+                                        value={p.text}
+                                        onChange={e => logic.updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="Draft the terms of this specific clause..."
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="flex gap-8 pt-8 border-t-4 border-[#ffcc00]/30">
+                        <button onClick={() => setEditingDeck(null)} className="flex-1 py-5 text-2xl hazbin-display rounded-full border-2 border-[#e52b50] text-[#e52b50] hover:bg-[#e52b50]/10 transition-all">Cancel Agreement</button>
+                        <button
+                            onClick={() => saveDeck(editingDeck)}
+                            className="flex-2 py-5 text-3xl hazbin-display rounded-full bg-[#e52b50] text-white border-2 border-[#ffcc00] shadow-[0_0_30px_rgba(229,43,80,0.8)] hover:scale-[1.03] transition-all active:scale-95 px-12"
+                        >
+                            Sign in Blood
+                        </button>
                     </div>
                 </div>
             )}

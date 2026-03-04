@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'PEACEFUL', desc: 'VILLAGE LIFE', color: '#55FF55', text: '#000000', icon: '🌿' },
@@ -213,6 +215,7 @@ export const MinecraftLayout: React.FC<{ children: React.ReactNode; activeTab: s
 
 export const MinecraftPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { intensity, setIntensity, prompt, setPrompt, history, activeDeckId, setActiveDeckId, customDecks, handleDraw } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!intensity && !prompt ? (
@@ -251,16 +254,66 @@ export const MinecraftPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             ) : !prompt ? (
-                <div className="flex flex-col items-center justify-center h-[60vh]">
-                    <div className="rpg-panel w-full text-center space-y-6">
-                        <div className="rpg-ribbon">QUEST STARTED</div>
-                        <div className="py-8"><div className="text-gray-400 text-sm mb-2 pixel-font">CURRENT MODE</div><div className="text-4xl gold-title">{intensity}</div></div>
-                        <div className="grid grid-cols-1 gap-4 px-4">
-                            <button onClick={() => handleDraw('Truth')} className="rpg-btn rpg-btn-primary py-4 text-xl">REVEAL TRUTH</button>
-                            <button onClick={() => handleDraw('Dare')} className="rpg-btn py-4 text-xl bg-[#c62828] border-top-[#ef5350] border-left-[#ef5350] shadow-[0_4px_0_#8e0000] active:shadow-none active:bg-[#b71c1c]">TAKE ACTION</button>
+                <div className="flex flex-col items-center justify-start h-full pt-4">
+                    <div className="rpg-panel w-full mb-6 relative">
+                        <div className="rpg-ribbon">INVENTORY</div>
+                        <div className="flex justify-between items-center mb-2 px-2">
+                            <h3 className="text-[10px] pixel-font text-gray-400">SELECT ITEM</h3>
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className="w-8 h-8 rpg-slot flex items-center justify-center hover:bg-[#333]"
+                            >
+                                🔍
+                            </button>
                         </div>
-                        <button onClick={() => setIntensity(null)} className="text-xs text-gray-500 hover:text-white mt-4 underline">ABANDON QUEST</button>
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={(id) => {
+                                const deck = customDecks.find(d => d.id === id);
+                                if (deck) logic.setGameMode(deck.gameMode);
+                                setActiveDeckId(id);
+                            }}
+                            accentColor="#ffb300"
+                        />
                     </div>
+
+                    <div className="rpg-panel w-full text-center space-y-4">
+                        <div className="rpg-ribbon">QUEST STARTED</div>
+                        <div className="py-4">
+                            <div className="text-gray-400 text-[10px] mb-1 pixel-font uppercase">Current Difficulty</div>
+                            <div className="text-3xl gold-title">{intensity}</div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 px-4">
+                            {logic.gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                                <button onClick={() => handleDraw('NeverHaveIEver')} className="rpg-btn rpg-btn-primary py-3 text-lg">NHIE QUEST</button>
+                            ) : (
+                                <>
+                                    <button onClick={() => handleDraw('Truth')} className="rpg-btn rpg-btn-primary py-3 text-lg">REVEAL TRUTH</button>
+                                    <button onClick={() => handleDraw('Dare')} className="rpg-btn py-3 text-lg bg-[#c62828] border-top-[#ef5350] border-left-[#ef5350] shadow-[0_4px_0_#8e0000] active:shadow-none active:bg-[#b71c1c]">TAKE ACTION</button>
+                                </>
+                            )}
+                        </div>
+                        <button onClick={() => setIntensity(null)} className="text-[10px] pixel-font text-gray-500 hover:text-white mt-2 underline uppercase tracking-widest">Abandon Quest</button>
+                    </div>
+
+                    <DeckSearchModal
+                        isOpen={isSearchOpen}
+                        onClose={() => setIsSearchOpen(false)}
+                        decks={customDecks}
+                        activeDeckId={activeDeckId}
+                        onSelect={(id) => {
+                            const deck = customDecks.find(d => d.id === id);
+                            if (deck) {
+                                logic.setGameMode(deck.gameMode);
+                                logic.setIntensity(deck.intensity);
+                            }
+                            setActiveDeckId(id);
+                        }}
+                        gameMode={logic.gameMode}
+                        intensity={intensity}
+                    />
                 </div>
             ) : (
                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="rpg-panel rpg-panel-gold mt-8">
@@ -287,7 +340,7 @@ export const MinecraftPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -295,14 +348,31 @@ export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="rpg-panel">
                         <div className="rpg-ribbon">INVENTORY</div>
                         <div className="flex justify-end mb-2">
-                            <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })} className="rpg-btn rpg-btn-primary px-4 py-1 text-sm">+ CRAFT NEW</button>
+                            <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })} className="rpg-btn rpg-btn-primary px-4 py-1 text-sm">+ CRAFT NEW</button>
                         </div>
                         <div className="space-y-2">
-                            {customDecks.length === 0 ? <div className="text-center py-8 text-gray-500">Inventory Empty</div> :
+                            {customDecks.length === 0 ? <div className="text-center py-8 text-gray-500 italic">No items found in your inventory...</div> :
                                 customDecks.map((deck: any) => (
-                                    <div key={deck.id} className="rpg-slot p-3 justify-between">
-                                        <div className="flex items-center gap-3"><span className="text-2xl">📘</span><div><div className="text-[#ffb300] text-lg">{deck.name || 'Unknown Item'}</div><div className="text-xs text-gray-500">{deck.prompts.length} Cards</div></div></div>
-                                        <div className="flex gap-2"><button onClick={() => setEditingDeck(deck)} className="rpg-btn px-2 py-1 text-xs">EDIT</button><button onClick={() => deleteDeck(deck.id)} className="rpg-btn rpg-btn-danger px-2 py-1 text-xs">DROP</button></div>
+                                    <div key={deck.id} className={`rpg-slot p-3 justify-between ${activeDeckId === deck.id ? 'active' : ''}`}>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-2xl">{activeDeckId === deck.id ? '🌟' : '📘'}</span>
+                                            <div>
+                                                <div className="text-[#ffb300] text-lg font-bold">{deck.name || 'Unknown Item'}</div>
+                                                <div className="text-[10px] text-gray-500 uppercase tracking-tighter">{deck.prompts.length} SHARDS | {deck.intensity}</div>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex gap-1">
+                                                <button onClick={() => setEditingDeck(deck)} className="text-[#ffb300] text-xs hover:underline">REPAIR</button>
+                                                <button onClick={() => deleteDeck(deck.id)} className="text-[#c62828] text-xs hover:underline">DISCARD</button>
+                                            </div>
+                                            <button
+                                                onClick={() => setActiveDeckId(deck.id)}
+                                                className={`rpg-btn px-3 py-1 text-[10px] ${activeDeckId === deck.id ? 'active opacity-50' : ''}`}
+                                            >
+                                                {activeDeckId === deck.id ? 'EQUIPPED' : 'EQUIP'}
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                         </div>
@@ -310,25 +380,72 @@ export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 </motion.div>
             ) : (
                 <div className="rpg-panel rpg-panel-gold">
-                    <div className="rpg-ribbon" style={{ background: '#ff8f00' }}>CRAFTING</div>
+                    <div className="rpg-ribbon" style={{ background: '#ff8f00' }}>ANVIL CRAFTING</div>
                     <div className="space-y-4 mt-2">
-                        <div className="space-y-2"><label className="text-xs text-[#ffb300] pixel-font">ITEM NAME</label><input className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="Name..." /></div>
-                        <div className="space-y-2"><label className="text-xs text-[#ffb300] pixel-font">LORE</label><textarea className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300] h-20" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="Description..." /></div>
                         <div className="space-y-2">
-                            <div className="flex justify-between items-center"><label className="text-xs text-[#ffb300] pixel-font">ENCHANTMENTS ({editingDeck.prompts.length})</label><button onClick={addNewPromptToEditingDeck} className="rpg-btn px-2 py-1 text-xs">+ ADD</button></div>
+                            <label className="text-xs text-[#ffb300] pixel-font">ITEM NAME</label>
+                            <input className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="Enter signature..." />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-xs text-[#ffb300] pixel-font">LORE</label>
+                            <textarea className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300] h-20" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="Item description..." />
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="space-y-2 flex-1">
+                                <label className="text-xs text-[#ffb300] pixel-font">MODE</label>
+                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]">
+                                    <option value="TruthOrDare">ADVENTURE (T/D)</option>
+                                    <option value="NeverHaveIEver">NHIE</option>
+                                </select>
+                            </div>
+                            <div className="space-y-2 flex-1">
+                                <label className="text-xs text-[#ffb300] pixel-font">LVL</label>
+                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]">
+                                    <option value="SOFT">PEACEFUL</option>
+                                    <option value="HOT">NETHER</option>
+                                    <option value="VULGAR">THE END</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                                <label className="text-xs text-[#ffb300] pixel-font">ENCHANTMENTS ({editingDeck.prompts.length})</label>
+                                <button onClick={addNewPromptToEditingDeck} className="rpg-btn px-2 py-1 text-xs">+ ENCHANT</button>
+                            </div>
                             <div className="max-h-[40vh] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                                 {editingDeck.prompts.map((p: any) => (
                                     <div key={p.id} className="rpg-slot p-2 gap-2 flex-col items-stretch">
                                         <div className="flex gap-2">
-                                            <select className="bg-[#222] text-white border border-[#555] text-xs p-1" value={p.type} onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value)}><option>Truth</option><option>Dare</option></select>
-                                            <input className="flex-1 bg-transparent border-b border-[#555] text-sm outline-none" value={p.text} onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)} placeholder="Effect..." />
-                                            <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#c62828] font-bold">×</button>
+                                            <select
+                                                className="bg-[#222] text-white border border-[#555] text-xs p-1"
+                                                value={p.type}
+                                                onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                            >
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                                ) : (
+                                                    <option value="NeverHaveIEver">NHIE</option>
+                                                )}
+                                            </select>
+                                            <div className="text-[#ffb300] text-[9px] pixel-font opacity-70 flex items-center px-2">{editingDeck.intensity}</div>
+                                            <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#c62828] font-black ml-auto">×</button>
                                         </div>
+                                        <textarea
+                                            className="flex-1 bg-transparent border-b border-[#555] text-sm outline-none resize-none py-1"
+                                            value={p.text}
+                                            onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                            placeholder="Item lore power..."
+                                        />
                                     </div>
                                 ))}
                             </div>
                         </div>
-                        <div className="flex gap-2 pt-2"><button onClick={() => setEditingDeck(null)} className="rpg-btn flex-1 py-2">CANCEL</button><button onClick={() => saveDeck(editingDeck)} className="rpg-btn rpg-btn-primary flex-1 py-2">CRAFT</button></div>
+                        <div className="flex gap-2 pt-2">
+                            <button onClick={() => setEditingDeck(null)} className="rpg-btn flex-1 py-3 text-sm">BACK</button>
+                            <button onClick={() => saveDeck(editingDeck)} className="rpg-btn rpg-btn-primary flex-1 py-3 text-sm">ENCHANT ITEM</button>
+                        </div>
                     </div>
                 </div>
             )}

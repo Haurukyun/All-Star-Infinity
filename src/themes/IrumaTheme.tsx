@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
+import { DeckCarousel } from '../components/DeckCarousel';
+import { DeckSearchModal } from '../components/DeckSearchModal';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'RANK 1 (ALEPH)', desc: 'MISFIT CLASS REGULAR', color: '#ffb300' },
@@ -222,32 +224,85 @@ export const IrumaIntensitySelector: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const IrumaPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
-    const { handleDraw, setIntensity } = logic;
+    const { intensity, handleDraw, setIntensity, activeDeckId, setActiveDeckId, customDecks, setGameMode, gameMode } = logic;
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full justify-center space-y-6 sm:space-y-8 p-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full justify-start space-y-6 sm:space-y-8 p-4 pt-8">
+            <div className="w-full mb-8">
+                <div className="flex justify-between items-center mb-2 px-2">
+                    <h3 className="text-sm font-black text-[#ffd700] uppercase tracking-widest drop-shadow-[0_2px_2px_#000]">Selected Grimoires</h3>
+                    <button
+                        onClick={() => setIsSearchOpen(true)}
+                        className="w-10 h-10 rounded-full bg-[#4a148c] border-2 border-[#ffd700] flex items-center justify-center shadow-[0_4px_0_rgba(0,0,0,0.5)] hover:scale-110 transition-transform"
+                    >
+                        🔍
+                    </button>
+                </div>
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={(id) => {
+                        const deck = customDecks.find(d => d.id === id);
+                        if (deck) setGameMode(deck.gameMode);
+                        setActiveDeckId(id);
+                    }}
+                    accentColor="#ffd700"
+                />
+            </div>
+
             <h2 className="text-4xl text-center font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000]">CHOOSE YOUR SPELL</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <button
-                    onClick={() => handleDraw('Truth')}
-                    className="aspect-square iruma-button flex flex-col justify-center items-center text-2xl sm:text-3xl font-black gap-4 group"
-                >
-                    <div className="text-5xl sm:text-6xl group-hover:scale-110 transition-transform">📖</div>
-                    TRUTH MAGIC
-                </button>
-                <button
-                    onClick={() => handleDraw('Dare')}
-                    className="aspect-square iruma-button flex flex-col justify-center items-center text-2xl sm:text-3xl font-black gap-4 group"
-                    style={{ background: '#d50000', borderColor: '#ffb300' }}
-                >
-                    <div className="text-5xl sm:text-6xl group-hover:scale-110 transition-transform">🔥</div>
-                    DARE MAGIC
-                </button>
+                {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
+                    <button
+                        onClick={() => handleDraw('NeverHaveIEver')}
+                        className="aspect-square iruma-button flex flex-col justify-center items-center text-2xl sm:text-3xl font-black gap-4 group col-span-1 sm:col-span-2"
+                        style={{ background: '#6a1b9a' }}
+                    >
+                        <div className="text-5xl sm:text-6xl group-hover:scale-110 transition-transform">🍷</div>
+                        NHIE MAGIC
+                    </button>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => handleDraw('Truth')}
+                            className="aspect-square iruma-button flex flex-col justify-center items-center text-2xl sm:text-3xl font-black gap-4 group"
+                        >
+                            <div className="text-5xl sm:text-6xl group-hover:scale-110 transition-transform">📖</div>
+                            TRUTH MAGIC
+                        </button>
+                        <button
+                            onClick={() => handleDraw('Dare')}
+                            className="aspect-square iruma-button flex flex-col justify-center items-center text-2xl sm:text-3xl font-black gap-4 group"
+                            style={{ background: '#d50000', borderColor: '#ffb300' }}
+                        >
+                            <div className="text-5xl sm:text-6xl group-hover:scale-110 transition-transform">🔥</div>
+                            DARE MAGIC
+                        </button>
+                    </>
+                )}
             </div>
 
             <button onClick={() => setIntensity(null)} className="w-full p-4 mt-8 text-white/70 font-bold hover:text-white rounded-xl transition-colors border border-white/20">
                 LOWER RANK ↩
             </button>
+
+            <DeckSearchModal
+                isOpen={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+                decks={customDecks}
+                activeDeckId={activeDeckId}
+                onSelect={(id) => {
+                    const deck = customDecks.find(d => d.id === id);
+                    if (deck) {
+                        setGameMode(deck.gameMode);
+                        setIntensity(deck.intensity);
+                    }
+                    setActiveDeckId(id);
+                }}
+                gameMode={gameMode}
+                intensity={intensity}
+            />
         </motion.div>
     );
 };
@@ -302,27 +357,117 @@ export const IrumaPlayButton: React.FC<{ label: string; onClick: () => void; isP
 };
 
 export const IrumaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { customDecks, activeDeckId, setActiveDeckId } = logic;
+    const { customDecks, activeDeckId, setActiveDeckId, setEditingDeck, editingDeck, generateId, deleteDeck, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
     return (
-        <div className="space-y-6 p-4">
-            <h2 className="text-4xl font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000] border-b-4 border-[#ffd700]/30 pb-2">GRIMOIRES</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {customDecks.map((deck: any) => (
-                    <button
-                        key={deck.id}
-                        onClick={() => setActiveDeckId(deck.id)}
-                        className={`text-left p-6 iruma-panel iruma-button flex flex-col ${activeDeckId === deck.id ? 'border-[#ffd700] bg-[#6a1b9a]' : 'border-[#4a148c] bg-[#2b1332]'}`}
-                    >
-                        <h3 className="text-2xl font-black mb-2 text-white">{deck.name}</h3>
-                        <p className="text-md opacity-80 mb-4 h-12 overflow-hidden">{deck.description}</p>
-                        <div className="flex justify-between items-center w-full mt-auto">
-                            <span className="bg-[#ff5722] px-3 py-1 rounded-full text-sm font-bold shadow-sm">{deck.prompts.length} SPELLS</span>
-                            {activeDeckId === deck.id && <span className="text-[#ffd700] font-black text-xl">★ ACTIVE</span>}
+        <AnimatePresence mode="wait">
+            {!editingDeck ? (
+                <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pt-4">
+                    <div className="flex justify-between items-end border-b-4 border-[#ffd700]/30 pb-2 mb-8">
+                        <h2 className="text-4xl font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000]">GRIMOIRES</h2>
+                        <button
+                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            className="iruma-button bg-[#ffd700] text-[#4a148c] px-4 py-2 text-sm"
+                        >
+                            + NEW SPELLS
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {customDecks.map((deck: any) => (
+                            <div
+                                key={deck.id}
+                                className={`text-left p-6 iruma-panel iruma-button flex flex-col ${activeDeckId === deck.id ? 'border-[#ffd700] bg-[#6a1b9a]' : 'border-[#4a148c] bg-[#2b1332]'}`}
+                            >
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="text-2xl font-black text-white">{deck.name || '???'}</h3>
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setEditingDeck(deck)} className="text-[#ffd700] text-xs font-bold hover:underline">REWRITE</button>
+                                        <button onClick={() => deleteDeck(deck.id)} className="text-red-400 text-xs font-bold hover:underline">BURN</button>
+                                    </div>
+                                </div>
+                                <p className="text-md opacity-80 mb-4 h-12 overflow-hidden">{deck.description}</p>
+                                <div className="flex justify-between items-center w-full mt-auto">
+                                    <span className="bg-[#ff5722] px-3 py-1 rounded-full text-sm font-bold shadow-sm">{deck.prompts.length} SPELLS</span>
+                                    <button
+                                        onClick={() => setActiveDeckId(deck.id)}
+                                        className={`px-3 py-1 rounded-lg text-xs font-black transition-all ${activeDeckId === deck.id ? 'bg-[#ffd700] text-[#4a148c]' : 'bg-black/20 text-white/40'}`}
+                                    >
+                                        {activeDeckId === deck.id ? 'EQUIPPED' : 'EQUIP'}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+            ) : (
+                <motion.div key="editor" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 pt-4 iruma-panel p-6">
+                    <h2 className="text-3xl font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000] border-b-2 border-[#ffd700]/20 pb-2">SPELLBOOK EDITOR</h2>
+                    <div className="space-y-4">
+                        <input
+                            className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-3 text-white font-bold rounded-xl outline-none focus:border-[#ffd700]"
+                            value={editingDeck.name}
+                            onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })}
+                            placeholder="BOOK TITLE"
+                        />
+                        <textarea
+                            className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-3 text-white font-bold rounded-xl outline-none focus:border-[#ffd700] h-24"
+                            value={editingDeck.description}
+                            onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })}
+                            placeholder="DESCRIPTION"
+                        />
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <label className="text-xs text-[#ffd700] font-black mb-1 block">GAME MODE</label>
+                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-2 text-white font-bold rounded-xl outline-none">
+                                    <option value="TruthOrDare">TRUTH/DARE</option>
+                                    <option value="NeverHaveIEver">NHIE</option>
+                                </select>
+                            </div>
+                            <div className="flex-1">
+                                <label className="text-xs text-[#ffd700] font-black mb-1 block">RANK (DIFF)</label>
+                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-2 text-white font-bold rounded-xl outline-none">
+                                    <option value="SOFT">ALEPH (SOFT)</option>
+                                    <option value="HOT">DALETH (HOT)</option>
+                                    <option value="VULGAR">YOD (VULGAR)</option>
+                                </select>
+                            </div>
                         </div>
-                    </button>
-                ))}
-            </div>
-        </div>
+
+                        <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+                            {editingDeck.prompts.map((p: any) => (
+                                <div key={p.id} className="p-4 border-2 border-[#ffd700]/10 bg-[#2b1332] rounded-xl space-y-3 relative">
+                                    <div className="flex justify-between items-center">
+                                        <select
+                                            className="bg-[#4a148c] text-white text-[10px] font-black border-2 border-[#ffd700]/30 px-2 py-1 rounded-lg outline-none"
+                                            value={p.type}
+                                            onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
+                                        >
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                            ) : (
+                                                <option value="NeverHaveIEver">NHIE</option>
+                                            )}
+                                        </select>
+                                        <span className="text-[10px] font-black bg-[#ffd700]/10 text-[#ffd700] px-3 py-1 rounded-full uppercase">{editingDeck.intensity}</span>
+                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 hover:text-white font-black text-xl">×</button>
+                                    </div>
+                                    <textarea
+                                        className="w-full bg-transparent border-b-2 border-[#ffd700]/10 text-white font-bold p-1 outline-none focus:border-[#ffd700] resize-none"
+                                        value={p.text}
+                                        onChange={e => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
+                                        placeholder="SPELL WORDS..."
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={addNewPromptToEditingDeck} className="w-full py-4 iruma-button bg-[#6a1b9a] text-white font-black">+ SUMMON NEW SPELL</button>
+                        <div className="flex gap-4">
+                            <button onClick={() => setEditingDeck(null)} className="flex-1 py-4 text-white/50 font-black hover:text-white">CANCEL</button>
+                            <button onClick={() => saveDeck(editingDeck)} className="flex-1 iruma-button bg-[#ffd700] text-[#4a148c] font-black">SEAL GRIMOIRE</button>
+                        </div>
+                    </div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 };
 
