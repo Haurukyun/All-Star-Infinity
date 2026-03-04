@@ -4,35 +4,37 @@ import MainMenu from './MainMenu';
 import { useGameLogic } from './hooks/useGameLogic';
 import Layout from './components/Layout';
 import { getThemeDefinition } from './themes';
-import { ThemeProvider } from './theme/ThemeContext';
+import { ThemeProvider, useTheme } from './theme/ThemeContext';
 import ThemeSelector from './components/ThemeSelector';
 
+
+const ThemedApp: React.FC<{ logic: any }> = ({ logic }) => {
+  const { currentThemeDefinition: themeDef } = useTheme();
+
+  if (logic.view === 'menu') {
+    return <MainMenu logic={logic} />;
+  }
+
+  const LayoutComponent = themeDef.LayoutComponent || Layout;
+
+  return (
+    <LayoutComponent
+      activeTab={logic.activeTab}
+      setActiveTab={logic.setActiveTab}
+      logic={logic}
+    >
+      <UnifiedGame logic={logic} />
+    </LayoutComponent>
+  );
+};
 
 const App: React.FC = () => {
   const logic = useGameLogic();
 
-  if (logic.view === 'menu') {
-    return (
-      <ThemeProvider>
-        <ThemeSelector />
-        <MainMenu logic={logic} />
-      </ThemeProvider>
-    );
-  }
-
-  const themeDef = getThemeDefinition(logic.theme);
-  const LayoutComponent = themeDef.LayoutComponent || Layout;
-
   return (
     <ThemeProvider>
       <ThemeSelector />
-      <LayoutComponent
-        activeTab={logic.activeTab}
-        setActiveTab={logic.setActiveTab}
-        logic={logic}
-      >
-        <UnifiedGame logic={logic} />
-      </LayoutComponent>
+      <ThemedApp logic={logic} />
     </ThemeProvider>
   );
 };

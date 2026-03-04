@@ -42,7 +42,8 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         }
     }, [gameMode, intensity, prompt, handleDraw]);
 
-    const themeDef = getThemeDefinition(theme);
+    const themeDef = currentThemeDefinition;
+    console.log('Rendering UI with active theme from context:', themeDef.name);
 
     // Default Views if Theme doesn't provide them
     const DefaultIntensitySelector = () => (

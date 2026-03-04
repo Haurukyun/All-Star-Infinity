@@ -1,6 +1,7 @@
 import React from 'react';
 import { Theme } from '../types';
 import { getThemeDefinition, themeRegistry } from '../themes';
+import { useTheme } from '../theme/ThemeContext';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,7 +11,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, logic }) => {
-  const themeDef = getThemeDefinition(logic.theme);
+  const { currentThemeDefinition: themeDef } = useTheme();
 
   const tabs = [
     { id: 'play', label: themeDef.tabLabels?.play || 'PLAY' },
