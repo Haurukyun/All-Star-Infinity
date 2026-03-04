@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'EASY MODE', desc: 'SLOW TEMPO', color: '#39C5BB' },
@@ -278,40 +279,18 @@ export const VocaloidHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const VocaloidThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { setTheme } = logic;
-    // Hardcoded theme list based on index.ts registration
-    const themeLabels: Record<string, string> = {
-        [Theme.PERSONA]: 'PHANTOM STAGE',
-        [Theme.MINECRAFT]: 'BLOCK WORLD',
-        [Theme.DANGANRONPA]: 'DESPAIR HIGH',
-        [Theme.OMORI]: 'DREAM SPACE',
-        [Theme.KIRBY]: 'DREAM LAND',
-        [Theme.POKEMON]: 'KANTO STADIUM',
-        [Theme.ANIMAL_CROSSING]: 'ISLAND RESORT',
-        [Theme.SKYRIM]: 'TAMIREL',
-        [Theme.SONIC]: 'GREEN HILL',
-        [Theme.SANRIO]: 'HELLO KITTY',
-        [Theme.CYBERPUNK]: 'NIGHT CITY',
-        [Theme.UNDERTALE]: 'UNDERGROUND',
-        [Theme.FALLOUT]: 'WASTELAND',
-        [Theme.HAZBIN]: 'PENTAGRAM CITY',
-        [Theme.VOCALOID]: 'VIRTUAL SINGER',
-        [Theme.FNAF]: 'FREDDY FAZBEAR',
-        [Theme.IRUMA]: 'BABYLS ACADEMY',
-        [Theme.ARCANE]: 'PILTOVER & ZAUN'
-    };
-
+    const { setTheme, theme } = logic;
     return (
         <div className="space-y-6 pb-20 px-4 sm:px-0">
             <h2 className="text-2xl sm:text-3xl font-black text-white border-b-2 border-[#39C5BB] pb-2 drop-shadow-[0_0_5px_rgba(57,197,187,0.8)]">CONNECT TO STAGE</h2>
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                {Object.keys(themeLabels).map(t => (
+                {allThemesList.map(t => (
                     <button
-                        key={t}
-                        onClick={() => setTheme(t as Theme)}
-                        className={`p-3 sm:p-4 rounded-xl font-bold text-center transition-all bg-[#1a1a1a] hover:bg-[#39C5BB] hover:text-[#111] text-xs sm:text-base ${t === Theme.VOCALOID ? 'border-2 border-[#39C5BB] text-[#39C5BB] shadow-[0_0_10px_rgba(57,197,187,0.5)]' : 'border border-white/10 text-white/80'}`}
+                        key={t.id}
+                        onClick={() => setTheme(t.id)}
+                        className={`p-3 sm:p-4 rounded-xl font-bold text-center transition-all bg-[#1a1a1a] hover:bg-[#39C5BB] hover:text-[#111] text-xs sm:text-base ${theme === t.id ? 'border-2 border-[#39C5BB] text-[#39C5BB] shadow-[0_0_10px_rgba(57,197,187,0.5)]' : 'border border-white/10 text-white/80'}`}
                     >
-                        {themeLabels[t]}
+                        {t.label}
                     </button>
                 ))}
             </div>

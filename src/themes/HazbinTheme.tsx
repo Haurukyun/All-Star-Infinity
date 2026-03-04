@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'Welcome Lobby', desc: 'Mild eternal torment.', color: '#fffb00' },
@@ -329,37 +330,17 @@ export const HazbinHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const HazbinThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
-    const themeLabels: Record<string, string> = {
-        [Theme.PERSONA]: 'The Phantom Thieves',
-        [Theme.MINECRAFT]: 'The Overworld',
-        [Theme.DANGANRONPA]: 'Hope\'s Peak',
-        [Theme.OMORI]: 'Headspace',
-        [Theme.KIRBY]: 'Dream Land',
-        [Theme.POKEMON]: 'Kanto Region',
-        [Theme.ANIMAL_CROSSING]: 'Nook Inc. Island',
-        [Theme.SKYRIM]: 'Tamriel',
-        [Theme.SONIC]: 'Green Hill Zone',
-        [Theme.SANRIO]: 'Hello Kitty Town',
-        [Theme.CYBERPUNK]: 'Night City',
-        [Theme.UNDERTALE]: 'The Underground',
-        [Theme.FALLOUT]: 'The Wasteland',
-        [Theme.HAZBIN]: 'Pentagram City',
-        [Theme.VOCALOID]: 'Virtual Singer',
-        [Theme.FNAF]: 'Freddy Fazbear',
-        [Theme.IRUMA]: 'Babyls Academy',
-        [Theme.ARCANE]: 'Piltover & Zaun',
-    };
     return (
         <div className="space-y-8 h-full flex flex-col items-center">
             <h2 className="text-4xl hazbin-display hazbin-neon mb-4">CHOOSE YOUR RING OF HELL</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-12 overflow-y-auto custom-scrollbar pr-4 w-full max-w-4xl">
-                {Object.values(Theme).filter(t => t !== Theme.NONE).map(t => (
+                {allThemesList.map(t => (
                     <button
-                        key={t}
-                        onClick={() => setTheme(t)}
-                        className={`text-center py-4 px-6 text-xl transition-all rounded-lg ${theme === t ? 'bg-[#e52b50] text-white border-2 border-[#ffcc00] shadow-[0_0_15px_#e52b50]' : 'bg-[#1a050f] border border-[#e52b50]/30 hover:border-[#e52b50] hover:bg-[#e52b50]/10'}`}
+                        key={t.id}
+                        onClick={() => setTheme(t.id)}
+                        className={`text-center py-4 px-6 text-xl transition-all rounded-lg ${theme === t.id ? 'bg-[#e52b50] text-white border-2 border-[#ffcc00] shadow-[0_0_15px_#e52b50]' : 'bg-[#1a050f] border border-[#e52b50]/30 hover:border-[#e52b50] hover:bg-[#e52b50]/10'}`}
                     >
-                        <span className="hazbin-display tracking-widest">{themeLabels[t] || t.toUpperCase()}</span>
+                        <span className="hazbin-display tracking-widest">{t.label}</span>
                     </button>
                 ))}
             </div>

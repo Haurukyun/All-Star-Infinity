@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: '* Easy', desc: 'No one gets hurt.', color: '#ffffff' },
@@ -293,34 +294,14 @@ export const UndertaleHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const UndertaleThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
-    const themeLabels: Record<string, string> = {
-        [Theme.PERSONA]: 'Persona',
-        [Theme.MINECRAFT]: 'Minecraft',
-        [Theme.DANGANRONPA]: 'Danganronpa',
-        [Theme.OMORI]: 'Omori',
-        [Theme.KIRBY]: 'Kirby',
-        [Theme.POKEMON]: 'Pokemon',
-        [Theme.ANIMAL_CROSSING]: 'Animal Crossing',
-        [Theme.SKYRIM]: 'Skyrim',
-        [Theme.SONIC]: 'Sonic',
-        [Theme.SANRIO]: 'Sanrio',
-        [Theme.CYBERPUNK]: 'Cyberpunk',
-        [Theme.UNDERTALE]: 'Undertale',
-        [Theme.FALLOUT]: 'Fallout',
-        [Theme.HAZBIN]: 'Hazbin Hotel',
-        [Theme.VOCALOID]: 'Vocaloid',
-        [Theme.FNAF]: 'FNAF',
-        [Theme.IRUMA]: 'Iruma-kun',
-        [Theme.ARCANE]: 'Arcane',
-    };
     return (
         <div className="space-y-6 h-full flex flex-col">
             <h2 className="text-4xl mb-8">* SELECT DIMENSION</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-12 pb-8 overflow-y-auto custom-scrollbar pr-4">
-                {Object.values(Theme).filter(t => t !== Theme.NONE).map(t => (
-                    <button key={t} onClick={() => setTheme(t)} className={`text-left text-2xl relative flex items-center ${theme === t ? 'text-white' : 'text-gray-500 border-transparent hover:text-white'}`}>
-                        <span className={`absolute -left-8 text-[#ff0000] ${theme === t ? 'opacity-100' : 'opacity-0'}`}>♥</span>
-                        * {themeLabels[t] || t}
+                {allThemesList.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`text-left text-2xl relative flex items-center ${theme === t.id ? 'text-white' : 'text-gray-500 border-transparent hover:text-white'}`}>
+                        <span className={`absolute -left-8 text-[#ff0000] ${theme === t.id ? 'opacity-100' : 'opacity-0'}`}>♥</span>
+                        * {t.label}
                     </button>
                 ))}
             </div>

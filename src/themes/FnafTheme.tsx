@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'CAM 1A-SHOW STAGE', desc: 'LOW RISK', color: '#ffffff' },
@@ -355,27 +356,7 @@ export const FnafHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
     );
 };
 
-// Hardcoded themes list fallback for layout compatibility
-const THEME_LIST = [
-    { id: Theme.PERSONA, label: 'PHANTOM THIEF' },
-    { id: Theme.MINECRAFT, label: 'BLOCKY WORLD' },
-    { id: Theme.DANGANRONPA, label: 'KILLING HARMONY' },
-    { id: Theme.OMORI, label: 'DREAM WORLD' },
-    { id: Theme.KIRBY, label: 'DREAM LAND' },
-    { id: Theme.POKEMON, label: 'KANTO REGION' },
-    { id: Theme.ANIMAL_CROSSING, label: 'ISLAND PARADISE' },
-    { id: Theme.SKYRIM, label: 'SKYRIM' },
-    { id: Theme.SONIC, label: 'SONIC MANIA' },
-    { id: Theme.SANRIO, label: 'SWEET WORLD' },
-    { id: Theme.CYBERPUNK, label: 'NIGHT CITY' },
-    { id: Theme.UNDERTALE, label: 'THE UNDERGROUND' },
-    { id: Theme.FALLOUT, label: 'THE WASTELAND' },
-    { id: Theme.HAZBIN, label: 'PENTAGRAM CITY' },
-    { id: Theme.VOCALOID, label: 'VIRTUAL SINGER' },
-    { id: Theme.FNAF, label: 'FREDDY FAZBEAR' },
-    { id: Theme.IRUMA, label: 'BABYLS ACADEMY' },
-    { id: Theme.ARCANE, label: 'PILTOVER & ZAUN' }
-];
+
 
 export const FnafThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme } = logic;
@@ -383,7 +364,7 @@ export const FnafThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         <div className="space-y-6 pt-6 sm:pt-12 px-4 sm:px-12 w-full max-w-4xl mx-auto">
             <h2 className="text-3xl sm:text-5xl font-bold mb-8 sm:mb-12 border-b-2 border-white/30 pb-4 fnaf-flicker">CONNECT TO OTHER LOCATIONS</h2>
             <div className="space-y-2">
-                {THEME_LIST.map(t => (
+                {allThemesList.map(t => (
                     <button
                         key={t.id}
                         onClick={() => setTheme(t.id)}

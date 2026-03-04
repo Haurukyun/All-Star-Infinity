@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'NOVICE', desc: 'Apprentice Level', color: '#FFFFFF', text: '#FFFFFF' },
@@ -201,27 +202,8 @@ export const SkyrimThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         <div className="max-w-4xl mx-auto text-center">
             <h2 className="skyrim-font-title text-3xl mb-12">WORLD MAP</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 pb-12">
-                {[
-                    { id: Theme.PERSONA, label: 'TOKYO' },
-                    { id: Theme.MINECRAFT, label: 'OVERWORLD' },
-                    { id: Theme.DANGANRONPA, label: "HOPE'S PEAK" },
-                    { id: Theme.OMORI, label: 'HEADSPACE' },
-                    { id: Theme.KIRBY, label: 'POPSTAR' },
-                    { id: Theme.POKEMON, label: 'KANTO' },
-                    { id: Theme.ANIMAL_CROSSING, label: 'PARADISE' },
-                    { id: Theme.SKYRIM, label: 'SKYRIM' },
-                    { id: Theme.SONIC, label: 'SONIC' },
-                    { id: Theme.SANRIO, label: 'SANRIO' },
-                    { id: Theme.CYBERPUNK, label: 'NIGHT CITY' },
-                    { id: Theme.UNDERTALE, label: 'UNDERGROUND' },
-                    { id: Theme.FALLOUT, label: 'WASTELAND' },
-                    { id: Theme.HAZBIN, label: 'HELL' },
-                    { id: Theme.VOCALOID, label: 'VOCALOID' },
-                    { id: Theme.FNAF, label: 'FAZBEAR' },
-                    { id: Theme.IRUMA, label: 'BABYLS' },
-                    { id: Theme.ARCANE, label: 'PILTOVER' },
-                ].map(t => (
-                    <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`group relative p-6 border border-white/10 hover:border-white/50 transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}>
+                {allThemesList.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`group relative p-6 border border-white/10 hover:border-white/50 transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}>
                         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black px-2"><div className="w-2 h-2 bg-white rotate-45 group-hover:bg-yellow-100 transition-colors"></div></div>
                         <span className="skyrim-font-title text-xl tracking-widest group-hover:text-yellow-100 transition-colors">{t.label}</span>
                     </button>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'PEACEFUL', desc: 'VILLAGE LIFE', color: '#55FF55', text: '#000000', icon: '🌿' },
@@ -360,33 +361,22 @@ export const MinecraftHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const MinecraftThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { theme, setTheme } = logic;
+    const iconMap: Record<string, string> = {
+        [Theme.PERSONA]: '🎭', [Theme.MINECRAFT]: '⛏️', [Theme.DANGANRONPA]: '⚖️',
+        [Theme.OMORI]: '💡', [Theme.KIRBY]: '⭐', [Theme.POKEMON]: '🔴',
+        [Theme.ANIMAL_CROSSING]: '🏝️', [Theme.SKYRIM]: '🐉', [Theme.SONIC]: '💨',
+        [Theme.SANRIO]: '🎀', [Theme.CYBERPUNK]: '🌆', [Theme.UNDERTALE]: '❤️',
+        [Theme.FALLOUT]: '☢️', [Theme.HAZBIN]: '😈', [Theme.VOCALOID]: '🎤',
+        [Theme.FNAF]: '🐻', [Theme.IRUMA]: '🦇', [Theme.ARCANE]: '⚙️',
+    };
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="rpg-panel rpg-panel-gold">
                 <div className="rpg-ribbon" style={{ background: '#ff8f00' }}>REALM SELECT</div>
                 <div className="grid grid-cols-2 gap-3 mt-4">
-                    {[
-                        { id: Theme.PERSONA, label: 'PHANTOM', icon: '🎭' },
-                        { id: Theme.MINECRAFT, label: 'BLOCKY', icon: '⛏️' },
-                        { id: Theme.DANGANRONPA, label: 'DESPAIR', icon: '⚖️' },
-                        { id: Theme.OMORI, label: 'DREAM', icon: '💡' },
-                        { id: Theme.KIRBY, label: 'POPSTAR', icon: '⭐' },
-                        { id: Theme.POKEMON, label: 'KANTO', icon: '🔴' },
-                        { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', icon: '🏝️' },
-                        { id: Theme.SKYRIM, label: 'SKYRIM', icon: '🐉' },
-                        { id: Theme.SONIC, label: 'SONIC', icon: '💨' },
-                        { id: Theme.SANRIO, label: 'SANRIO', icon: '🎀' },
-                        { id: Theme.CYBERPUNK, label: 'NEON', icon: '🌆' },
-                        { id: Theme.UNDERTALE, label: 'SOUL', icon: '❤️' },
-                        { id: Theme.FALLOUT, label: 'VAULT', icon: '☢️' },
-                        { id: Theme.HAZBIN, label: 'HELL', icon: '😈' },
-                        { id: Theme.VOCALOID, label: 'SINGER', icon: '🎤' },
-                        { id: Theme.FNAF, label: 'BEAR', icon: '🐻' },
-                        { id: Theme.IRUMA, label: 'DEMON', icon: '🦇' },
-                        { id: Theme.ARCANE, label: 'HEX', icon: '⚙️' },
-                    ].map(t => (
-                        <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`rpg-slot flex-col p-4 gap-2 hover:bg-[#333] ${theme === t.id ? 'active' : ''}`}>
-                            <span className="text-3xl">{t.icon}</span>
+                    {allThemesList.map(t => (
+                        <button key={t.id} onClick={() => setTheme(t.id)} className={`rpg-slot flex-col p-4 gap-2 hover:bg-[#333] ${theme === t.id ? 'active' : ''}`}>
+                            <span className="text-3xl">{iconMap[t.id] || '⭐'}</span>
                             <span className="pixel-font text-xs text-[#ffb300]">{t.label}</span>
                         </button>
                     ))}

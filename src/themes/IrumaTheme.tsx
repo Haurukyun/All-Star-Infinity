@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'RANK 1 (ALEPH)', desc: 'MISFIT CLASS REGULAR', color: '#ffb300' },
@@ -345,26 +346,6 @@ export const IrumaHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
     );
 };
 
-const THEME_LIST = [
-    { id: Theme.PERSONA, label: 'PHANTOM THIEF' },
-    { id: Theme.MINECRAFT, label: 'BLOCKY WORLD' },
-    { id: Theme.DANGANRONPA, label: 'KILLING HARMONY' },
-    { id: Theme.OMORI, label: 'DREAM WORLD' },
-    { id: Theme.KIRBY, label: 'DREAM LAND' },
-    { id: Theme.POKEMON, label: 'KANTO REGION' },
-    { id: Theme.ANIMAL_CROSSING, label: 'ISLAND PARADISE' },
-    { id: Theme.SKYRIM, label: 'SKYRIM' },
-    { id: Theme.SONIC, label: 'SONIC MANIA' },
-    { id: Theme.SANRIO, label: 'SWEET WORLD' },
-    { id: Theme.CYBERPUNK, label: 'NIGHT CITY' },
-    { id: Theme.UNDERTALE, label: 'THE UNDERGROUND' },
-    { id: Theme.FALLOUT, label: 'THE WASTELAND' },
-    { id: Theme.HAZBIN, label: 'PENTAGRAM CITY' },
-    { id: Theme.VOCALOID, label: 'VIRTUAL SINGER' },
-    { id: Theme.FNAF, label: 'FREDDY FAZBEAR' },
-    { id: Theme.IRUMA, label: 'BABYLS ACADEMY' },
-    { id: Theme.ARCANE, label: 'PILTOVER & ZAUN' }
-];
 
 export const IrumaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme } = logic;
@@ -372,7 +353,7 @@ export const IrumaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         <div className="space-y-6 p-4">
             <h2 className="text-3xl sm:text-4xl font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000] border-b-4 border-[#ffd700]/30 pb-2">OTHERWORLD GATES</h2>
             <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-4">
-                {THEME_LIST.map(t => (
+                {allThemesList.map(t => (
                     <button
                         key={t.id}
                         onClick={() => setTheme(t.id)}

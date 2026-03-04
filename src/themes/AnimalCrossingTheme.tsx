@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'DAILY TASK', desc: 'EASY PEASY', color: '#88E0EF', text: '#546E7A', icon: '✈️' },
@@ -310,34 +311,14 @@ export const AnimalCrossingHistoryScreen: React.FC<{ logic: any }> = ({ logic })
 
 export const AnimalCrossingThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
-    const themes = [
-        { id: Theme.PERSONA, label: 'Tokyo', color: '#EF5350' },
-        { id: Theme.MINECRAFT, label: 'Overworld', color: '#66BB6A' },
-        { id: Theme.DANGANRONPA, label: 'Academy', color: '#AB47BC' },
-        { id: Theme.OMORI, label: 'Headspace', color: '#5C6BC0' },
-        { id: Theme.KIRBY, label: 'Popstar', color: '#EC407A' },
-        { id: Theme.POKEMON, label: 'Kanto', color: '#42A5F5' },
-        { id: Theme.ANIMAL_CROSSING, label: 'Island', color: '#9CCC65' },
-        { id: Theme.SKYRIM, label: 'Skyrim', color: '#B0BEC5' },
-        { id: Theme.SONIC, label: 'Sonic', color: '#1E90FF' },
-        { id: Theme.SANRIO, label: 'Sanrio', color: '#FF69B4' },
-        { id: Theme.CYBERPUNK, label: 'Night City', color: '#4DD0E1' },
-        { id: Theme.UNDERTALE, label: 'Underground', color: '#9E9E9E' },
-        { id: Theme.FALLOUT, label: 'Wasteland', color: '#81C784' },
-        { id: Theme.HAZBIN, label: 'Pentagram', color: '#E57373' },
-        { id: Theme.VOCALOID, label: 'Stage', color: '#4DD0E1' },
-        { id: Theme.FNAF, label: 'Pizzeria', color: '#795548' },
-        { id: Theme.IRUMA, label: 'Babyls', color: '#BA68C8' },
-        { id: Theme.ARCANE, label: 'Piltover', color: '#7986CB' },
-    ];
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <div className="ac-panel p-4 bg-[#E1BEE7]">
                 <div className="flex items-center gap-2 mb-4"><span className="text-2xl">✈️</span><h2 className="text-xl font-bold text-[#8E24AA]">Dodo Airlines</h2></div>
                 <p className="text-sm text-[#8E24AA] mb-4 font-bold">Where would you like to go?</p>
                 <div className="grid grid-cols-2 gap-3">
-                    {themes.map(t => (
-                        <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`ac-card flex flex-col items-center justify-center gap-2 py-4 hover:scale-105 transition-transform ${theme === t.id ? 'ring-4 ring-[#AB47BC]' : ''}`}>
+                    {allThemesList.map(t => (
+                        <button key={t.id} onClick={() => setTheme(t.id)} className={`ac-card flex flex-col items-center justify-center gap-2 py-4 hover:scale-105 transition-transform ${theme === t.id ? 'ring-4 ring-[#AB47BC]' : ''}`}>
                             <div className="w-8 h-8 rounded-full" style={{ backgroundColor: t.color }}></div>
                             <span className="font-bold text-sm text-[#5D4037]">{t.label}</span>
                         </button>

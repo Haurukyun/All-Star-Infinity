@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'MODERATE', desc: 'LOW THREAT LEVEL', color: '#00f0ff', secondary: '#fcee0a', icon: '📶' },
@@ -410,33 +411,13 @@ export const CyberpunkHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const CyberpunkThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
-    const themeLabels: Record<string, string> = {
-        [Theme.PERSONA]: 'PERSONA 5',
-        [Theme.MINECRAFT]: 'MINECRAFT',
-        [Theme.DANGANRONPA]: 'DANGANRONPA',
-        [Theme.OMORI]: 'OMORI',
-        [Theme.KIRBY]: 'KIRBY',
-        [Theme.POKEMON]: 'POKÉMON',
-        [Theme.ANIMAL_CROSSING]: 'ANIMAL CROSSING',
-        [Theme.SKYRIM]: 'SKYRIM',
-        [Theme.SONIC]: 'SONIC MANIA',
-        [Theme.SANRIO]: 'SANRIO',
-        [Theme.CYBERPUNK]: 'CYBERPUNK 2077',
-        [Theme.UNDERTALE]: 'UNDERTALE',
-        [Theme.FALLOUT]: 'FALLOUT',
-        [Theme.HAZBIN]: 'HAZBIN HOTEL',
-        [Theme.VOCALOID]: 'VOCALOID',
-        [Theme.FNAF]: 'FNAF',
-        [Theme.IRUMA]: 'IRUMA-KUN',
-        [Theme.ARCANE]: 'ARCANE',
-    };
     return (
         <div className="space-y-6">
             <h2 className="text-2xl font-bold tracking-widest text-[#00f0ff] border-b border-[#00f0ff]/30 pb-2">DATABASE</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-8">
-                {Object.values(Theme).filter(t => t !== Theme.NONE).map(t => (
-                    <button key={t} onClick={() => setTheme(t)} className={`cyber-button text-left text-sm py-4 ${theme === t ? 'cyan active text-black font-bold' : ''}`}>
-                        {themeLabels[t] || t.toUpperCase()}
+                {allThemesList.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`cyber-button text-left text-sm py-4 ${theme === t.id ? 'cyan active text-black font-bold' : ''}`}>
+                        {t.label.toUpperCase()}
                     </button>
                 ))}
             </div>

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'WHITE SPACE', desc: 'CALM AND EMPTY', color: '#FFFFFF', text: '#000000' },
@@ -259,39 +260,14 @@ export const OmoriHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const OmoriThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
-    const { setTheme } = logic;
-    const themes = [
-        { id: Theme.PERSONA, label: 'PHANTOM THIEF' },
-        { id: Theme.MINECRAFT, label: 'BLOCKY WORLD' },
-        { id: Theme.DANGANRONPA, label: 'KILLING HARMONY' },
-        { id: Theme.OMORI, label: 'DREAM WORLD' },
-        { id: Theme.KIRBY, label: 'DREAM LAND' },
-        { id: Theme.POKEMON, label: 'KANTO REGION' },
-        { id: Theme.ANIMAL_CROSSING, label: 'ISLAND PARADISE' },
-        { id: Theme.SKYRIM, label: 'SKYRIM' },
-    ];
+    const { setTheme, theme } = logic;
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <h2 className="text-3xl border-b-2 border-black pb-1">REALITY CHECK</h2>
             <div className="grid grid-cols-1 gap-4">
-                <button onClick={() => setTheme(Theme.PERSONA)} className="omori-button py-6 text-xl">PHANTOM THIEF</button>
-                <button onClick={() => setTheme(Theme.MINECRAFT)} className="omori-button py-6 text-xl">BLOCKY WORLD</button>
-                <button onClick={() => setTheme(Theme.DANGANRONPA)} className="omori-button py-6 text-xl">KILLING HARMONY</button>
-                <button onClick={() => setTheme(Theme.OMORI)} className="omori-button py-6 text-xl active">DREAM WORLD</button>
-                <button onClick={() => setTheme(Theme.KIRBY)} className="omori-button py-6 text-xl">DREAM LAND</button>
-                <button onClick={() => setTheme(Theme.POKEMON)} className="omori-button py-6 text-xl">KANTO REGION</button>
-                <button onClick={() => setTheme(Theme.ANIMAL_CROSSING)} className="omori-button py-6 text-xl">ISLAND PARADISE</button>
-                <button onClick={() => setTheme(Theme.SKYRIM)} className="omori-button py-6 text-xl">SKYRIM</button>
-                <button onClick={() => setTheme(Theme.SONIC)} className="omori-button py-6 text-xl">SONIC MANIA</button>
-                <button onClick={() => setTheme(Theme.SANRIO)} className="omori-button py-6 text-xl">SWEET WORLD</button>
-                <button onClick={() => setTheme(Theme.CYBERPUNK)} className="omori-button py-6 text-xl">NIGHT CITY</button>
-                <button onClick={() => setTheme(Theme.UNDERTALE)} className="omori-button py-6 text-xl">THE UNDERGROUND</button>
-                <button onClick={() => setTheme(Theme.FALLOUT)} className="omori-button py-6 text-xl">THE WASTELAND</button>
-                <button onClick={() => setTheme(Theme.HAZBIN)} className="omori-button py-6 text-xl">PENTAGRAM CITY</button>
-                <button onClick={() => setTheme(Theme.VOCALOID)} className="omori-button py-6 text-xl">VIRTUAL SINGER</button>
-                <button onClick={() => setTheme(Theme.FNAF)} className="omori-button py-6 text-xl">FREDDY FAZBEAR</button>
-                <button onClick={() => setTheme(Theme.IRUMA)} className="omori-button py-6 text-xl">BABYLS ACADEMY</button>
-                <button onClick={() => setTheme(Theme.ARCANE)} className="omori-button py-6 text-xl">PILTOVER & ZAUN</button>
+                {allThemesList.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`omori-button py-6 text-xl ${theme === t.id ? 'active' : ''}`}>{t.label.toUpperCase()}</button>
+                ))}
             </div>
         </motion.div>
     );

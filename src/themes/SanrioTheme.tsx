@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
   { id: Intensity.SOFT, title: 'HELLO KITTY', desc: 'SWEET GARDEN', color: '#B3E5FC', secondary: '#29B6F6', icon: '🎀' },
@@ -375,28 +376,18 @@ export const SanrioHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 };
 
 export const SanrioThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
-  const { setTheme } = logic;
+  const { setTheme, theme } = logic;
   return (
     <div className="space-y-6">
       <h2 className="sanrio-title text-3xl text-center mb-6">TRAVEL MAP</h2>
       <div className="grid grid-cols-1 gap-4 pb-4">
-        <button onClick={() => setTheme(Theme.PERSONA)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#FCE4EC] hover:scale-[1.02] transition-all text-center">PHANTOM THIEF</button>
-        <button onClick={() => setTheme(Theme.MINECRAFT)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F1F8E9] hover:scale-[1.02] transition-all text-center">BLOCKY WORLD</button>
-        <button onClick={() => setTheme(Theme.DANGANRONPA)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F3E5F5] hover:scale-[1.02] transition-all text-center">KILLING HARMONY</button>
-        <button onClick={() => setTheme(Theme.OMORI)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E8EAF6] hover:scale-[1.02] transition-all text-center">DREAM WORLD</button>
-        <button onClick={() => setTheme(Theme.KIRBY)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#FCE4EC] hover:scale-[1.02] transition-all text-center">KIRBY'S DREAM</button>
-        <button onClick={() => setTheme(Theme.SANRIO)} className="sanrio-button pink w-full py-5 text-xl tracking-wider">SWEET WORLD</button>
-        <button onClick={() => setTheme(Theme.POKEMON)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E3F2FD] hover:scale-[1.02] transition-all text-center">POKéMON WORLD</button>
-        <button onClick={() => setTheme(Theme.SKYRIM)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#ECEFF1] hover:scale-[1.02] transition-all text-center">SKYRIM</button>
-        <button onClick={() => setTheme(Theme.SONIC)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E1F5FE] hover:scale-[1.02] transition-all text-center">SONIC MANIA</button>
-        <button onClick={() => setTheme(Theme.CYBERPUNK)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E0F2F1] hover:scale-[1.02] transition-all text-center">NIGHT CITY</button>
-        <button onClick={() => setTheme(Theme.UNDERTALE)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F5F5F5] hover:scale-[1.02] transition-all text-center">THE UNDERGROUND</button>
-        <button onClick={() => setTheme(Theme.FALLOUT)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E8F5E9] hover:scale-[1.02] transition-all text-center">THE WASTELAND</button>
-        <button onClick={() => setTheme(Theme.HAZBIN)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#FFEBEE] hover:scale-[1.02] transition-all text-center">PENTAGRAM CITY</button>
-        <button onClick={() => setTheme(Theme.VOCALOID)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E0F7FA] hover:scale-[1.02] transition-all text-center">VIRTUAL SINGER</button>
-        <button onClick={() => setTheme(Theme.FNAF)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#EFEBE9] hover:scale-[1.02] transition-all text-center">FREDDY FAZBEAR</button>
-        <button onClick={() => setTheme(Theme.IRUMA)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#F3E5F5] hover:scale-[1.02] transition-all text-center">BABYLS ACADEMY</button>
-        <button onClick={() => setTheme(Theme.ARCANE)} className="sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#E8EAF6] hover:scale-[1.02] transition-all text-center">PILTOVER & ZAUN</button>
+        {allThemesList.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setTheme(t.id)}
+            className={`${theme === t.id ? 'sanrio-button pink w-full py-5 text-xl tracking-wider' : 'sanrio-panel font-black text-[#7B4B94] text-xl py-5 hover:bg-[#FCE4EC] hover:scale-[1.02] transition-all text-center'}`}
+          >{t.label}</button>
+        ))}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'NORMAL', desc: 'EFFECTIVE', color: '#A8A878', text: '#FFFFFF', icon: '⚪' },
@@ -196,27 +197,8 @@ export const PokemonThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="poke-panel">
             <h2 className="text-sm mb-4">TOWN MAP</h2>
             <div className="grid grid-cols-2 gap-3">
-                {[
-                    { id: Theme.PERSONA, label: 'TOKYO', color: '#D04040' },
-                    { id: Theme.MINECRAFT, label: 'MINING', color: '#78C850' },
-                    { id: Theme.DANGANRONPA, label: 'ACADEMY', color: '#F08030' },
-                    { id: Theme.OMORI, label: 'HEADSPACE', color: '#A890F0' },
-                    { id: Theme.KIRBY, label: 'DREAMLAND', color: '#F85888' },
-                    { id: Theme.POKEMON, label: 'KANTO', color: '#6890F0' },
-                    { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', color: '#9CCC65' },
-                    { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
-                    { id: Theme.SONIC, label: 'SONIC', color: '#1E90FF' },
-                    { id: Theme.SANRIO, label: 'SANRIO', color: '#FF69B4' },
-                    { id: Theme.CYBERPUNK, label: 'NIGHT CITY', color: '#00FFFF' },
-                    { id: Theme.UNDERTALE, label: 'UNDERGROUND', color: '#FFFFFF' },
-                    { id: Theme.FALLOUT, label: 'WASTELAND', color: '#00FF00' },
-                    { id: Theme.HAZBIN, label: 'HELL', color: '#FF0000' },
-                    { id: Theme.VOCALOID, label: 'VOCALOID', color: '#00FFFF' },
-                    { id: Theme.FNAF, label: 'FAZBEAR', color: '#555555' },
-                    { id: Theme.IRUMA, label: 'BABYLS', color: '#800080' },
-                    { id: Theme.ARCANE, label: 'PILTOVER', color: '#000080' },
-                ].map(t => (
-                    <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`poke-btn flex flex-col items-center justify-center gap-2 h-24 ${theme === t.id ? 'bg-[#F8D030] active' : ''}`}>
+                {allThemesList.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`poke-btn flex flex-col items-center justify-center gap-2 h-24 ${theme === t.id ? 'bg-[#F8D030] active' : ''}`}>
                         <div className="w-8 h-8 rounded-full border-2 border-gray-400" style={{ background: t.color }}></div>
                         <span className="text-[8px]">{t.label}</span>
                     </button>

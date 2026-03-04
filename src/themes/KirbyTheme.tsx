@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'FRIEND GO!', desc: 'BREEZY', color: '#FF69B4', text: '#FFFFFF', icon: '⭐' },
@@ -427,27 +428,36 @@ export const KirbyHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const KirbyThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
+    const colorMap: Record<string, string> = {
+        [Theme.PERSONA]: 'from-red-500 to-red-700',
+        [Theme.MINECRAFT]: 'from-green-500 to-green-700',
+        [Theme.DANGANRONPA]: 'from-pink-500 to-purple-700',
+        [Theme.OMORI]: 'from-gray-700 to-black',
+        [Theme.KIRBY]: 'from-pink-400 to-pink-600',
+        [Theme.POKEMON]: 'from-blue-400 to-blue-600',
+        [Theme.ANIMAL_CROSSING]: 'from-green-400 to-green-600',
+        [Theme.SKYRIM]: 'from-gray-600 to-gray-800',
+        [Theme.SONIC]: 'from-blue-500 to-blue-700',
+        [Theme.SANRIO]: 'from-pink-300 to-pink-500',
+        [Theme.CYBERPUNK]: 'from-cyan-500 to-cyan-700',
+        [Theme.UNDERTALE]: 'from-gray-700 to-gray-900',
+        [Theme.FALLOUT]: 'from-green-600 to-green-800',
+        [Theme.HAZBIN]: 'from-red-700 to-red-900',
+        [Theme.VOCALOID]: 'from-teal-400 to-teal-600',
+        [Theme.FNAF]: 'from-yellow-700 to-yellow-900',
+        [Theme.IRUMA]: 'from-purple-500 to-purple-700',
+        [Theme.ARCANE]: 'from-amber-600 to-amber-800',
+    };
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
             <h2 className="font-display text-3xl text-white text-stroke-sm drop-shadow-md text-center">WORLD SELECT</h2>
             <div className="grid grid-cols-2 gap-3">
-                {[
-                    { id: Theme.PERSONA, label: 'PHANTOM', color: 'from-red-500 to-red-700' },
-                    { id: Theme.MINECRAFT, label: 'BLOCKY', color: 'from-green-500 to-green-700' },
-                    { id: Theme.DANGANRONPA, label: 'DESPAIR', color: 'from-pink-500 to-purple-700' },
-                    { id: Theme.OMORI, label: 'DREAM', color: 'from-gray-700 to-black' },
-                    { id: Theme.KIRBY, label: 'POPSTAR', color: 'from-pink-400 to-pink-600' },
-                    { id: Theme.POKEMON, label: 'KANTO', color: 'from-blue-400 to-blue-600' },
-                    { id: Theme.ANIMAL_CROSSING, label: 'ISLAND', color: 'from-green-400 to-green-600' },
-                    { id: Theme.SKYRIM, label: 'SKYRIM', color: 'from-gray-600 to-gray-800' },
-                    { id: Theme.SONIC, label: 'SONIC', color: 'from-blue-400 to-blue-600' },
-                    { id: Theme.SANRIO, label: 'SANRIO', color: 'from-pink-300 to-pink-500' },
-                ].map(t => (
+                {allThemesList.map(t => (
                     <button
                         key={t.id}
-                        onClick={() => setTheme(t.id as Theme)}
+                        onClick={() => setTheme(t.id)}
                         className={`
-                            bg-gradient-to-br ${t.color} p-4 rounded-3xl shadow-lg border-4 border-white
+                            bg-gradient-to-br ${colorMap[t.id] || 'from-gray-500 to-gray-700'} p-4 rounded-3xl shadow-lg border-4 border-white
                             flex flex-col items-center justify-center gap-2
                             transform transition-transform active:scale-95
                             ${theme === t.id ? 'ring-4 ring-yellow-300 scale-105' : 'opacity-90'}

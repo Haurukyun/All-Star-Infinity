@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'ACT 1', desc: 'CHILL ZONE', color: '#0122e5', secondary: '#ffde00', icon: '🌀' },
@@ -327,35 +328,15 @@ export const SonicHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const SonicThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
-    const themeLabels: Record<string, string> = {
-        [Theme.PERSONA]: 'PERSONA 5',
-        [Theme.MINECRAFT]: 'MINECRAFT',
-        [Theme.DANGANRONPA]: 'DANGANRONPA',
-        [Theme.OMORI]: 'OMORI',
-        [Theme.KIRBY]: 'KIRBY',
-        [Theme.POKEMON]: 'POKÉMON',
-        [Theme.ANIMAL_CROSSING]: 'ANIMAL CROSSING',
-        [Theme.SKYRIM]: 'SKYRIM',
-        [Theme.SONIC]: 'SONIC MANIA',
-        [Theme.SANRIO]: 'SANRIO',
-        [Theme.CYBERPUNK]: 'NIGHT CITY',
-        [Theme.UNDERTALE]: 'THE UNDERGROUND',
-        [Theme.FALLOUT]: 'THE WASTELAND',
-        [Theme.HAZBIN]: 'PENTAGRAM CITY',
-        [Theme.VOCALOID]: 'VIRTUAL SINGER',
-        [Theme.FNAF]: 'FREDDY FAZBEAR',
-        [Theme.IRUMA]: 'BABYLS ACADEMY',
-        [Theme.ARCANE]: 'PILTOVER & ZAUN',
-    };
     return (
         <div className="space-y-8 mt-2">
             <h2 className="text-5xl flex items-center gap-4 italic font-black border-b-[8px] border-black pb-2 text-white" style={{ WebkitTextStroke: '2px black', textShadow: '4px 4px 0 #000' }}>
                 <span className="text-4xl">🗺️</span> STAGE OUTPOST
             </h2>
             <div className="grid grid-cols-1 gap-5 pb-20">
-                {Object.values(Theme).filter(t => t !== Theme.NONE).map(t => (
-                    <button key={t} onClick={() => setTheme(t)} className={`sonic-button py-6 text-3xl font-black italic ${theme === t ? 'active !bg-[#e10000] !text-white' : 'secondary'}`}>
-                        {themeLabels[t] || t.toUpperCase()}
+                {allThemesList.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`sonic-button py-6 text-3xl font-black italic ${theme === t.id ? 'active !bg-[#e10000] !text-white' : 'secondary'}`}>
+                        {t.label.toUpperCase()}
                     </button>
                 ))}
             </div>

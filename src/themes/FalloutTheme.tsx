@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: '> LOCAL_THREAT', desc: 'RAD LEVEL: NOMINAL', color: '#21ed43' },
@@ -362,37 +363,28 @@ export const FalloutHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const FalloutThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
-    const themeLabels: Record<string, string> = {
-        [Theme.PERSONA]: 'PERSONA_OS',
-        [Theme.MINECRAFT]: 'MINECRAFT_OS',
-        [Theme.DANGANRONPA]: 'DANGAN_OS',
-        [Theme.OMORI]: 'OMORI_OS',
-        [Theme.KIRBY]: 'KIRBY_OS',
-        [Theme.POKEMON]: 'PKMN_OS',
-        [Theme.ANIMAL_CROSSING]: 'ACNH_OS',
-        [Theme.SKYRIM]: 'SKYRIM_OS',
-        [Theme.SONIC]: 'SONIC_OS',
-        [Theme.SANRIO]: 'SANRIO_OS',
-        [Theme.CYBERPUNK]: 'NETRUN_OS',
-        [Theme.UNDERTALE]: 'MTT_OS',
-        [Theme.FALLOUT]: 'ROBCO_OS',
-        [Theme.HAZBIN]: 'HELL_OS',
-        [Theme.VOCALOID]: 'MIKU_OS',
-        [Theme.FNAF]: 'FAZBEAR_OS',
-        [Theme.IRUMA]: 'BABYLS_OS',
-        [Theme.ARCANE]: 'HEX_OS',
+    const falloutLabels: Record<string, string> = {
+        [Theme.PERSONA]: 'PERSONA_OS', [Theme.MINECRAFT]: 'MINECRAFT_OS',
+        [Theme.DANGANRONPA]: 'DANGAN_OS', [Theme.OMORI]: 'OMORI_OS',
+        [Theme.KIRBY]: 'KIRBY_OS', [Theme.POKEMON]: 'PKMN_OS',
+        [Theme.ANIMAL_CROSSING]: 'ACNH_OS', [Theme.SKYRIM]: 'SKYRIM_OS',
+        [Theme.SONIC]: 'SONIC_OS', [Theme.SANRIO]: 'SANRIO_OS',
+        [Theme.CYBERPUNK]: 'NETRUN_OS', [Theme.UNDERTALE]: 'MTT_OS',
+        [Theme.FALLOUT]: 'ROBCO_OS', [Theme.HAZBIN]: 'HELL_OS',
+        [Theme.VOCALOID]: 'MIKU_OS', [Theme.FNAF]: 'FAZBEAR_OS',
+        [Theme.IRUMA]: 'BABYLS_OS', [Theme.ARCANE]: 'HEX_OS',
     };
     return (
         <div className="space-y-6 h-full flex flex-col">
             <h2 className="text-3xl border-b-2 border-[#21ed43] pb-2">&gt; OVERRIDE SYSTEM THEME</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-8 overflow-y-auto custom-scrollbar pr-4">
-                {Object.values(Theme).filter(t => t !== Theme.NONE).map(t => (
+                {allThemesList.map(t => (
                     <button
-                        key={t}
-                        onClick={() => setTheme(t)}
-                        className={`text-left text-2xl p-2 border ${theme === t ? 'border-[#21ed43] bg-[#21ed43] text-black font-bold' : 'border-transparent hover:border-[#21ed43]/50'}`}
+                        key={t.id}
+                        onClick={() => setTheme(t.id)}
+                        className={`text-left text-2xl p-2 border ${theme === t.id ? 'border-[#21ed43] bg-[#21ed43] text-black font-bold' : 'border-transparent hover:border-[#21ed43]/50'}`}
                     >
-                        {theme === t ? '► ' : '  '}{themeLabels[t] || t.toUpperCase()}
+                        {theme === t.id ? '► ' : '  '}{falloutLabels[t.id] || t.id.toUpperCase()}
                     </button>
                 ))}
             </div>

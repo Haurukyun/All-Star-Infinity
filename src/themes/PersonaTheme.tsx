@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const P5_VARIANTS = {
     initial: { opacity: 0, x: -30, skewX: -5, scale: 1.02 },
@@ -43,76 +44,78 @@ export const PersonaLayout: React.FC<{ children: React.ReactNode; activeTab: str
     const { useEasyFont } = logic;
 
     return (
-        <div className={`h-[100dvh] w-screen bg-black text-white overflow-hidden font-sans flex flex-col relative persona-theme-root ${useEasyFont ? 'p5-easy-font' : ''}`}>
+        <div className={`h - [100dvh] w - screen bg - black text - white overflow - hidden font - sans flex flex - col relative persona - theme - root ${useEasyFont ? 'p5-easy-font' : ''} `}>
             <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;800;900&display=swap');
         
-        .p5-easy-font .font-p5-display { font-family: 'Nunito', sans-serif; font-weight: 900; letter-spacing: 0.02em; }
-        .p5-easy-font p, .p5-easy-font span, .p5-easy-font div { font-family: 'Nunito', sans-serif; }
-        .p5-easy-font h1, .p5-easy-font h2, .p5-easy-font h3 { font-family: 'Nunito', sans-serif; font-weight: 900; }
+        .p5 - easy - font.font - p5 - display { font - family: 'Nunito', sans - serif; font - weight: 900; letter - spacing: 0.02em; }
+        .p5 - easy - font p, .p5 - easy - font span, .p5 - easy - font div { font - family: 'Nunito', sans - serif; }
+        .p5 - easy - font h1, .p5 - easy - font h2, .p5 - easy - font h3 { font - family: 'Nunito', sans - serif; font - weight: 900; }
         
-        .font-p5-display {
-          font-family: 'Bangers', cursive;
-          letter-spacing: 0.05em;
+        .font - p5 - display {
+    font - family: 'Bangers', cursive;
+    letter - spacing: 0.05em;
+}
+
+        .p5 - dots - bg {
+    background - color: #050505;
+    background - image:
+    radial - gradient(circle at 2px 2px, #300 1px, transparent 0),
+        linear - gradient(45deg, #100 25 %, transparent 25 %, transparent 75 %, #100 75 %, #100),
+        linear - gradient(-45deg, #100 25 %, transparent 25 %, transparent 75 %, #100 75 %, #100);
+    background - size: 12px 12px, 100px 100px, 100px 100px;
+    animation: p5bgMove 40s linear infinite;
+}
+
+        .p5 - stars - bg {
+    background - image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L53 47L100 50L53 53L50 100L47 53L0 50L47 47L50 0Z' fill='rgba(216,0,0,0.1)'/%3E%3C/svg%3E");
+    background - size: 50px 50px;
+    opacity: 0.3;
+}
+
+@keyframes p5bgMove {
+    0 % { background- position: 0 0, 0 0, 0 0;
+}
+100 % { background- position: 0 0, 1000px 1000px, -1000px 1000px; }
         }
 
-        .p5-dots-bg {
-          background-color: #050505;
-          background-image: 
-            radial-gradient(circle at 2px 2px, #300 1px, transparent 0),
-            linear-gradient(45deg, #100 25%, transparent 25%, transparent 75%, #100 75%, #100),
-            linear-gradient(-45deg, #100 25%, transparent 25%, transparent 75%, #100 75%, #100);
-          background-size: 12px 12px, 100px 100px, 100px 100px;
-          animation: p5bgMove 40s linear infinite;
+        .p5 - shards {
+    position: absolute;
+    inset: 0;
+    background - image:
+    linear - gradient(115deg, transparent 20 %, rgba(216, 0, 0, 0.05) 21 %, rgba(216, 0, 0, 0.05) 24 %, transparent 25 %),
+        linear - gradient(115deg, transparent 40 %, rgba(216, 0, 0, 0.03) 41 %, rgba(216, 0, 0, 0.03) 46 %, transparent 47 %),
+        linear - gradient(115deg, transparent 70 %, rgba(216, 0, 0, 0.08) 71 %, rgba(216, 0, 0, 0.08) 78 %, transparent 79 %);
+    background - size: 200 % 100 %;
+    animation: p5shardMove 20s ease -in -out infinite alternate;
+}
+
+@keyframes p5shardMove {
+    0 % { background- position: 0 % 0 %;
+}
+100 % { background- position: 100 % 0 %; }
         }
 
-        .p5-stars-bg {
-          background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 0L53 47L100 50L53 53L50 100L47 53L0 50L47 47L50 0Z' fill='rgba(216,0,0,0.1)'/%3E%3C/svg%3E");
-          background-size: 50px 50px;
-          opacity: 0.3;
-        }
+        .p5 - border {
+    box - shadow: 0 0 0 3px #000;
+}
+        .p5 - border - sm {
+    box - shadow: 0 0 0 2px #000;
+}
 
-        @keyframes p5bgMove {
-          0% { background-position: 0 0, 0 0, 0 0; }
-          100% { background-position: 0 0, 1000px 1000px, -1000px 1000px; }
-        }
+        .vibrate - hover:hover {
+    animation: p5vibrate 0.3s linear infinite both;
+}
 
-        .p5-shards {
-          position: absolute;
-          inset: 0;
-          background-image: 
-            linear-gradient(115deg, transparent 20%, rgba(216,0,0,0.05) 21%, rgba(216,0,0,0.05) 24%, transparent 25%),
-            linear-gradient(115deg, transparent 40%, rgba(216,0,0,0.03) 41%, rgba(216,0,0,0.03) 46%, transparent 47%),
-            linear-gradient(115deg, transparent 70%, rgba(216,0,0,0.08) 71%, rgba(216,0,0,0.08) 78%, transparent 79%);
-          background-size: 200% 100%;
-          animation: p5shardMove 20s ease-in-out infinite alternate;
-        }
-
-        @keyframes p5shardMove {
-          0% { background-position: 0% 0%; }
-          100% { background-position: 100% 0%; }
-        }
-
-        .p5-border {
-          box-shadow: 0 0 0 3px #000;
-        }
-        .p5-border-sm {
-          box-shadow: 0 0 0 2px #000;
-        }
-
-        .vibrate-hover:hover {
-          animation: p5vibrate 0.3s linear infinite both;
-        }
-
-        @keyframes p5vibrate {
-          0% { transform: translate(0); }
-          20% { transform: translate(-2px, 2px); }
-          40% { transform: translate(-2px, -2px); }
-          60% { transform: translate(2px, 2px); }
-          80% { transform: translate(2px, -2px); }
-          100% { transform: translate(0); }
-        }
-      `}</style>
+@keyframes p5vibrate {
+    0 % { transform: translate(0); }
+    20 % { transform: translate(-2px, 2px); }
+    40 % { transform: translate(-2px, -2px); }
+    60 % { transform: translate(2px, 2px); }
+    80 % { transform: translate(2px, -2px); }
+    100 % { transform: translate(0); }
+}
+`}</style>
 
             {/* Background Pattern */}
             <div className="absolute inset-0 p5-dots-bg z-0 opacity-100"></div>
@@ -167,15 +170,16 @@ export const PersonaLayout: React.FC<{ children: React.ReactNode; activeTab: str
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`
-                  flex items-center justify-center 
-                  transition-all duration-300 ease-[0.22,1,0.36,1]
+                  flex items - center justify - center
+transition - all duration - 300 ease - [0.22, 1, 0.36, 1]
                   ${rotation}
                   ${isActive
                                         ? 'bg-white text-black w-20 h-16 sm:w-32 sm:h-24 z-20 -translate-y-4 shadow-[6px_6px_0_black] p5-border'
-                                        : 'bg-[#D80000] text-white w-16 h-12 sm:w-24 sm:h-18 hover:-translate-y-2 hover:z-10 shadow-[3px_3px_0_black] p5-border'}
-                `}
+                                        : 'bg-[#D80000] text-white w-16 h-12 sm:w-24 sm:h-18 hover:-translate-y-2 hover:z-10 shadow-[3px_3px_0_black] p5-border'
+                                    }
+`}
                             >
-                                <span className={`font-p5-display uppercase tracking-wider ${isActive ? 'text-base sm:text-2xl' : 'text-[8px] sm:text-xs'}`}>
+                                <span className={`font - p5 - display uppercase tracking - wider ${isActive ? 'text-base sm:text-2xl' : 'text-[8px] sm:text-xs'} `}>
                                     {tab.label}
                                 </span>
                             </button>
@@ -207,7 +211,7 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="flex flex-col gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                         <button
                             onClick={() => setActiveDeckId('default')}
-                            className={`p-2 sm:p-3 text-left border-[2px] border-black transition-all transform -skew-x-6 group shadow-[3px_3px_0_black] ${activeDeckId === 'default' ? 'bg-white text-black translate-x-0.5 translate-y-0.5 shadow-none' : 'bg-black text-white border-white/20 opacity-60'}`}
+                            className={`p - 2 sm: p - 3 text - left border - [2px] border - black transition - all transform - skew - x - 6 group shadow - [3px_3px_0_black] ${activeDeckId === 'default' ? 'bg-white text-black translate-x-0.5 translate-y-0.5 shadow-none' : 'bg-black text-white border-white/20 opacity-60'} `}
                         >
                             <span className="font-p5-display text-lg sm:text-xl transform skew-x-6 block italic">★ PHANTOM DEFAULT</span>
                         </button>
@@ -215,7 +219,7 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <button
                                 key={deck.id}
                                 onClick={() => setActiveDeckId(deck.id)}
-                                className={`p-2 sm:p-3 text-left border-[2px] border-black transition-all transform -skew-x-6 group shadow-[3px_3px_0_black] ${activeDeckId === deck.id ? 'bg-white text-black translate-x-0.5 translate-y-0.5 shadow-none' : 'bg-black text-white border-white/20 opacity-60'}`}
+                                className={`p - 2 sm: p - 3 text - left border - [2px] border - black transition - all transform - skew - x - 6 group shadow - [3px_3px_0_black] ${activeDeckId === deck.id ? 'bg-white text-black translate-x-0.5 translate-y-0.5 shadow-none' : 'bg-black text-white border-white/20 opacity-60'} `}
                             >
                                 <span className="font-p5-display text-lg sm:text-xl transform skew-x-6 block italic">{deck.name.toUpperCase()}</span>
                                 <span className="block text-[7px] sm:text-[9px] opacity-60 font-bold tracking-widest mt-0.5 transform skew-x-6">{deck.prompts.length} CARDS FORGED</span>
@@ -235,13 +239,13 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                                 transition={{ delay: i * 0.05, type: 'spring', stiffness: 300, damping: 20 }}
                                 whileHover={{ x: 3, scale: 1.01 }}
                                 onClick={() => setIntensity(stage.id)}
-                                className={`group relative flex items-center justify-between p-3 sm:p-4 overflow-hidden transform ${i % 2 === 0 ? '-skew-x-6' : 'skew-x-6'} p5-border ${stage.id === Intensity.SOFT ? 'bg-white text-black' : stage.id === Intensity.HOT ? 'bg-[#D80000] text-white' : 'bg-black text-white'}`}
+                                className={`group relative flex items - center justify - between p - 3 sm: p - 4 overflow - hidden transform ${i % 2 === 0 ? '-skew-x-6' : 'skew-x-6'} p5 - border ${stage.id === Intensity.SOFT ? 'bg-white text-black' : stage.id === Intensity.HOT ? 'bg-[#D80000] text-white' : 'bg-black text-white'} `}
                             >
-                                <div className={`flex flex-col text-left transform ${i % 2 === 0 ? 'skew-x-6' : '-skew-x-6'}`}>
+                                <div className={`flex flex - col text - left transform ${i % 2 === 0 ? 'skew-x-6' : '-skew-x-6'} `}>
                                     <span className="font-p5-display text-xl sm:text-3xl leading-none uppercase italic">{stage.title}</span>
                                     <span className="text-[6px] sm:text-[8px] font-black tracking-[0.2em] uppercase opacity-60 mt-0.5">{stage.desc}</span>
                                 </div>
-                                <span className={`font-p5-display text-2xl sm:text-4xl opacity-10 font-bold transform ${i % 2 === 0 ? 'skew-x-6' : '-skew-x-6'}`}>0{i + 1}</span>
+                                <span className={`font - p5 - display text - 2xl sm: text - 4xl opacity - 10 font - bold transform ${i % 2 === 0 ? 'skew-x-6' : '-skew-x-6'} `}>0{i + 1}</span>
                             </motion.button>
                         ))}
                     </div>
@@ -411,7 +415,7 @@ export const PersonaSettingsScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     className="w-full flex justify-between items-center p-3 sm:p-3.5 bg-black border-2 border-white/20 transform skew-x-12 hover:border-white/60 transition-colors"
                 >
                     <span className="font-p5-display text-base sm:text-lg text-white transform skew-x-[-12deg]">EASY FONT MODE</span>
-                    <span className={`font-black text-[9px] sm:text-[10px] transform skew-x-[-12deg] ${useEasyFont ? 'text-[#D80000]' : 'text-white/40'}`}>
+                    <span className={`font - black text - [9px] sm: text - [10px] transform skew - x - [-12deg] ${useEasyFont ? 'text-[#D80000]' : 'text-white/40'} `}>
                         {useEasyFont ? 'ON' : 'OFF'}
                     </span>
                 </button>
@@ -426,39 +430,19 @@ export const PersonaSettingsScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const PersonaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { theme, setTheme } = logic;
-    const themes = [
-        { id: Theme.PERSONA, label: 'PERSONA 5', sub: 'THE PHANTOM THIEF' },
-        { id: Theme.MINECRAFT, label: 'MINECRAFT', sub: 'BLOCKY DIMENSION' },
-        { id: Theme.DANGANRONPA, label: 'DANGANRONPA', sub: 'KILLING HARMONY' },
-        { id: Theme.OMORI, label: 'OMORI', sub: 'DREAM WORLD' },
-        { id: Theme.KIRBY, label: 'KIRBY', sub: 'DREAM LAND' },
-        { id: Theme.POKEMON, label: 'POKEMON', sub: 'KANTO REGION' },
-        { id: Theme.ANIMAL_CROSSING, label: 'ANIMAL CROSSING', sub: 'ISLAND PARADISE' },
-        { id: Theme.SKYRIM, label: 'SKYRIM', sub: 'THE ELDER SCROLLS' },
-        { id: Theme.SONIC, label: 'SONIC', sub: 'MANIA INFINITY' },
-        { id: Theme.SANRIO, label: 'SANRIO', sub: 'SWEET WORLD' },
-        { id: Theme.CYBERPUNK, label: 'CYBERPUNK', sub: 'NIGHT CITY' },
-        { id: Theme.UNDERTALE, label: 'UNDERTALE', sub: 'THE UNDERGROUND' },
-        { id: Theme.FALLOUT, label: 'FALLOUT', sub: 'THE WASTELAND' },
-        { id: Theme.HAZBIN, label: 'HAZBIN HOTEL', sub: 'PENTAGRAM CITY' },
-        { id: Theme.VOCALOID, label: 'VOCALOID', sub: 'VIRTUAL SINGER' },
-        { id: Theme.FNAF, label: 'FNAF', sub: 'FREDDY FAZBEAR' },
-        { id: Theme.IRUMA, label: 'IRUMA-KUN', sub: 'BABYLS ACADEMY' },
-        { id: Theme.ARCANE, label: 'ARCANE', sub: 'PILTOVER & ZAUN' }
-    ];
 
     return (
         <motion.div variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="pt-2 space-y-4 sm:space-y-6">
             <h2 className="font-p5-display text-4xl sm:text-5xl italic text-white drop-shadow-[3px_3px_0_#D80000] vibrate-hover cursor-default">THEMES</h2>
             <div className="grid grid-cols-1 gap-3 sm:gap-4">
-                {themes.map((t) => (
+                {allThemesList.map((t) => (
                     <button
                         key={t.id}
                         onClick={() => setTheme(t.id)}
-                        className={`p-4 sm:p-6 text-left transform -skew-x-6 transition-all border-[2px] sm:border-[3px] border-black shadow-[4px_4px_0_black] ${theme === t.id ? 'bg-white text-black translate-x-1 translate-y-1 shadow-none' : 'bg-black text-white border-white/10 opacity-60'}`}
+                        className={`p - 4 sm: p - 6 text - left transform - skew - x - 6 transition - all border - [2px] sm: border - [3px] border - black shadow - [4px_4px_0_black] ${theme === t.id ? 'bg-white text-black translate-x-1 translate-y-1 shadow-none' : 'bg-black text-white border-white/10 opacity-60'} `}
                     >
                         <span className="font-p5-display text-2xl sm:text-3xl italic block">{t.label}</span>
-                        <span className="block text-[8px] sm:text-[10px] font-black opacity-60 mt-0.5 uppercase tracking-widest">{t.sub}</span>
+                        <span className="block text-[8px] sm:text-[10px] font-black opacity-60 mt-0.5 uppercase tracking-widest">{t.id}</span>
                     </button>
                 ))}
             </div>
@@ -474,14 +458,14 @@ export const PersonaMenu: React.FC<{ logic: any }> = ({ logic }) => {
     return (
         <div className="h-full w-full flex flex-col items-center justify-center p-4 sm:p-8 relative overflow-hidden bg-black select-none font-p5-display">
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
-                .font-p5-display { font-family: 'Bangers', cursive; }
-                .p5-dots-bg {
-                    background-color: #050505;
-                    background-image: radial-gradient(circle at 2px 2px, #300 1px, transparent 0);
-                    background-size: 12px 12px;
-                }
-            `}</style>
+@import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+                .font - p5 - display { font - family: 'Bangers', cursive; }
+                .p5 - dots - bg {
+    background - color: #050505;
+    background - image: radial - gradient(circle at 2px 2px, #300 1px, transparent 0);
+    background - size: 12px 12px;
+}
+`}</style>
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
                 <div className="absolute inset-0 p5-dots-bg opacity-30"></div>
                 <div className="absolute top-0 right-[-10%] w-[120%] h-full bg-[#D80000] transform skew-x-[-15deg] translate-x-[30%] opacity-90 shadow-[inset_20px_0_40px_rgba(0,0,0,0.5)]"></div>
@@ -519,7 +503,7 @@ export const PersonaMenu: React.FC<{ logic: any }> = ({ logic }) => {
                         {activeSection === 'themes' && (
                             <motion.div key="decks-sub" initial={{ opacity: 0, x: 100, rotate: -5 }} animate={{ opacity: 1, x: 0, rotate: 2 }} exit={{ opacity: 0, scale: 0.8 }} className="w-full max-w-2xl grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 px-4">
                                 {themes.map((t, i) => (
-                                    <motion.button key={t} whileHover={{ scale: 1.1 }} onClick={() => setTheme(t)} className={`p-3 sm:p-5 italic font-p5-display transition-all transform shadow-[6px_6px_0_#000] border-[3px] ${theme === t ? 'bg-[#D80000] text-white' : 'bg-black text-white hover:bg-white hover:text-black'}`}>
+                                    <motion.button key={t} whileHover={{ scale: 1.1 }} onClick={() => setTheme(t)} className={`p - 3 sm: p - 5 italic font - p5 - display transition - all transform shadow - [6px_6px_0_#000] border - [3px] ${theme === t ? 'bg-[#D80000] text-white' : 'bg-black text-white hover:bg-white hover:text-black'} `}>
                                         <span className="text-xs sm:text-lg">{t.toUpperCase()}</span>
                                     </motion.button>
                                 ))}

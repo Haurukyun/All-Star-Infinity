@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition } from '../types';
+import { allThemesList } from './allThemesList';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'DAILY LIFE', desc: 'SCHOOL DAYS', color: '#00FFFF', text: '#000000' },
@@ -347,27 +348,8 @@ export const DanganronpaThemesScreen: React.FC<{ logic: any }> = ({ logic }) => 
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4 pt-4">
             <h2 className="text-2xl font-black italic text-white border-b-2 border-white/20 pb-2 mb-4">REALITY SHIFT</h2>
             <div className="grid grid-cols-1 gap-3">
-                {[
-                    { id: Theme.PERSONA, label: 'PHANTOM THIEF', color: '#D80000' },
-                    { id: Theme.MINECRAFT, label: 'BLOCKY WORLD', color: '#55FF55' },
-                    { id: Theme.DANGANRONPA, label: 'KILLING HARMONY', color: '#FF00FF' },
-                    { id: Theme.OMORI, label: 'DREAM WORLD', color: '#FFFFFF' },
-                    { id: Theme.KIRBY, label: 'DREAM LAND', color: '#FFB7C5' },
-                    { id: Theme.POKEMON, label: 'KANTO REGION', color: '#6890F0' },
-                    { id: Theme.ANIMAL_CROSSING, label: 'ISLAND PARADISE', color: '#9CCC65' },
-                    { id: Theme.SKYRIM, label: 'SKYRIM', color: '#CCCCCC' },
-                    { id: Theme.SONIC, label: 'SONIC MANIA', color: '#1E90FF' },
-                    { id: Theme.SANRIO, label: 'SWEET WORLD', color: '#FF69B4' },
-                    { id: Theme.CYBERPUNK, label: 'NIGHT CITY', color: '#00FFFF' },
-                    { id: Theme.UNDERTALE, label: 'THE UNDERGROUND', color: '#FFFFFF' },
-                    { id: Theme.FALLOUT, label: 'THE WASTELAND', color: '#00FF00' },
-                    { id: Theme.HAZBIN, label: 'PENTAGRAM CITY', color: '#FF0000' },
-                    { id: Theme.VOCALOID, label: 'VIRTUAL SINGER', color: '#00FFFF' },
-                    { id: Theme.FNAF, label: 'FREDDY FAZBEAR', color: '#555555' },
-                    { id: Theme.IRUMA, label: 'BABYLS ACADEMY', color: '#800080' },
-                    { id: Theme.ARCANE, label: 'PILTOVER & ZAUN', color: '#000080' },
-                ].map(t => (
-                    <button key={t.id} onClick={() => setTheme(t.id as Theme)} className={`p-4 text-left border border-white/10 hover:border-white transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}>
+                {allThemesList.map(t => (
+                    <button key={t.id} onClick={() => setTheme(t.id)} className={`p-4 text-left border border-white/10 hover:border-white transition-all ${theme === t.id ? 'bg-white/10 border-white' : ''}`}>
                         <span className="font-black text-lg" style={{ color: theme === t.id ? '#fff' : t.color }}>{t.label}</span>
                     </button>
                 ))}
