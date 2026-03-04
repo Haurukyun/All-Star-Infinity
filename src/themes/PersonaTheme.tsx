@@ -281,7 +281,7 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-6 sm:mt-8 px-1 sm:px-2 relative z-30">
-                        <button onClick={() => setPrompt(null)} className="bg-white text-black font-p5-display text-lg sm:text-xl h-12 sm:h-14 transform -skew-x-12 border-[2px] border-black shadow-[3px_3px_0_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all">
+                        <button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="bg-white text-black font-p5-display text-lg sm:text-xl h-12 sm:h-14 transform -skew-x-12 border-[2px] border-black shadow-[3px_3px_0_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all">
                             <span className="transform skew-x-12 block">DONE</span>
                         </button>
                         <button onClick={() => handleDraw(prompt.type)} className="bg-[#D80000] text-white font-p5-display text-lg sm:text-xl h-12 sm:h-14 transform skew-x-12 border-[2px] border-black shadow-[3px_3px_0_black] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all">

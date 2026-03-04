@@ -276,7 +276,7 @@ export const MinecraftPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <div className="text-gray-300">{prompt.penalty}</div>
                         </div>
                         <div className="grid grid-cols-2 gap-3 mt-6">
-                            <button onClick={() => setPrompt(null)} className="rpg-btn py-2">COMPLETE</button>
+                            <button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="rpg-btn py-2">COMPLETE</button>
                             <button onClick={() => handleDraw(prompt.type)} className="rpg-btn rpg-btn-primary py-2">REROLL</button>
                         </div>
                     </div>

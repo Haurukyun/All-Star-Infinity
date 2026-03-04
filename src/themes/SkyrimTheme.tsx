@@ -128,7 +128,7 @@ export const SkyrimPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <div className="flex items-center justify-center gap-4 text-sm opacity-70 pt-4"><span className="uppercase tracking-widest text-xs">Objective:</span><span className="italic text-red-300">{prompt.penalty}</span></div>
                         </div>
                     </div>
-                    <div className="flex gap-8 mt-8"><button onClick={() => setPrompt(null)} className="skyrim-btn text-sm border border-white/20 hover:bg-white/10">COMPLETE</button><button onClick={() => handleDraw(prompt.type)} className="skyrim-btn text-sm border border-white/20 hover:bg-white/10">REROLL</button></div>
+                    <div className="flex gap-8 mt-8"><button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="skyrim-btn text-sm border border-white/20 hover:bg-white/10">COMPLETE</button><button onClick={() => handleDraw(prompt.type)} className="skyrim-btn text-sm border border-white/20 hover:bg-white/10">REROLL</button></div>
                 </motion.div>
             )}
         </AnimatePresence>

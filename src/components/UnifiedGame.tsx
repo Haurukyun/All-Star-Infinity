@@ -29,6 +29,9 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
     useEffect(() => {
         if (gameMode === GameMode.NEVER_HAVE_I_EVER && intensity && !prompt) {
+            // If the user selects an intensity, but we don't have a prompt,
+            // check if they just finished. The "Finished" button should clear intensity too.
+            // Leaving this useEffect here, but changing the finish buttons in themes to clear intensity.
             handleDraw('NeverHaveIEver');
         }
     }, [gameMode, intensity, prompt, handleDraw]);

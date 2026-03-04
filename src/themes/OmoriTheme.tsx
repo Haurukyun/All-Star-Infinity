@@ -190,7 +190,7 @@ export const OmoriPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <p className="text-xl italic">{prompt.penalty}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-4 pt-6">
-                        <button onClick={() => setPrompt(null)} className="omori-button">FORGET</button>
+                        <button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="omori-button">FORGET</button>
                         <button onClick={() => handleDraw(prompt.type)} className="omori-button active">REMEMBER</button>
                     </div>
                 </motion.div>

@@ -275,7 +275,7 @@ export const DanganronpaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         </div>
                     </motion.div>
                     <div className="flex justify-end gap-2">
-                        <button onClick={() => setPrompt(null)} className="dr-ui-btn px-6 py-2 text-xs font-bold text-white">BACK</button>
+                        <button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="dr-ui-btn px-6 py-2 text-xs font-bold text-white">BACK</button>
                         <button onClick={() => handleDraw(prompt.type)} className="dr-ui-btn px-6 py-2 text-xs font-bold text-[#00FFFF] border-[#00FFFF]">RELOAD</button>
                     </div>
                 </div>

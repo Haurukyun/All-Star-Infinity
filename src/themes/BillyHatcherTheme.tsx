@@ -248,7 +248,7 @@ export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
 
                     <div className="flex gap-4">
-                        <button onClick={() => setPrompt(null)} className="flex-1 billy-btn !bg-white !text-[${HERO_BLUE}]">FINISHED</button>
+                        <button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="flex-1 billy-btn !bg-white !text-[${HERO_BLUE}]">FINISHED</button>
                         <button onClick={() => handleDraw(prompt.type)} className="flex-1 billy-btn billy-btn-yellow">AGAIN</button>
                     </div>
                 </motion.div>
@@ -353,7 +353,7 @@ export const BillyHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <span className={`absolute top-4 right-4 text-white px-5 py-2 rounded-[16px] border-[4px] text-sm font-black shadow-sm ${h.type === 'Truth' ? 'bg-[${SPOT_BLUE}] border-[${HERO_BLUE}]' : 'bg-[${HERO_RED}] border-white'}`} style={{ backgroundColor: h.type === 'Truth' ? SPOT_BLUE : HERO_RED, borderColor: h.type === 'Truth' ? HERO_BLUE : 'white' }}>
                                 {h.type.toUpperCase()}
                             </span>
-                            <p className="text-2xl leading-snug px-2 font-Fredoka font-black text-[${HERO_BLUE}] mt-4" style={{ color: HERO_BLUE }}>"{h.prompt.text}"</p>
+                            <p className="text-2xl leading-snug px-2 font-Fredoka font-black text-[${HERO_BLUE}] mt-4" style={{ color: HERO_BLUE }}>"{h.text}"</p>
                             <div className="mt-5 text-sm font-black text-[${HERO_RED}] bg-[#fff1f1] border-[4px] border-[#ffccd2] px-4 py-2 rounded-[16px] inline-block" style={{ color: HERO_RED }}>
                                 RANK: {h.intensity}
                             </div>

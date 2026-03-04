@@ -230,7 +230,7 @@ export const AnimalCrossingPlayScreen: React.FC<{ logic: any }> = ({ logic }) =>
                         </div>
                     </div>
                     <div className="flex gap-3 mt-6">
-                        <button onClick={() => setPrompt(null)} className="flex-1 ac-btn bg-[#AED581] text-white border-[#DCEDC8]">Done!</button>
+                        <button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="flex-1 ac-btn bg-[#AED581] text-white border-[#DCEDC8]">Done!</button>
                         <button onClick={() => handleDraw(prompt.type)} className="flex-1 ac-btn bg-[#4DB6AC] text-white border-[#B2DFDB]">Again!</button>
                     </div>
                 </motion.div>

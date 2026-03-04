@@ -129,7 +129,7 @@ export const PokemonPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                     <div className="bg-white border-2 border-[#C0C0C0] p-4 rounded mb-4 min-h-[120px] flex items-center justify-center text-center"><p className="text-xs leading-relaxed">{prompt.text}</p></div>
                     <div className="bg-[#E0E0E0] p-2 rounded border border-[#C0C0C0] mb-4"><div className="text-[8px] text-gray-500 mb-1">EFFECT:</div><div className="text-[10px] text-[#C03028]">{prompt.penalty}</div></div>
-                    <div className="flex gap-2"><button onClick={() => setPrompt(null)} className="flex-1 poke-btn text-center text-xs">DONE</button><button onClick={() => handleDraw(prompt.type)} className="flex-1 poke-btn text-center text-xs bg-[#E0F0F8]">AGAIN</button></div>
+                    <div className="flex gap-2"><button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="flex-1 poke-btn text-center text-xs">DONE</button><button onClick={() => handleDraw(prompt.type)} className="flex-1 poke-btn text-center text-xs bg-[#E0F0F8]">AGAIN</button></div>
                 </motion.div>
             )}
         </AnimatePresence>

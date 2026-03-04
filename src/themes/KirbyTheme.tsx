@@ -325,7 +325,7 @@ export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
 
                     <div className="flex gap-3 mt-6">
-                        <button onClick={() => setPrompt(null)} className="flex-1 bg-gray-200 text-gray-600 font-bold py-3 rounded-2xl border-b-4 border-gray-300 active:border-b-0 active:translate-y-1">
+                        <button onClick={() => { setPrompt(null); if (prompt?.type === 'NeverHaveIEver') setIntensity(null); }} className="flex-1 bg-gray-200 text-gray-600 font-bold py-3 rounded-2xl border-b-4 border-gray-300 active:border-b-0 active:translate-y-1">
                             Done
                         </button>
                         <button onClick={() => handleDraw(prompt.type)} className="flex-1 bg-pink-400 text-white font-bold py-3 rounded-2xl border-b-4 border-pink-600 active:border-b-0 active:translate-y-1">
