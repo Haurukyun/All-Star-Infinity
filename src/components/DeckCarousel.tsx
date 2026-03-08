@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomDeck } from '../types';
 
@@ -34,12 +34,30 @@ export const DeckCarousel: React.FC<DeckCarouselProps> = ({
     fontFamily = 'inherit'
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    if (decks.length === 0) return null;
 
     const allOptions = [
         { id: 'default', name: 'Standard Bag', prompts: [], isCustom: false, intensity: '' },
         ...decks
     ];
+
+    // Auto-scroll to the active card when it changes or when component mounts
+    useEffect(() => {
+        const activeIndex = allOptions.findIndex(d => d.id === activeDeckId);
+        if (activeIndex < 0 || !containerRef.current) return;
+        const container = containerRef.current;
+        requestAnimationFrame(() => {
+            // For snap-center carousels, scrollTarget = (cardWidth + gap) * index
+            // centers each card regardless of padding, as long as padding = 50% - halfCardWidth
+            const sanrioCard = 176; // w-44
+            const defaultCard = 256; // w-64
+            const sanrioGap = 12; // gap-3
+            const defaultGap = 40; // gap-10
+            const cardWidth = variant === 'sanrio' ? sanrioCard : defaultCard;
+            const gap = variant === 'sanrio' ? sanrioGap : defaultGap;
+            const scrollTarget = Math.max(0, (cardWidth + gap) * activeIndex);
+            container.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+        });
+    }, [activeDeckId, variant]);
 
     const getVariantStyles = (type: DeckVariant, isActive: boolean) => {
         switch (type) {
@@ -95,7 +113,8 @@ export const DeckCarousel: React.FC<DeckCarouselProps> = ({
                     borderRadius: '45px',
                     border: `5px solid ${isActive ? accentColor : '#ffffff'}`,
                     background: isActive ? 'white' : 'rgba(255,255,255,0.6)',
-                    boxShadow: isActive ? `0 15px 30px ${accentColor}33` : 'none'
+                    boxShadow: isActive ? `0 10px 40px ${accentColor}33` : 'none',
+                    overflow: 'visible'
                 };
             case 'fnaf':
                 return {
@@ -199,7 +218,7 @@ export const DeckCarousel: React.FC<DeckCarouselProps> = ({
     };
 
     return (
-        <div className="relative w-full py-20 overflow-visible select-none" style={{ fontFamily }}>
+        <div className={`relative w-full overflow-visible select-none ${variant === 'sanrio' ? 'py-12' : 'py-20'}`} style={{ fontFamily }}>
             <style>{`
                 .no-scrollbar::-webkit-scrollbar { display: none; }
                 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -230,7 +249,7 @@ export const DeckCarousel: React.FC<DeckCarouselProps> = ({
 
             <div
                 ref={containerRef}
-                className="w-full flex items-center gap-10 px-[calc(50%-128px)] overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth py-20 -my-20"
+                className={`w-full flex items-center overflow-x-auto no-scrollbar snap-x snap-mandatory scroll-smooth ${variant === 'sanrio' ? 'gap-3 py-12 -my-12 px-[calc(50%-88px)]' : 'gap-10 py-20 -my-20 px-[calc(50%-128px)]'}`}
             >
                 {allOptions.map((deck, idx) => {
                     const isActive = activeDeckId === deck.id;
@@ -252,8 +271,9 @@ export const DeckCarousel: React.FC<DeckCarouselProps> = ({
                         >
                             <div
                                 className={`
-                                    relative transition-all duration-500 p-7 w-64 h-44 flex flex-col justify-center items-center text-center
+                                    relative transition-all duration-500 flex flex-col justify-center items-center text-center
                                     group backdrop-blur-sm
+                                    ${variant === 'sanrio' ? 'p-4 w-44 h-32' : 'p-7 w-64 h-44'}
                                     ${variant === 'fallout' ? 'fallout-monitor' : ''}
                                     ${variant === 'omori' ? 'sketch-border' : ''}
                                     ${variant === 'cyberpunk' && isActive ? 'cyberpunk-glitch' : ''}
@@ -272,8 +292,10 @@ export const DeckCarousel: React.FC<DeckCarouselProps> = ({
 
                                 {isActive && showGlow && variant !== 'persona' && variant !== 'minecraft' && variant !== 'danganronpa' && (
                                     <motion.div
-                                        layoutId="active-glow"
-                                        className="absolute inset-0 blur-3xl opacity-20 -z-10"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 0.2 }}
+                                        exit={{ opacity: 0 }}
+                                        className="absolute inset-0 blur-3xl -z-10"
                                         style={{ backgroundColor: accentColor }}
                                     />
                                 )}

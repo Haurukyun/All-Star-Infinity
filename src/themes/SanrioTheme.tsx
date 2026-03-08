@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
@@ -65,6 +65,7 @@ export const SanrioLayout: React.FC<{ children: React.ReactNode; activeTab: stri
           box-shadow: 0 10px 25px rgba(255, 105, 180, 0.15), inset 0 0 0 4px white;
           position: relative;
           padding: 24px;
+          overflow: visible;
         }
 
         .sanrio-title {
@@ -175,13 +176,13 @@ export const SanrioLayout: React.FC<{ children: React.ReactNode; activeTab: stri
         </div>
       ))}
 
-      <header className="pt-10 pb-4 flex justify-center items-center shrink-0 relative z-20">
+      <header className="pt-6 pb-2 flex justify-center items-center shrink-0 relative z-20">
         <h1 className="text-4xl sanrio-title tracking-widest text-center px-4 leading-tight">
           ISLAND<br />ADVENTURE
         </h1>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-6 pb-28 relative z-20 no-scrollbar">
+      <main className="flex-1 overflow-y-auto overflow-x-hidden pb-36 relative z-20 no-scrollbar">
         {children}
       </main>
 
@@ -237,45 +238,120 @@ export const SanrioPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =>
   const { intensity, setIntensity, handleDraw, activeDeckId, setActiveDeckId, customDecks, setGameMode, gameMode } = logic;
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // When entering this intensity, auto-select the first relevant deck
+  // (if the currently active deck doesn't match this intensity)
+  useEffect(() => {
+    const relevantDecks = customDecks.filter((d: any) => d.intensity === intensity);
+    const activeDeckIsRelevant = activeDeckId === 'default' || relevantDecks.some((d: any) => d.id === activeDeckId);
+    if (!activeDeckIsRelevant && relevantDecks.length > 0) {
+      // Auto-select first matching deck and set its game mode
+      const firstDeck = relevantDecks[0];
+      setActiveDeckId(firstDeck.id);
+      setGameMode(firstDeck.gameMode);
+    } else if (!activeDeckIsRelevant) {
+      setActiveDeckId('default');
+    }
+  }, [intensity]);
+
+  const handleDeckSelect = (id: string) => {
+    setActiveDeckId(id);
+    if (id !== 'default') {
+      const deck = customDecks.find((d: any) => d.id === id);
+      if (deck) setGameMode(deck.gameMode);
+    }
+  };
+
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const scrollBy = (dir: 'left' | 'right') => {
+    if (!carouselRef.current) return;
+    const cardW = carouselRef.current.clientWidth * 0.32;
+    carouselRef.current.scrollBy({ left: dir === 'right' ? cardW : -cardW, behavior: 'smooth' });
+  };
+
+  const allDecks = [
+    { id: 'default', name: 'Standard Bag', label: 'CORE', icon: '🌸', isDefault: true },
+    ...customDecks
+      .filter((d: any) => d.intensity === intensity)
+      .map((d: any) => ({ id: d.id, name: d.name || 'Custom Deck', label: `${d.prompts.length} ♥`, icon: '💝', isDefault: false }))
+  ];
+
   return (
-    <div className="h-full flex flex-col justify-center space-y-4">
-      <h2 className="sanrio-title text-3xl text-center">LEVEL: {intensity}</h2>
+    <div className="h-full flex flex-col py-1">
+      <h2 className="sanrio-title text-2xl text-center mb-2">LEVEL: {intensity}</h2>
 
-      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-4">
-        <div className="sanrio-panel text-center">
-          <h3 className="text-xl font-black text-[#7B4B94] mb-2">CHOOSE ACTIVITY</h3>
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        className="flex-1 flex flex-col gap-3"
+      >
+        {/* Carousel with left/right arrows */}
+        <div className="relative px-8">
+          {/* Left arrow */}
+          <button
+            onClick={() => scrollBy('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center text-[#FF69B4] shadow-md text-lg font-black border border-white/80 hover:scale-110 active:scale-90 transition-transform"
+          >
+            ‹
+          </button>
 
-          <div className="w-full mb-6">
-            <DeckCarousel
-              decks={customDecks.filter(d => d.intensity === intensity)}
-              activeDeckId={activeDeckId}
-              onSelect={setActiveDeckId}
-              variant="sanrio"
-              accentColor="#FF69B4"
-            />
+          {/* Scrollable deck strip — py-2 gives vertical room for scale-105 border */}
+          <div
+            ref={carouselRef}
+            className={`flex overflow-x-auto gap-2 snap-x snap-mandatory py-2 ${allDecks.length === 1 ? 'justify-center' : ''}`}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' } as any}
+          >
+            {allDecks.map(deck => (
+              <button
+                key={deck.id}
+                onClick={() => handleDeckSelect(deck.id)}
+                className={`shrink-0 w-[31%] snap-center rounded-[18px] py-4 px-2 flex flex-col items-center justify-center gap-1 transition-all border-3 ${activeDeckId === deck.id
+                  ? 'border-[3px] border-[#FF69B4] bg-white scale-105 shadow-[0_6px_20px_rgba(255,105,180,0.35)]'
+                  : 'border-[3px] border-[#FFD6E7] bg-white/60 scale-95 opacity-60'
+                  }`}
+              >
+                <span className="text-2xl">{deck.icon}</span>
+                <span className="font-black text-[#7B4B94] text-[10px] tracking-wide text-center leading-tight">{deck.name.toUpperCase()}</span>
+                <span className="text-[9px] text-[#A188A6] font-bold border border-[#E1BEE7] px-1.5 py-0.5 rounded-full">{deck.label}</span>
+              </button>
+            ))}
           </div>
 
-          <div className="flex gap-4">
+          {/* Right arrow */}
+          <button
+            onClick={() => scrollBy('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/60 backdrop-blur-sm flex items-center justify-center text-[#FF69B4] shadow-md text-lg font-black border border-white/80 hover:scale-110 active:scale-90 transition-transform"
+          >
+            ›
+          </button>
+        </div>
+
+        {/* Action panel */}
+        <div className="sanrio-panel mx-4 py-8 px-4 flex flex-col gap-4">
+          <h3 className="text-sm font-black text-[#7B4B94] uppercase tracking-widest text-center">CHOOSE ACTIVITY</h3>
+          <div className="flex gap-3">
             {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
-              <button onClick={() => handleDraw('NeverHaveIEver')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
-                <span className="text-4xl">🤫</span>
+              <button onClick={() => handleDraw('NeverHaveIEver')} className="sanrio-button pink flex-1 h-24 flex-col justify-center text-base">
+                <span className="text-2xl mb-1">🤫</span>
                 CONFESS
               </button>
             ) : (
               <>
-                <button onClick={() => handleDraw('Truth')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
-                  <span className="text-4xl">🌸</span>
+                <button onClick={() => handleDraw('Truth')} className="sanrio-button pink flex-1 h-24 flex-col justify-center text-base">
+                  <span className="text-2xl mb-1">🌸</span>
                   TRUTH
                 </button>
-                <button onClick={() => handleDraw('Dare')} className="sanrio-button yellow flex-1 h-32 flex-col justify-center text-xl">
-                  <span className="text-4xl">🔥</span>
+                <button onClick={() => handleDraw('Dare')} className="sanrio-button yellow flex-1 h-24 flex-col justify-center text-base">
+                  <span className="text-2xl mb-1">🔥</span>
                   DARE
                 </button>
               </>
             )}
           </div>
         </div>
-        <button onClick={() => setIntensity(null)} className="sanrio-button w-full h-14 bg-white text-[#7B4B94] shadow-sm text-sm border-2">
+
+        {/* Back button */}
+        <button onClick={() => setIntensity(null)} className="sanrio-button mx-4 h-10 bg-white text-[#7B4B94] shadow-sm text-sm border-2">
           GO BACK ↩
         </button>
       </motion.div>
@@ -341,7 +417,7 @@ export const SanrioPlayButton: React.FC<{ label: string; onClick: () => void; is
 };
 
 export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
-  const { customDecks, activeDeckId, setActiveDeckId, editingDeck, setEditingDeck, saveDeck, generateId, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+  const { customDecks, editingDeck, setEditingDeck, saveDeck, generateId, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
 
   const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
 
@@ -363,10 +439,9 @@ export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
               <div className="sanrio-panel py-16 text-center text-[#A188A6] font-bold italic border-dashed border-[#E1BEE7]">No outfits in your closet...</div>
             ) : (
               customDecks.map((deck: any) => (
-                <div key={deck.id} className={`sanrio-panel flex items-center p-5 group transition-all ${activeDeckId === deck.id ? 'border-[#4DD0E1] bg-[#F0FBFC]' : ''}`}>
+                <div key={deck.id} className="sanrio-panel flex items-center p-5 group transition-all">
                   <div className="flex-1 text-left">
-                    <h3 className="text-xl font-black text-[#7B4B94] mb-1 flex items-center gap-2">
-                      {activeDeckId === deck.id && <span className="text-sm">🌟</span>}
+                    <h3 className="text-xl font-black text-[#7B4B94] mb-1">
                       {deck.name || 'Cozy Outfit'}
                     </h3>
                     <div className="flex gap-2">
@@ -378,17 +453,9 @@ export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setActiveDeckId(deck.id)}
-                      className={`sanrio-button !py-2 !px-4 !text-xs !shadow-sm ${activeDeckId === deck.id ? '!bg-[#4DD0E1]' : '!bg-white !text-[#4DD0E1]'}`}
-                    >
-                      {activeDeckId === deck.id ? 'ON' : 'LOAD'}
-                    </button>
-                    <div className="flex flex-col gap-1">
-                      <button onClick={() => setEditingDeck(deck)} className="text-[#A188A6] hover:text-[#FF69B4] text-[10px] font-black uppercase tracking-tighter transition-colors">EDIT</button>
-                      <button onClick={() => logic.deleteDeck(deck.id)} className="text-[#A188A6] hover:text-red-400 text-[10px] font-black uppercase tracking-tighter transition-colors">DROP</button>
-                    </div>
+                  <div className="flex flex-col gap-1">
+                    <button onClick={() => setEditingDeck(deck)} className="text-[#A188A6] hover:text-[#FF69B4] text-[10px] font-black uppercase tracking-tighter transition-colors">EDIT</button>
+                    <button onClick={() => logic.deleteDeck(deck.id)} className="text-[#A188A6] hover:text-red-400 text-[10px] font-black uppercase tracking-tighter transition-colors">DROP</button>
                   </div>
                 </div>
               ))
