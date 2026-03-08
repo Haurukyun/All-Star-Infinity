@@ -4,6 +4,7 @@ import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: '* Easy', desc: 'No one gets hurt.', color: '#ffffff' },
@@ -146,32 +147,35 @@ export const UndertalePromptTypeSelector: React.FC<{ logic: any }> = ({ logic })
 
     return (
         <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full items-center justify-center space-y-8">
-            <div className="w-full max-w-2xl">
-                <div className="flex justify-between items-center mb-4 px-2">
-                    <span className="text-xl">* SELECT ITEM</span>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="w-10 h-10 border-4 border-white flex items-center justify-center hover:bg-white hover:text-black transition-all"
-                    >
-                        🔍
-                    </button>
-                </div>
-                <DeckCarousel
-                    decks={customDecks.filter(d => d.intensity === intensity)}
-                    activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#ff0000"
-                />
-            </div>
-
             <div className="w-full max-w-2xl ut-border p-8 text-2xl min-h-[120px]">
                 * A wild prompt appears!<br />
                 * Difficulty: {intensity}<br />
                 * What will you do?
+            </div>
+
+            <div className="w-full mb-12 flex justify-center">
+                <div className="w-full max-w-lg">
+                    <DeckCarousel
+                        decks={customDecks.filter(d => d.intensity === intensity)}
+                        activeDeckId={activeDeckId}
+                        onSelect={setActiveDeckId}
+                        accentColor="#ffff00"
+                        textColor="#ffffff"
+                        inactiveColor="#888888"
+                        cardBg="#000000"
+                        showGlow={true}
+                        fontFamily="'Determination Sans', sans-serif"
+                    />
+                </div>
+            </div>
+
+            <div className="w-full mb-8">
+                <DeckCarousel
+                    decks={customDecks.filter((d: any) => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={setActiveDeckId}
+                    variant="undertale"
+                />
             </div>
 
             <div className="grid grid-cols-2 gap-x-24 gap-y-8 pl-8">
@@ -233,6 +237,12 @@ export const UndertalePromptTypeSelector: React.FC<{ logic: any }> = ({ logic })
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#ff0000',
+                    bg: '#000',
+                    textColor: '#fff',
+                    borderColor: '#fff'
+                }}
             />
         </motion.div>
     );
@@ -283,6 +293,8 @@ export const UndertalePlayButton: React.FC<{ label: string; onClick: () => void;
 export const UndertaleDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -293,15 +305,7 @@ export const UndertaleDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <p className="text-sm text-gray-500 mt-1">* 8 slots available.</p>
                         </div>
                         <button
-                            onClick={() => setEditingDeck({
-                                id: generateId(),
-                                name: '',
-                                description: '',
-                                prompts: [],
-                                isCustom: true,
-                                intensity: logic.intensity || Intensity.SOFT,
-                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                            })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="text-2xl hover:text-[#ff0000] transition-colors"
                         >
                             * NEW_ITEM
@@ -374,26 +378,15 @@ export const UndertaleDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-8">
                             <div className="flex-1 space-y-2">
                                 <label className="text-sm text-gray-500 block">* ACTION_PROTOCOL</label>
-                                <select
-                                    value={editingDeck.gameMode}
-                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
-                                    className="bg-transparent text-white border-b-4 border-white pb-1 text-2xl outline-none w-full cursor-pointer hover:border-[#ff9900] transition-colors"
-                                >
-                                    <option className="bg-black" value={GameMode.TRUTH_OR_DARE}>TRUTH_OR_DARE</option>
-                                    <option className="bg-black" value={GameMode.NEVER_HAVE_I_EVER}>NHIE_PROTOCOL</option>
-                                </select>
+                                <div className="text-white border-b-4 border-white pb-1 text-2xl w-full translate-x-2">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'TRUTH_OR_DARE' : 'NHIE_PROTOCOL'}
+                                </div>
                             </div>
                             <div className="flex-1 space-y-2">
                                 <label className="text-sm text-gray-500 block">* DIFFICULTY_SETTING</label>
-                                <select
-                                    value={editingDeck.intensity}
-                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
-                                    className="bg-transparent text-white border-b-4 border-white pb-1 text-2xl outline-none w-full cursor-pointer hover:border-[#ff9900] transition-colors"
-                                >
-                                    <option className="bg-black" value={Intensity.SOFT}>* EASY (SOFT)</option>
-                                    <option className="bg-black" value={Intensity.HOT}>* NORMAL (HOT)</option>
-                                    <option className="bg-black" value={Intensity.VULGAR}>* HARD (VULGAR)</option>
-                                </select>
+                                <div className="text-white border-b-4 border-white pb-1 text-2xl w-full translate-x-2">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -408,21 +401,28 @@ export const UndertaleDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="ut-border p-5 space-y-4 bg-black/50 group hover:border-white transition-colors">
                                     <div className="flex justify-between items-center border-b-2 border-gray-800 pb-2">
-                                        <div className="flex gap-6 items-center">
-                                            <select
-                                                className="bg-black text-white text-xl outline-none border-none cursor-pointer hover:text-[#ff9900]"
-                                                value={p.type}
-                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option value="Truth">* Truth</option><option value="Dare">* Dare</option></>
-                                                ) : (
-                                                    <option value="NeverHaveIEver">* NHIE</option>
-                                                )}
-                                            </select>
-                                            <div className="text-lg text-gray-600 italic">[{editingDeck.intensity}]</div>
+                                        <div className="flex gap-6 items-center flex-1">
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <div className="flex gap-4 flex-1">
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`text-xl transition-colors ${p.type === 'Truth' ? 'text-[#ff0000]' : 'text-gray-600 hover:text-white'}`}
+                                                    >
+                                                        * Truth
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`text-xl transition-colors ${p.type === 'Dare' ? 'text-[#ff0000]' : 'text-gray-600 hover:text-white'}`}
+                                                    >
+                                                        * Dare
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="text-xl text-gray-700 italic flex-1">* NHIE_PAGE</div>
+                                            )}
+                                            <div className="text-lg text-gray-600 italic shrink-0">[{editingDeck.intensity}]</div>
                                         </div>
-                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#ff0000] text-2xl hover:scale-125 transition-transform">X</button>
+                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#ff0000] text-2xl hover:scale-125 transition-transform ml-4 shrink-0">X</button>
                                     </div>
                                     <textarea
                                         className="w-full bg-transparent text-white focus:outline-none text-2xl resize-none h-24 placeholder:opacity-20"
@@ -441,6 +441,29 @@ export const UndertaleDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#ff0000',
+                    bg: '#000',
+                    textColor: '#fff',
+                    cardBg: '#000',
+                    fontFamily: 'DotGothic16, sans-serif'
+                }}
+            />
         </AnimatePresence>
     );
 };

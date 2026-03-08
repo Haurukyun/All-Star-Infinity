@@ -4,6 +4,7 @@ import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'MODERATE', desc: 'LOW THREAT LEVEL', color: '#00f0ff', secondary: '#fcee0a', icon: '📶' },
@@ -284,28 +285,6 @@ export const CyberpunkPromptTypeSelector: React.FC<{ logic: any }> = ({ logic })
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-start h-full pt-4">
-            <div className="w-full mb-8">
-                <div className="flex justify-between items-center mb-2 px-6">
-                    <h3 className="text-xs cyber-mono text-[#00f0ff] uppercase tracking-[0.2em]">Active Dataset</h3>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="cyber-button text-xs py-1 px-3 border-[#00f0ff]/50"
-                    >
-                        SCAN
-                    </button>
-                </div>
-                <DeckCarousel
-                    decks={customDecks.filter(d => d.intensity === intensity)}
-                    activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#00f0ff"
-                />
-            </div>
-
             <div className="flex gap-8 w-full max-w-2xl mb-12">
                 {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
                     <button onClick={() => handleDraw('NeverHaveIEver')} className="cyber-panel p-8 flex-1 flex flex-col items-center group hover:border-[#fcee0a]">
@@ -328,6 +307,17 @@ export const CyberpunkPromptTypeSelector: React.FC<{ logic: any }> = ({ logic })
                     </>
                 )}
             </div>
+
+            <div className="w-full max-w-lg mb-8">
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={setActiveDeckId}
+                    variant="cyberpunk"
+                    accentColor="#00f0ff"
+                />
+            </div>
+
             <button onClick={() => setIntensity(null)} className="text-[#ff003c] cyber-mono text-sm tracking-widest hover:text-[#fcee0a] transition-colors">[ ABORT PROTOCOL ]</button>
 
             <DeckSearchModal
@@ -345,6 +335,12 @@ export const CyberpunkPromptTypeSelector: React.FC<{ logic: any }> = ({ logic })
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#00f0ff',
+                    bg: '#050505',
+                    textColor: '#ffffff',
+                    cardBg: '#050505'
+                }}
             />
         </motion.div>
     );
@@ -393,6 +389,8 @@ export const CyberpunkPlayButton: React.FC<{ label: string; onClick: () => void;
 export const CyberpunkDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = React.useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -404,15 +402,7 @@ export const CyberpunkDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <p className="text-[10px] cyber-mono text-[#ff003c]/60 mt-0.5">LOCAL_STORAGE // DECKS.DB</p>
                         </div>
                         <button
-                            onClick={() => setEditingDeck({
-                                id: generateId(),
-                                name: '',
-                                description: '',
-                                prompts: [],
-                                isCustom: true,
-                                intensity: logic.intensity || Intensity.SOFT,
-                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                            })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="cyber-button text-sm cyan hover:scale-105 transition-transform"
                         >
                             + CRAFT_NEW
@@ -482,26 +472,15 @@ export const CyberpunkDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-6">
                             <div className="flex-1 relative">
                                 <label className="absolute -top-3 left-4 bg-black px-2 text-[10px] cyber-mono text-[#ff003c]">MODE_PROTOCOL</label>
-                                <select
-                                    value={editingDeck.gameMode}
-                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
-                                    className="w-full bg-black border-2 border-[#ff003c]/30 p-3 text-[#ff003c] font-bold tracking-widest focus:outline-none focus:border-[#ff003c] appearance-none text-center cursor-pointer"
-                                >
-                                    <option value={GameMode.TRUTH_OR_DARE}>TRUTH_OR_DARE</option>
-                                    <option value={GameMode.NEVER_HAVE_I_EVER}>NEVER_HAVE_I_EVER</option>
-                                </select>
+                                <div className="w-full bg-black border-2 border-[#ff003c]/30 p-3 text-[#ff003c] font-black tracking-widest text-center cursor-default">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'TRUTH/DARE' : 'NHIE'}
+                                </div>
                             </div>
                             <div className="flex-1 relative">
                                 <label className="absolute -top-3 left-4 bg-black px-2 text-[10px] cyber-mono text-[#ff003c]">THREAT_LVL</label>
-                                <select
-                                    value={editingDeck.intensity}
-                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
-                                    className="w-full bg-black border-2 border-[#ff003c]/30 p-3 text-[#ff003c] font-bold tracking-widest focus:outline-none focus:border-[#ff003c] appearance-none text-center cursor-pointer"
-                                >
-                                    <option value={Intensity.SOFT}>MODERATE (SOFT)</option>
-                                    <option value={Intensity.HOT}>HIGH (HOT)</option>
-                                    <option value={Intensity.VULGAR}>SEVERE (VULGAR)</option>
-                                </select>
+                                <div className="w-full bg-black border-2 border-[#ff003c]/30 p-3 text-[#ff003c] font-black tracking-widest text-center cursor-default">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -517,18 +496,25 @@ export const CyberpunkDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                                 <div key={p.id} className="bg-black/80 border border-white/10 p-4 space-y-3 group hover:border-[#00f0ff]/50 transition-colors">
                                     <div className="flex justify-between items-center">
                                         <div className="flex gap-2">
-                                            <select
-                                                className="bg-black text-[#00f0ff] cyber-mono text-[10px] border border-[#00f0ff]/30 px-2 py-1 outline-none font-bold"
-                                                value={p.type}
-                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                                ) : (
-                                                    <option value="NeverHaveIEver">NHIE</option>
-                                                )}
-                                            </select>
-                                            <div className="text-[#fcee0a] cyber-mono text-[9px] font-bold opacity-70 px-2 py-1 flex items-center bg-[#fcee0a]/5">LVL: {editingDeck.intensity}</div>
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <div className="flex gap-1">
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`cyber-mono text-[9px] px-3 py-1 font-bold transition-all border ${p.type === 'Truth' ? 'bg-[#00f0ff] text-black border-[#00f0ff]' : 'bg-transparent text-[#00f0ff] border-[#00f0ff]/30'}`}
+                                                    >
+                                                        INTEGRITY
+                                                    </button>
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`cyber-mono text-[9px] px-3 py-1 font-bold transition-all border ${p.type === 'Dare' ? 'bg-[#fcee0a] text-black border-[#fcee0a]' : 'bg-transparent text-[#fcee0a] border-[#fcee0a]/30'}`}
+                                                    >
+                                                        EXECUTION
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="text-[#00f0ff] cyber-mono text-[10px] border border-[#00f0ff]/30 px-3 py-1 font-bold bg-[#00f0ff]/5">SYS_NHIE</div>
+                                            )}
+                                            <div className="text-white/40 cyber-mono text-[9px] font-bold px-2 py-1 flex items-center bg-white/5 uppercase">LVL: {editingDeck.intensity}</div>
                                         </div>
                                         <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#ff003c] hover:text-white transition-colors p-1 leading-none text-xl">×</button>
                                     </div>
@@ -550,6 +536,29 @@ export const CyberpunkDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#00f0ff',
+                    bg: '#050505',
+                    textColor: '#ffffff',
+                    cardBg: '#050505',
+                    fontFamily: 'Rajdhani, sans-serif'
+                }}
+            />
         </AnimatePresence>
     );
 };

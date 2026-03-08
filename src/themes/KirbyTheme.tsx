@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'FRIEND GO!', desc: 'BREEZY', color: '#FF69B4', text: '#FFFFFF', icon: '⭐' },
@@ -271,28 +272,6 @@ export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 </motion.div>
             ) : !prompt ? (
                 <div className="flex flex-col items-center justify-start h-full pt-4 relative">
-                    <div className="w-full mb-6 z-20">
-                        <div className="flex justify-between items-center mb-1 px-4">
-                            <h3 className="text-xs font-bold text-white uppercase tracking-widest drop-shadow-md">FILE SELECT</h3>
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="w-8 h-8 rounded-full bg-white/20 border-2 border-white flex items-center justify-center shadow-lg backdrop-blur-sm"
-                            >
-                                🔍
-                            </button>
-                        </div>
-                        <DeckCarousel
-                            decks={customDecks.filter(d => d.intensity === intensity)}
-                            activeDeckId={activeDeckId}
-                            onSelect={(id) => {
-                                const deck = customDecks.find(d => d.id === id);
-                                if (deck) logic.setGameMode(deck.gameMode);
-                                setActiveDeckId(id);
-                            }}
-                            accentColor="#FF69B4"
-                        />
-                    </div>
-
                     <motion.div
                         initial={{ scale: 0 }} animate={{ scale: 1 }}
                         className="relative z-10 mb-4"
@@ -305,10 +284,18 @@ export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             </div>
                         </div>
                     </motion.div>
-
                     <h2 className="font-display text-2xl text-white text-stroke-sm drop-shadow-[0_2px_0_rgba(0,0,0,0.2)] mb-6 text-center">
                         {intensity}
                     </h2>
+
+                    <div className="w-full max-w-lg mb-8 relative z-10">
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={setActiveDeckId}
+                            variant="kirby"
+                        />
+                    </div>
 
                     <div className="flex gap-4 w-full px-4">
                         {logic.gameMode === GameMode.NEVER_HAVE_I_EVER ? (
@@ -346,6 +333,12 @@ export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         }}
                         gameMode={logic.gameMode}
                         intensity={intensity}
+                        styles={{
+                            accent: '#FF69B4',
+                            bg: '#1a237e',
+                            textColor: '#FF69B4',
+                            borderColor: '#ffffff'
+                        }}
                     />
                 </div>
             ) : (
@@ -383,13 +376,16 @@ export const KirbyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         </button>
                     </div>
                 </motion.div>
-            )}
-        </AnimatePresence>
+            )
+            }
+        </AnimatePresence >
     );
 };
 
 export const KirbyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -397,7 +393,7 @@ export const KirbyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="flex justify-between items-center mb-4 border-b-4 border-white pb-2">
                         <h2 className="font-display text-3xl text-white text-stroke-sm drop-shadow-md">FILE SELECT</h2>
                         <button
-                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold border-2 border-white shadow-lg hover:scale-105 transition-transform"
                         >
                             + New File
@@ -444,18 +440,15 @@ export const KirbyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <label className="text-[10px] font-black text-pink-300 uppercase tracking-widest pl-2 mb-1 block">Game Type</label>
-                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-white border-4 border-pink-100 rounded-2xl p-3 text-pink-500 font-display outline-none focus:border-pink-400 transition-colors">
-                                    <option value="TruthOrDare">STORY (T/D)</option>
-                                    <option value="NeverHaveIEver">NHIE</option>
-                                </select>
+                                <div className="w-full bg-white border-4 border-pink-100 rounded-2xl p-3 text-pink-500 font-display text-center uppercase">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'STORY (T/D)' : 'NHIE'}
+                                </div>
                             </div>
                             <div className="flex-1">
                                 <label className="text-[10px] font-black text-pink-300 uppercase tracking-widest pl-2 mb-1 block">Spicy Level</label>
-                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-white border-4 border-pink-100 rounded-2xl p-3 text-pink-500 font-display outline-none focus:border-pink-400 transition-colors">
-                                    <option value="SOFT">FRIEND GO!</option>
-                                    <option value="HOT">ARENA</option>
-                                    <option value="VULGAR">MELTER</option>
-                                </select>
+                                <div className="w-full bg-white border-4 border-pink-100 rounded-2xl p-3 text-pink-500 font-display text-center uppercase">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -469,19 +462,30 @@ export const KirbyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="bg-white border-4 border-blue-50 rounded-3xl p-4 space-y-3 relative group shadow-sm hover:shadow-md transition-shadow">
                                     <div className="flex items-center gap-3">
-                                        <select
-                                            className="bg-blue-50 text-blue-500 text-[10px] font-black rounded-full px-4 py-2 outline-none border-2 border-transparent focus:border-blue-200"
-                                            value={p.type}
-                                            onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                        >
+                                        <div className="flex gap-2 flex-1">
                                             {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
+                                                <>
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`flex-1 py-1.5 rounded-full text-[10px] font-black border-2 transition-all ${p.type === 'Truth' ? 'bg-pink-400 text-white border-white' : 'bg-pink-50 text-pink-300 border-transparent'}`}
+                                                    >
+                                                        TRUTH
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`flex-1 py-1.5 rounded-full text-[10px] font-black border-2 transition-all ${p.type === 'Dare' ? 'bg-blue-400 text-white border-white' : 'bg-blue-50 text-blue-300 border-transparent'}`}
+                                                    >
+                                                        DARE
+                                                    </button>
+                                                </>
                                             ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
+                                                <div className="flex-1 py-1.5 rounded-full text-[10px] font-black bg-pink-50 text-pink-200 text-center uppercase">
+                                                    NHIE CARD
+                                                </div>
                                             )}
-                                        </select>
-                                        <div className="bg-blue-50 text-blue-400 text-[9px] font-black rounded-full px-3 py-1.5 flex items-center justify-center opacity-60 border border-blue-100 uppercase tracking-tighter">{editingDeck.intensity}</div>
-                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-400 font-black text-2xl hover:scale-125 transition-transform ml-auto leading-none">×</button>
+                                        </div>
+                                        <div className="bg-blue-50 text-blue-400 text-[9px] font-black rounded-full px-3 py-1.5 flex items-center justify-center opacity-60 border border-blue-100 uppercase tracking-tighter shrink-0">{editingDeck.intensity}</div>
+                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-400 font-black text-2xl hover:scale-125 transition-transform ml-auto leading-none shrink-0">×</button>
                                     </div>
                                     <textarea
                                         className="w-full text-sm font-bold text-gray-600 outline-none px-2 bg-transparent border-b-2 border-dashed border-blue-50 focus:border-blue-200 py-1 resize-none"
@@ -499,6 +503,29 @@ export const KirbyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#FF69B4',
+                    bg: '#1a237e',
+                    textColor: '#FF69B4',
+                    cardBg: '#ffffff',
+                    fontFamily: 'Fredoka One, cursive'
+                }}
+            />
         </AnimatePresence>
     );
 };

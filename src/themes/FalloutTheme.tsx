@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: '> LOCAL_THREAT', desc: 'RAD LEVEL: NOMINAL', color: '#21ed43' },
@@ -222,32 +223,20 @@ export const FalloutPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <motion.div key="type" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full pt-4">
-            <div className="w-full mb-8">
-                <div className="flex justify-between items-center mb-2 px-6">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-[#21ed43]">&gt; TARGET_DATASET</h3>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="border border-[#21ed43] text-xs py-1 px-3 hover:bg-[#21ed43] hover:text-black transition-colors"
-                    >
-                        [ SCAN ]
-                    </button>
-                </div>
-                <DeckCarousel
-                    decks={customDecks.filter(d => d.intensity === intensity)}
-                    activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#21ed43"
-                />
-            </div>
 
             <div className="pip-border p-6 mb-8 text-2xl">
                 &gt; WAITING FOR COMMAND...<br />
                 &gt; INTENSITY: {intensity}<br />
                 &gt; SECTOR: {gameMode === GameMode.NEVER_HAVE_I_EVER ? 'NHIE' : 'TRUTH/DARE'}
+            </div>
+
+            <div className="mb-8 p-1 pip-border">
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={setActiveDeckId}
+                    variant="fallout"
+                />
             </div>
 
             <div className="space-y-4 max-w-xl mx-auto w-full">
@@ -298,6 +287,12 @@ export const FalloutPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#21ed43',
+                    bg: '#051505',
+                    textColor: '#21ed43',
+                    borderColor: '#21ed43'
+                }}
             />
         </motion.div>
     );
@@ -344,6 +339,8 @@ export const FalloutPlayButton: React.FC<{ label: string; onClick: () => void; i
 export const FalloutDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -355,15 +352,7 @@ export const FalloutDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <p className="text-xs opacity-60 mt-1">&gt; 38.2 GB FREE // HOLOTAPE_STORAGE</p>
                         </div>
                         <button
-                            onClick={() => setEditingDeck({
-                                id: generateId(),
-                                name: '',
-                                description: '',
-                                prompts: [],
-                                isCustom: true,
-                                intensity: logic.intensity || Intensity.SOFT,
-                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                            })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="text-xl hover:bg-[#21ed43] hover:text-black px-3 py-1 transition-colors border border-[#21ed43]/50"
                         >
                             [ ADD_ENTRY ]
@@ -433,26 +422,15 @@ export const FalloutDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-1">
                                 <label className="text-xs opacity-50">&gt; EXEC_PROTOCOL</label>
-                                <select
-                                    value={editingDeck.gameMode}
-                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
-                                    className="w-full bg-black text-[#21ed43] p-3 text-xl outline-none border border-[#21ed43] cursor-pointer hover:bg-[#21ed43]/10 transition-colors appearance-none text-center"
-                                >
-                                    <option value={GameMode.TRUTH_OR_DARE}>TRUTH_OR_DARE.exe</option>
-                                    <option value={GameMode.NEVER_HAVE_I_EVER}>NHIE_SYSTEM.bat</option>
-                                </select>
+                                <div className="w-full bg-[#21ed43]/10 text-[#21ed43] p-3 text-xl border border-[#21ed43]/30 text-center uppercase font-bold">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'TRUTH_OR_DARE.exe' : 'NHIE_SYSTEM.bat'}
+                                </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs opacity-50">&gt; RADIATION_LVL</label>
-                                <select
-                                    value={editingDeck.intensity}
-                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
-                                    className="w-full bg-black text-[#21ed43] p-3 text-xl outline-none border border-[#21ed43] cursor-pointer hover:bg-[#21ed43]/10 transition-colors appearance-none text-center"
-                                >
-                                    <option value={Intensity.SOFT}>LOCAL (SOFT)</option>
-                                    <option value={Intensity.HOT}>REGIONAL (HOT)</option>
-                                    <option value={Intensity.VULGAR}>GLOBAL (VULGAR)</option>
-                                </select>
+                                <div className="w-full bg-[#21ed43]/10 text-[#21ed43] p-3 text-xl border border-[#21ed43]/30 text-center uppercase font-bold">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -467,19 +445,28 @@ export const FalloutDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="border border-[#21ed43]/30 p-4 space-y-3 bg-[#21ed43]/5 group hover:border-[#21ed43] transition-colors">
                                     <div className="flex justify-between items-center border-b border-[#21ed43]/20 pb-2">
-                                        <div className="flex gap-4 items-center">
-                                            <select
-                                                className="bg-black text-[#21ed43] text-lg outline-none border border-[#21ed43]/30 px-2 cursor-pointer"
-                                                value={p.type}
-                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                                ) : (
-                                                    <option value="NeverHaveIEver">NHIE</option>
-                                                )}
-                                            </select>
-                                            <div className="text-sm opacity-50 tracking-widest">[RAD: {editingDeck.intensity}]</div>
+                                        <div className="flex gap-4 items-center flex-1">
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <div className="flex gap-2 flex-1">
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`flex-1 text-sm font-bold py-1 border transition-all ${p.type === 'Truth' ? 'bg-[#21ed43] text-black border-[#21ed43]' : 'border-[#21ed43]/30 text-[#21ed43]/50'}`}
+                                                    >
+                                                        [ TRUTH ]
+                                                    </button>
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`flex-1 text-sm font-bold py-1 border transition-all ${p.type === 'Dare' ? 'bg-[#21ed43] text-black border-[#21ed43]' : 'border-[#21ed43]/30 text-[#21ed43]/50'}`}
+                                                    >
+                                                        [ DARE ]
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex-1 bg-black text-[#21ed43] text-sm py-1 border border-[#21ed43]/30 text-center font-bold opacity-50 uppercase">
+                                                    [ NHIE ]
+                                                </div>
+                                            )}
+                                            <div className="text-[10px] opacity-40 tracking-widest shrink-0 uppercase">[RAD: {editingDeck.intensity}]</div>
                                         </div>
                                         <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-red-500/50 hover:text-red-500 transition-colors text-xl leading-none px-2 font-bold">×</button>
                                     </div>
@@ -500,6 +487,29 @@ export const FalloutDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#21ed43',
+                    bg: '#051505',
+                    textColor: '#21ed43',
+                    cardBg: 'rgba(10, 30, 10, 0.9)',
+                    fontFamily: 'Share Tech Mono, monospace'
+                }}
+            />
         </AnimatePresence>
     );
 };

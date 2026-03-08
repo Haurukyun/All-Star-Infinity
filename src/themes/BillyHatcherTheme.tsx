@@ -1,9 +1,10 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const EGG_WHITE = '#FDFAF4';
 const HERO_BLUE = '#1873CA';
@@ -212,16 +213,12 @@ export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             </div>
                         </div>
 
-                        <div className="w-full">
+                        <div className="w-full mb-4">
                             <DeckCarousel
-                                decks={customDecks.filter(d => d.intensity === intensity)}
+                                decks={customDecks.filter((d: any) => d.intensity === intensity)}
                                 activeDeckId={activeDeckId}
-                                onSelect={(id) => {
-                                    const deck = customDecks.find(d => d.id === id);
-                                    if (deck) setGameMode(deck.gameMode);
-                                    setActiveDeckId(id);
-                                }}
-                                accentColor={HERO_BLUE}
+                                onSelect={setActiveDeckId}
+                                variant="billy"
                             />
                         </div>
 
@@ -251,6 +248,13 @@ export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             }}
                             gameMode={gameMode}
                             intensity={intensity}
+                            styles={{
+                                accent: HERO_BLUE,
+                                bg: EGG_WHITE,
+                                textColor: HERO_BLUE,
+                                cardBg: EGG_WHITE,
+                                fontFamily: 'Fredoka One, cursive'
+                            }}
                         />
                         <div className="pt-4">
                             <button onClick={() => setIntensity(null)} className="text-[${HERO_BLUE}] hover:text-[${HERO_RED}] transition-colors uppercase text-sm font-bold border-b-2 border-dotted pb-1" style={{ color: HERO_BLUE, borderColor: HERO_BLUE }}>RUN AWAY</button>
@@ -290,6 +294,8 @@ export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 export const BillyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = React.useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -301,15 +307,7 @@ export const BillyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                                 <p className="text-xs text-[#1873CA] font-bold tracking-widest uppercase">Incubating custom challenges</p>
                             </div>
                             <button
-                                onClick={() => setEditingDeck({
-                                    id: generateId(),
-                                    name: '',
-                                    description: '',
-                                    prompts: [],
-                                    isCustom: true,
-                                    intensity: logic.intensity || Intensity.SOFT,
-                                    gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                                })}
+                                onClick={() => setIsIntensitySelectOpen(true)}
                                 className="bg-[#E81E3B] text-white px-6 py-3 rounded-full font-black border-4 border-white shadow-[0_6px_0_#b3001b] active:translate-y-1 active:shadow-none transition-all text-xl"
                             >
                                 + ADD
@@ -386,26 +384,15 @@ export const BillyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-xs font-black text-[#1873CA] tracking-widest pl-2">PROTOCOL</label>
-                                <select
-                                    value={editingDeck.gameMode}
-                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
-                                    className="w-full bg-[#1873CA] text-white p-4 rounded-2xl border-4 border-[#1873CA] outline-none font-black text-lg cursor-pointer shadow-[0_4px_0_#0e58a0]"
-                                >
-                                    <option value={GameMode.TRUTH_OR_DARE}>TRUTH/DARE</option>
-                                    <option value={GameMode.NEVER_HAVE_I_EVER}>NHIE MODE</option>
-                                </select>
+                                <div className="w-full bg-[#1873CA] text-white p-4 rounded-2xl border-4 border-[#1873CA] font-black text-lg text-center cursor-default shadow-[0_4px_0_#0e58a0]">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'TRUTH/DARE' : 'NHIE MODE'}
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xs font-black text-[#1873CA] tracking-widest pl-2">INTENSITY</label>
-                                <select
-                                    value={editingDeck.intensity}
-                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
-                                    className="w-full bg-[#F3C910] text-[#1873CA] p-4 rounded-2xl border-4 border-[#F3C910] outline-none font-black text-lg cursor-pointer shadow-[0_4px_0_#ccaa00]"
-                                >
-                                    <option value={Intensity.SOFT}>MORNING (SOFT)</option>
-                                    <option value={Intensity.HOT}>CRACKED (HOT)</option>
-                                    <option value={Intensity.VULGAR}>CROWING (VULGAR)</option>
-                                </select>
+                                <div className="w-full bg-[#F3C910] text-[#1873CA] p-4 rounded-2xl border-4 border-[#F3C910] font-black text-lg text-center cursor-default shadow-[0_4px_0_#ccaa00]">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -431,17 +418,24 @@ export const BillyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                                         ×
                                     </button>
                                     <div className="flex gap-4 mb-4">
-                                        <select
-                                            className="flex-1 bg-[#f1f8ff] text-[#1873CA] font-black p-3 rounded-xl border-4 border-[#1873CA]/10 outline-none"
-                                            value={p.type}
-                                            onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                        >
-                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                            ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
-                                            )}
-                                        </select>
+                                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                            <div className="flex gap-1 flex-1">
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                    className={`flex-1 font-black p-3 rounded-xl border-4 transition-all ${p.type === 'Truth' ? 'bg-[#1873CA] text-white border-[#1873CA]' : 'bg-[#f1f8ff] text-[#1873CA] border-[#1873CA]/10'}`}
+                                                >
+                                                    TRUTH
+                                                </button>
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                    className={`flex-1 font-black p-3 rounded-xl border-4 transition-all ${p.type === 'Dare' ? 'bg-[#E81E3B] text-white border-[#E81E3B]' : 'bg-[#f1f8ff] text-[#1873CA] border-[#1873CA]/10'}`}
+                                                >
+                                                    DARE
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex-1 bg-[#f1f8ff] text-[#1873CA] font-black p-3 rounded-xl border-4 border-[#1873CA]/10 text-center">EGG</div>
+                                        )}
                                         <div className="flex-1 bg-[#f1f8ff] text-[#1873CA] font-black p-3 rounded-xl border-4 border-[#1873CA]/10 flex items-center justify-center opacity-50 italic text-sm">
                                             {editingDeck.intensity}
                                         </div>
@@ -477,6 +471,29 @@ export const BillyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: HERO_BLUE,
+                    bg: EGG_WHITE,
+                    textColor: HERO_BLUE,
+                    cardBg: EGG_WHITE,
+                    fontFamily: 'Fredoka One, cursive'
+                }}
+            />
         </AnimatePresence>
     );
 };

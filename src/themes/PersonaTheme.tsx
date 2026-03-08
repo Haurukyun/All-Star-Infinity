@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const P5_VARIANTS = {
     initial: { opacity: 0, x: -30, skewX: -5, scale: 1.02 },
@@ -232,36 +233,20 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 </motion.div>
             ) : !prompt ? (
                 <motion.div key="choice" variants={P5_VARIANTS} initial="initial" animate="animate" exit="exit" className="flex flex-col items-center gap-4 pt-1">
-                    <div className="w-full mb-6">
-                        <div className="flex justify-between items-center mb-2 px-4">
-                            <div className="bg-white text-black px-3 py-0.5 transform -skew-x-12 border-2 border-black shadow-[2px_2px_0_black]">
-                                <h3 className="font-p5-display text-xs tracking-widest transform skew-x-12 uppercase italic">Select Source</h3>
-                            </div>
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="w-8 h-8 bg-black text-white border-2 border-white flex items-center justify-center shadow-[2px_2px_0_black] hover:bg-[#D80000] transition-colors vibrate-hover"
-                            >
-                                🔍
-                            </button>
-                        </div>
-                        <DeckCarousel
-                            decks={customDecks.filter(d => d.intensity === intensity)}
-                            activeDeckId={activeDeckId}
-                            onSelect={(id) => {
-                                const deck = customDecks.find(d => d.id === id);
-                                if (deck) setGameMode(deck.gameMode);
-                                setActiveDeckId(id);
-                            }}
-                            accentColor="#D80000"
-                        />
-                    </div>
-
                     <div className="text-center relative mb-4">
                         <div className="absolute -inset-4 bg-white/5 blur-xl rounded-full"></div>
                         <p className="font-p5-display text-sm sm:text-base text-[#D80000] tracking-widest relative z-10">MISSION_PARAMS</p>
                         <h2 className="font-p5-display text-3xl sm:text-5xl text-white italic tracking-tighter drop-shadow-[3px_3px_0px_#D80000] relative z-10 uppercase">
                             {intensity}
                         </h2>
+                    </div>
+                    <div className="w-full max-w-sm">
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={setActiveDeckId}
+                            variant="persona"
+                        />
                     </div>
 
                     <div className="grid grid-cols-1 gap-3 sm:gap-4 w-full px-2 sm:px-4">
@@ -297,6 +282,12 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         }}
                         gameMode={gameMode}
                         intensity={intensity}
+                        styles={{
+                            accent: '#D80000',
+                            bg: '#f0f0f0',
+                            textColor: '#000000',
+                            cardBg: '#ffffff'
+                        }}
                     />
                 </motion.div>
             ) : (
@@ -330,6 +321,8 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -337,15 +330,7 @@ export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="flex justify-between items-end mb-2">
                         <h2 className="font-p5-display text-4xl sm:text-5xl italic text-white drop-shadow-[3px_3px_0px_#D80000] vibrate-hover cursor-default">FORGE</h2>
                         <button
-                            onClick={() => setEditingDeck({
-                                id: generateId(),
-                                name: '',
-                                description: '',
-                                prompts: [],
-                                isCustom: true,
-                                intensity: logic.intensity || Intensity.SOFT,
-                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                            })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="bg-white text-black px-4 py-1.5 border-[3px] border-black transform -skew-x-12 font-p5-display text-lg sm:text-xl italic shadow-[4px_4px_0_black] active:translate-x-1 active:translate-y-1 active:shadow-none transition-all hover:bg-[#D80000] hover:text-white"
                         >
                             + NEW
@@ -403,23 +388,14 @@ export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-4 mt-6">
                             <div className="flex-1 group">
                                 <label className="block text-[8px] sm:text-[10px] font-black uppercase mb-1 tracking-widest text-[#D80000]">STRATEGY</label>
-                                <div className="relative">
-                                    <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-black text-white font-p5-display text-xl sm:text-2xl border-none p-2 skew-x-[-12deg] focus:outline-none appearance-none cursor-pointer hover:bg-[#D80000] transition-colors">
-                                        <option value={GameMode.TRUTH_OR_DARE}>PHANTOM (T/D)</option>
-                                        <option value={GameMode.NEVER_HAVE_I_EVER}>GOSSIP (NHIE)</option>
-                                    </select>
-                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white font-bold">▼</div>
+                                <div className="bg-black text-white font-p5-display text-xl sm:text-2xl p-2 skew-x-[-12deg] text-center border-b-2 border-white/20">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'PHANTOM (T/D)' : 'GOSSIP (NHIE)'}
                                 </div>
                             </div>
                             <div className="flex-1 group">
                                 <label className="block text-[8px] sm:text-[10px] font-black uppercase mb-1 tracking-widest text-[#D80000]">THREAT_LVL</label>
-                                <div className="relative">
-                                    <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-black text-white font-p5-display text-xl sm:text-2xl border-none p-2 skew-x-[-12deg] focus:outline-none appearance-none cursor-pointer hover:bg-[#D80000] transition-colors">
-                                        <option value={Intensity.SOFT}>CASUAL</option>
-                                        <option value={Intensity.HOT}>MODEL</option>
-                                        <option value={Intensity.VULGAR}>EXPOSURE</option>
-                                    </select>
-                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white font-bold">▼</div>
+                                <div className="bg-black text-white font-p5-display text-xl sm:text-2xl p-2 skew-x-[-12deg] text-center border-b-2 border-white/20">
+                                    {editingDeck.intensity}
                                 </div>
                             </div>
                         </div>
@@ -435,18 +411,27 @@ export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="bg-white p-3 sm:p-4 border-[3px] border-black transform -skew-x-2 shadow-[3px_3px_0_black] relative group">
                                     <div className="flex gap-2 mb-2">
-                                        <select
-                                            className="bg-black text-white text-[9px] font-black p-1 px-3 border-2 border-transparent focus:border-[#D80000] outline-none skew-x-6 appearance-none"
-                                            value={p.type}
-                                            onChange={(e) => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value)}
-                                        >
-                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                            ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
-                                            )}
-                                        </select>
-                                        <div className="bg-[#f0f0f0] text-black text-[9px] font-black p-1 px-3 border-2 border-black flex items-center skew-x-6">
+                                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                    className={`px-3 py-1 text-[8px] font-black transform skew-x-6 border-2 transition-all ${p.type === 'Truth' ? 'bg-[#D80000] text-white border-black' : 'bg-white text-black border-black/10'}`}
+                                                >
+                                                    TRUTH
+                                                </button>
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                    className={`px-3 py-1 text-[8px] font-black transform skew-x-6 border-2 transition-all ${p.type === 'Dare' ? 'bg-[#D80000] text-white border-black' : 'bg-white text-black border-black/10'}`}
+                                                >
+                                                    DARE
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-black text-white text-[8px] font-black px-3 py-1 border-2 border-transparent skew-x-6">
+                                                GOSSIP (NHIE)
+                                            </div>
+                                        )}
+                                        <div className="bg-[#f0f0f0] text-black text-[8px] font-black px-3 py-1 border-2 border-black flex items-center skew-x-6 opacity-60">
                                             {editingDeck.intensity}
                                         </div>
                                         <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="ml-auto text-black/30 hover:text-[#D80000] font-black text-2xl leading-none transition-colors">×</button>
@@ -469,6 +454,29 @@ export const PersonaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#D80000',
+                    bg: '#f0f0f0',
+                    textColor: '#000000',
+                    cardBg: '#ffffff',
+                    fontFamily: '"Bangers", cursive'
+                }}
+            />
         </AnimatePresence>
     );
 };

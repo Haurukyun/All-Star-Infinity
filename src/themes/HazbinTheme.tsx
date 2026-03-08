@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'Welcome Lobby', desc: 'Mild eternal torment.', color: '#fffb00' },
@@ -198,29 +199,17 @@ export const HazbinPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =>
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <motion.div key="type" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-start h-full pt-4">
-            <div className="w-full mb-10 overflow-visible">
-                <div className="flex justify-between items-center mb-4 px-8">
-                    <h3 className="hazbin-display text-[#ffcc00] hazbin-neon-gold text-sm tracking-widest">Selected Grimoires</h3>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="w-10 h-10 rounded-full bg-[#1a050f] border-2 border-[#ffcc00] flex items-center justify-center shadow-[0_0_15px_rgba(255,204,0,0.4)] hover:scale-110 transition-transform"
-                    >
-                        🔍
-                    </button>
-                </div>
+
+            <h2 className="text-4xl hazbin-display mb-8 hazbin-neon-gold">PICK A CARD, ANY CARD!</h2>
+
+            <div className="w-full max-w-2xl mb-12">
                 <DeckCarousel
                     decks={customDecks.filter(d => d.intensity === intensity)}
                     activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#ffcc00"
+                    onSelect={setActiveDeckId}
+                    variant="hazbin"
                 />
             </div>
-
-            <h2 className="text-4xl hazbin-display mb-8 hazbin-neon-gold">PICK A CARD, ANY CARD!</h2>
 
             <div className="flex gap-8 w-full max-w-3xl mb-12 flex-col sm:flex-row">
                 {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
@@ -262,6 +251,12 @@ export const HazbinPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =>
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#ffcc00',
+                    bg: '#1a050f',
+                    textColor: '#ffcccb',
+                    borderColor: '#e52b50'
+                }}
             />
         </motion.div>
     );
@@ -310,6 +305,8 @@ export const HazbinPlayButton: React.FC<{ label: string; onClick: () => void; is
 export const HazbinDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -320,15 +317,7 @@ export const HazbinDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <p className="text-sm italic opacity-60 mt-1 text-[#ffcccb]">Bound agreements and eternal contracts.</p>
                         </div>
                         <button
-                            onClick={() => setEditingDeck({
-                                id: generateId(),
-                                name: '',
-                                description: '',
-                                prompts: [],
-                                isCustom: true,
-                                intensity: logic.intensity || Intensity.SOFT,
-                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                            })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="py-2 px-6 rounded-full border-2 border-[#ffcc00] text-[#ffcc00] hover:bg-[#ffcc00] hover:text-black transition-all hazbin-display shadow-[0_0_15px_rgba(255,204,0,0.3)]"
                         >
                             Forge New Agreement
@@ -404,26 +393,15 @@ export const HazbinDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="grid grid-cols-2 gap-8">
                             <div className="space-y-2">
                                 <label className="hazbin-display text-[#ffcc00] text-sm tracking-widest pl-2">Governing Protocol</label>
-                                <select
-                                    value={editingDeck.gameMode}
-                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
-                                    className="w-full bg-[#1a050f] border-2 border-[#e52b50] p-4 text-[#ffcc00] hazbin-display text-xl focus:outline-none rounded-2xl hover:border-[#ffcc00] transition-colors appearance-none text-center cursor-pointer shadow-inner"
-                                >
-                                    <option className="bg-[#1a050f]" value={GameMode.TRUTH_OR_DARE}>Truth Or Dare</option>
-                                    <option className="bg-[#1a050f]" value={GameMode.NEVER_HAVE_I_EVER}>Never Have I Ever</option>
-                                </select>
+                                <div className="w-full bg-[#1a050f] border-2 border-[#e52b50] p-4 text-[#ffcc00] hazbin-display text-xl rounded-2xl text-center shadow-inner uppercase font-bold">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'Truth Or Dare' : 'Never Have I Ever'}
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="hazbin-display text-[#ffcc00] text-sm tracking-widest pl-2">Intensity Layer</label>
-                                <select
-                                    value={editingDeck.intensity}
-                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
-                                    className="w-full bg-[#1a050f] border-2 border-[#e52b50] p-4 text-[#ffcc00] hazbin-display text-xl focus:outline-none rounded-2xl hover:border-[#ffcc00] transition-colors appearance-none text-center cursor-pointer shadow-inner"
-                                >
-                                    <option className="bg-[#1a050f]" value={Intensity.SOFT}>SOFT LAYER</option>
-                                    <option className="bg-[#1a050f]" value={Intensity.HOT}>HOT LAYER</option>
-                                    <option className="bg-[#1a050f]" value={Intensity.VULGAR}>VULGAR LAYER</option>
-                                </select>
+                                <div className="w-full bg-[#1a050f] border-2 border-[#e52b50] p-4 text-[#ffcc00] hazbin-display text-xl rounded-2xl text-center shadow-inner uppercase font-bold">
+                                    {editingDeck.intensity} LAYER
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -443,19 +421,28 @@ export const HazbinDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="hazbin-panel p-6 bg-[#1a050f]/50 border-2 group hover:border-white transition-colors">
                                     <div className="flex justify-between items-center mb-4 border-b border-[#e52b50]/30 pb-4">
-                                        <div className="flex gap-6 items-center">
-                                            <select
-                                                className="bg-transparent text-[#ffcc00] hazbin-display text-2xl outline-none cursor-pointer hover:text-white transition-colors"
-                                                value={p.type}
-                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option className="bg-[#1a050f]" value="Truth">Truth</option><option className="bg-[#1a050f]" value="Dare">Dare</option></>
-                                                ) : (
-                                                    <option className="bg-[#1a050f]" value="NeverHaveIEver">NHIE</option>
-                                                )}
-                                            </select>
-                                            <div className="text-[#ffcc00] hazbin-display text-xl opacity-40 italic">[{editingDeck.intensity}]</div>
+                                        <div className="flex gap-6 items-center flex-1">
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <div className="flex gap-4 flex-1">
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`flex-1 py-1 px-4 rounded-full border-2 hazbin-display text-lg transition-all ${p.type === 'Truth' ? 'bg-[#e52b50] text-white border-[#ffcc00]' : 'border-[#e52b50]/30 text-[#ffcccb]/40'}`}
+                                                    >
+                                                        Truth
+                                                    </button>
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`flex-1 py-1 px-4 rounded-full border-2 hazbin-display text-lg transition-all ${p.type === 'Dare' ? 'bg-[#ffcc00] text-black border-[#ffcc00]' : 'border-[#e52b50]/30 text-[#ffcccb]/40'}`}
+                                                    >
+                                                        Dare
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex-1 py-1 px-4 rounded-full border-2 border-[#e52b50]/20 text-[#ffcccb]/30 hazbin-display text-center">
+                                                    NHIE Clause
+                                                </div>
+                                            )}
+                                            <div className="text-[#ffcc00] hazbin-display text-lg opacity-40 italic shrink-0">[{editingDeck.intensity}]</div>
                                         </div>
                                         <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#e52b50] hover:text-red-500 hover:scale-125 transition-all text-3xl">✖</button>
                                     </div>
@@ -481,6 +468,29 @@ export const HazbinDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#e52b50',
+                    bg: '#1a050f',
+                    textColor: '#ffcccb',
+                    cardBg: 'rgba(26, 5, 15, 0.95)',
+                    fontFamily: 'Lora, serif'
+                }}
+            />
         </AnimatePresence>
     );
 };

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'RANK 1 (ALEPH)', desc: 'MISFIT CLASS REGULAR', color: '#ffb300' },
@@ -228,29 +229,17 @@ export const IrumaPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full justify-start space-y-6 sm:space-y-8 p-4 pt-8">
+
+            <h2 className="text-4xl text-center font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000]">CHOOSE YOUR SPELL</h2>
+
             <div className="w-full mb-8">
-                <div className="flex justify-between items-center mb-2 px-2">
-                    <h3 className="text-sm font-black text-[#ffd700] uppercase tracking-widest drop-shadow-[0_2px_2px_#000]">Selected Grimoires</h3>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="w-10 h-10 rounded-full bg-[#4a148c] border-2 border-[#ffd700] flex items-center justify-center shadow-[0_4px_0_rgba(0,0,0,0.5)] hover:scale-110 transition-transform"
-                    >
-                        🔍
-                    </button>
-                </div>
                 <DeckCarousel
                     decks={customDecks.filter(d => d.intensity === intensity)}
                     activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#ffd700"
+                    onSelect={setActiveDeckId}
+                    variant="iruma"
                 />
             </div>
-
-            <h2 className="text-4xl text-center font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000]">CHOOSE YOUR SPELL</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
@@ -302,6 +291,12 @@ export const IrumaPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => 
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#ffd700',
+                    bg: '#2e1534',
+                    textColor: '#ffffff',
+                    cardBg: '#4a148c'
+                }}
             />
         </motion.div>
     );
@@ -358,6 +353,9 @@ export const IrumaPlayButton: React.FC<{ label: string; onClick: () => void; isP
 
 export const IrumaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, activeDeckId, setActiveDeckId, setEditingDeck, editingDeck, generateId, deleteDeck, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -365,7 +363,7 @@ export const IrumaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="flex justify-between items-end border-b-4 border-[#ffd700]/30 pb-2 mb-8">
                         <h2 className="text-4xl font-black text-[#ffd700] drop-shadow-[0_2px_2px_#000]">GRIMOIRES</h2>
                         <button
-                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="iruma-button bg-[#ffd700] text-[#4a148c] px-4 py-2 text-sm"
                         >
                             + NEW SPELLS
@@ -417,18 +415,15 @@ export const IrumaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <label className="text-xs text-[#ffd700] font-black mb-1 block">GAME MODE</label>
-                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-2 text-white font-bold rounded-xl outline-none">
-                                    <option value="TruthOrDare">TRUTH/DARE</option>
-                                    <option value="NeverHaveIEver">NHIE</option>
-                                </select>
+                                <div className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-2 text-white font-bold rounded-xl text-center cursor-default">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'TRUTH/DARE' : 'NHIE'}
+                                </div>
                             </div>
                             <div className="flex-1">
                                 <label className="text-xs text-[#ffd700] font-black mb-1 block">RANK (DIFF)</label>
-                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-2 text-white font-bold rounded-xl outline-none">
-                                    <option value="SOFT">ALEPH (SOFT)</option>
-                                    <option value="HOT">DALETH (HOT)</option>
-                                    <option value="VULGAR">YOD (VULGAR)</option>
-                                </select>
+                                <div className="w-full bg-[#1f0b24] border-2 border-[#ffd700]/30 p-2 text-white font-bold rounded-xl text-center cursor-default">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
 
@@ -436,17 +431,24 @@ export const IrumaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="p-4 border-2 border-[#ffd700]/10 bg-[#2b1332] rounded-xl space-y-3 relative">
                                     <div className="flex justify-between items-center">
-                                        <select
-                                            className="bg-[#4a148c] text-white text-[10px] font-black border-2 border-[#ffd700]/30 px-2 py-1 rounded-lg outline-none"
-                                            value={p.type}
-                                            onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                        >
-                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                            ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
-                                            )}
-                                        </select>
+                                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                    className={`px-3 py-1 text-[10px] font-black border-2 rounded-lg transition-all ${p.type === 'Truth' ? 'bg-[#ffd700] text-[#4a148c] border-[#ffd700]' : 'bg-transparent text-[#ffd700] border-[#ffd700]/30'}`}
+                                                >
+                                                    TRUTH
+                                                </button>
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                    className={`px-3 py-1 text-[10px] font-black border-2 rounded-lg transition-all ${p.type === 'Dare' ? 'bg-[#d50000] text-white border-[#d50000]' : 'bg-transparent text-[#d50000] border-[#d50000]/30'}`}
+                                                >
+                                                    DARE
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-[#4a148c] text-white text-[10px] font-black border-2 border-transparent px-3 py-1 rounded-lg">MAGIC</div>
+                                        )}
                                         <span className="text-[10px] font-black bg-[#ffd700]/10 text-[#ffd700] px-3 py-1 rounded-full uppercase">{editingDeck.intensity}</span>
                                         <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 hover:text-white font-black text-xl">×</button>
                                     </div>
@@ -467,6 +469,29 @@ export const IrumaDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#ffd700',
+                    bg: '#2e1534',
+                    textColor: '#ffffff',
+                    cardBg: '#4a148c',
+                    fontFamily: 'Sniglet, cursive'
+                }}
+            />
         </AnimatePresence>
     );
 };

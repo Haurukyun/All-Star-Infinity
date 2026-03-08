@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
   { id: Intensity.SOFT, title: 'HELLO KITTY', desc: 'SWEET GARDEN', color: '#B3E5FC', secondary: '#29B6F6', icon: '🎀' },
@@ -238,33 +239,22 @@ export const SanrioPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =>
 
   return (
     <div className="h-full flex flex-col justify-center space-y-4">
-      <div className="w-full">
-        <div className="flex justify-between items-center mb-2 px-4">
-          <span className="text-xs font-black text-[#FF69B4] tracking-widest uppercase">SELECT OUTFIT</span>
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="w-10 h-10 bg-white border-4 border-[#FF69B4] rounded-full flex items-center justify-center text-xl shadow-sm hover:scale-110 transition-transform"
-          >
-            🔍
-          </button>
-        </div>
-        <DeckCarousel
-          decks={customDecks.filter(d => d.intensity === intensity)}
-          activeDeckId={activeDeckId}
-          onSelect={(id) => {
-            const deck = customDecks.find(d => d.id === id);
-            if (deck) setGameMode(deck.gameMode);
-            setActiveDeckId(id);
-          }}
-          accentColor="#FF69B4"
-        />
-      </div>
-
       <h2 className="sanrio-title text-3xl text-center">LEVEL: {intensity}</h2>
 
       <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="space-y-4">
         <div className="sanrio-panel text-center">
-          <h3 className="text-xl font-black text-[#7B4B94] mb-6">CHOOSE ACTIVITY</h3>
+          <h3 className="text-xl font-black text-[#7B4B94] mb-2">CHOOSE ACTIVITY</h3>
+
+          <div className="w-full mb-6">
+            <DeckCarousel
+              decks={customDecks.filter(d => d.intensity === intensity)}
+              activeDeckId={activeDeckId}
+              onSelect={setActiveDeckId}
+              variant="sanrio"
+              accentColor="#FF69B4"
+            />
+          </div>
+
           <div className="flex gap-4">
             {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
               <button onClick={() => handleDraw('NeverHaveIEver')} className="sanrio-button pink flex-1 h-32 flex-col justify-center text-xl">
@@ -305,6 +295,12 @@ export const SanrioPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =>
         }}
         gameMode={gameMode}
         intensity={intensity}
+        styles={{
+          accent: '#FF69B4',
+          bg: '#FFF0F5',
+          textColor: '#7B4B94',
+          borderColor: '#FFB6C1'
+        }}
       />
     </div>
   );
@@ -347,6 +343,8 @@ export const SanrioPlayButton: React.FC<{ label: string; onClick: () => void; is
 export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
   const { customDecks, activeDeckId, setActiveDeckId, editingDeck, setEditingDeck, saveDeck, generateId, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
 
+  const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
   return (
     <AnimatePresence mode="wait">
       {!editingDeck ? (
@@ -354,7 +352,7 @@ export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
           <div className="flex justify-between items-center mb-6">
             <h2 className="sanrio-title text-3xl">WARDROBE</h2>
             <button
-              onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+              onClick={() => setIsIntensitySelectOpen(true)}
               className="bg-white text-[#FF69B4] px-4 py-2 rounded-full font-black text-xs border-4 border-[#FF69B4] shadow-sm hover:scale-105 active:scale-95 transition-all"
             >
               + NEW LOOK
@@ -421,18 +419,15 @@ export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
             <div className="flex gap-4">
               <div className="flex-1 space-y-1">
                 <label className="text-[10px] font-black text-[#FF69B4] pl-4 uppercase tracking-widest">Adventure Type</label>
-                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-white border-4 border-[#F8BBD0] rounded-full p-3 text-xs font-black text-[#7B4B94] outline-none appearance-none text-center cursor-pointer">
-                  <option value="TruthOrDare">PARTY (T/D)</option>
-                  <option value="NeverHaveIEver">GOSSIP (NHIE)</option>
-                </select>
+                <div className="w-full bg-white border-4 border-[#F8BBD0] rounded-full p-3 text-xs font-black text-[#7B4B94] text-center">
+                  {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'PARTY (T/D)' : 'GOSSIP (NHIE)'}
+                </div>
               </div>
               <div className="flex-1 space-y-1">
                 <label className="text-[10px] font-black text-[#FF69B4] pl-4 uppercase tracking-widest">Sweetness</label>
-                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-white border-4 border-[#F8BBD0] rounded-full p-3 text-xs font-black text-[#7B4B94] outline-none appearance-none text-center cursor-pointer">
-                  <option value="SOFT">GARDEN</option>
-                  <option value="HOT">BERRY</option>
-                  <option value="VULGAR">GOTHIC</option>
-                </select>
+                <div className="w-full bg-white border-4 border-[#F8BBD0] rounded-full p-3 text-xs font-black text-[#7B4B94] text-center uppercase">
+                  {editingDeck.intensity}
+                </div>
               </div>
             </div>
 
@@ -446,19 +441,26 @@ export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 {editingDeck.prompts.map((p: any) => (
                   <div key={p.id} className="bg-white border-4 border-[#FFF0F5] rounded-[25px] p-4 space-y-3 shadow-sm hover:shadow-md transition-shadow relative group">
                     <div className="flex items-center gap-3">
-                      <select
-                        className="bg-[#FCE4EC] text-[#D81B60] text-[10px] font-black rounded-full px-4 py-1.5 outline-none border-2 border-transparent focus:border-[#F8BBD0] transition-all"
-                        value={p.type}
-                        onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                      >
-                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                          <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                        ) : (
-                          <option value="NeverHaveIEver">NHIE</option>
-                        )}
-                      </select>
-                      <div className="text-[9px] font-black text-[#FF69B4] opacity-50 uppercase tracking-tighter px-2 border-l-2 border-[#FFF0F5]">{editingDeck.intensity}</div>
-                      <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#FFB6C1] hover:text-[#FF69B4] font-black text-2xl transition-colors ml-auto leading-none">×</button>
+                      {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                        <div className="flex gap-2 flex-1">
+                          <button
+                            onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                            className={`flex-1 text-[10px] font-black rounded-full px-4 py-1.5 transition-all border-2 ${p.type === 'Truth' ? 'bg-[#FF69B4] text-white border-white' : 'bg-[#FCE4EC] text-[#D81B60] border-transparent'}`}
+                          >
+                            TRUTH
+                          </button>
+                          <button
+                            onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                            className={`flex-1 text-[10px] font-black rounded-full px-4 py-1.5 transition-all border-2 ${p.type === 'Dare' ? 'bg-[#FFCA28] text-[#7B4B94] border-white' : 'bg-[#FCE4EC] text-[#D81B60] border-transparent'}`}
+                          >
+                            DARE
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex-1 bg-[#F5F5F5] text-[#BCAAA4] text-[10px] font-black rounded-full px-4 py-1.5 text-center">GOSSIP PIECE</div>
+                      )}
+                      <div className="text-[9px] font-black text-[#FF69B4] opacity-50 uppercase tracking-tighter px-2 border-l-2 border-[#FFF0F5] shrink-0">{editingDeck.intensity}</div>
+                      <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#FFB6C1] hover:text-[#FF69B4] font-black text-2xl transition-colors ml-auto leading-none shrink-0">×</button>
                     </div>
                     <textarea
                       className="w-full text-sm font-bold text-[#7B4B94] outline-none px-2 bg-transparent border-b-2 border-dashed border-[#FFF0F5] focus:border-[#FFB6C1] py-1 resize-none italic"
@@ -479,6 +481,29 @@ export const SanrioDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
           </div>
         </motion.div>
       )}
+      <ThemedIntensitySelect
+        isOpen={isIntensitySelectOpen}
+        onClose={() => setIsIntensitySelectOpen(false)}
+        onSelect={(intensity, gameMode) => {
+          setEditingDeck({
+            id: generateId(),
+            name: '',
+            description: '',
+            prompts: [],
+            isCustom: true,
+            intensity,
+            gameMode
+          });
+          setIsIntensitySelectOpen(false);
+        }}
+        styles={{
+          accent: '#FF69B4',
+          bg: '#FFF0F5',
+          textColor: '#7B4B94',
+          cardBg: '#FFFFFF',
+          fontFamily: 'Nunito, sans-serif'
+        }}
+      />
     </AnimatePresence>
   );
 };

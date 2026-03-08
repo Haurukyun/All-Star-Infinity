@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'NORMAL', desc: 'EFFECTIVE', color: '#A8A878', text: '#FFFFFF', icon: '⚪' },
@@ -91,30 +92,17 @@ export const PokemonPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 </motion.div>
             ) : !prompt ? (
                 <div className="flex flex-col items-center justify-start h-full pt-2">
-                    <div className="poke-panel w-full mb-6">
-                        <div className="flex justify-between items-center mb-2 px-2">
-                            <h3 className="text-[10px] text-gray-400 uppercase">SELECT ITEM</h3>
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="w-8 h-8 rounded border-2 border-[#606060] flex items-center justify-center hover:bg-[#D0D0A8] transition-colors"
-                            >
-                                🔍
-                            </button>
-                        </div>
-                        <DeckCarousel
-                            decks={customDecks.filter(d => d.intensity === intensity)}
-                            activeDeckId={activeDeckId}
-                            onSelect={(id) => {
-                                const deck = customDecks.find(d => d.id === id);
-                                if (deck) setGameMode(deck.gameMode);
-                                setActiveDeckId(id);
-                            }}
-                            accentColor="#3B4CCA"
-                        />
-                    </div>
-
                     <div className="poke-panel w-full text-center space-y-4 border-double border-8 border-[#404040]">
                         <div className="bg-[#404040] text-white py-1 -mx-4 -mt-4 mb-2 text-center text-[8px]">LEVEL: {intensity}</div>
+
+                        <div className="bg-[#A0A0A0] p-1 rounded border-2 border-[#606060] mb-4">
+                            <DeckCarousel
+                                decks={customDecks.filter(d => d.intensity === intensity)}
+                                activeDeckId={activeDeckId}
+                                onSelect={setActiveDeckId}
+                                variant="pixelfore"
+                            />
+                        </div>
 
                         <div className="bg-[#A0A0A0] p-4 rounded border-2 border-[#606060] grid grid-cols-1 gap-2">
                             {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
@@ -144,6 +132,13 @@ export const PokemonPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         }}
                         gameMode={gameMode}
                         intensity={intensity}
+                        styles={{
+                            accent: '#D04040',
+                            bg: '#70D090',
+                            textColor: '#404040',
+                            cardBg: '#F8F8D0',
+                            fontFamily: '"Press Start 2P", cursive'
+                        }}
                     />
                 </div>
             ) : (
@@ -163,12 +158,13 @@ export const PokemonPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const PokemonDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
                 <motion.div key="decks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                     <div className="poke-panel poke-panel-blue">
-                        <div className="flex justify-between items-center mb-4"><h2 className="text-sm">YOUR BAG</h2><button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || 'SOFT', gameMode: logic.gameMode || 'TruthOrDare' })} className="text-[8px] bg-[#6890F0] text-white px-2 py-1 rounded border border-[#405080]">NEW ITEM</button></div>
+                        <div className="flex justify-between items-center mb-4"><h2 className="text-sm">YOUR BAG</h2><button onClick={() => setIsIntensitySelectOpen(true)} className="text-[8px] bg-[#6890F0] text-white px-2 py-1 rounded border border-[#405080]">NEW ITEM</button></div>
                         <div className="bg-white border-2 border-[#A8C0D8] rounded h-[60vh] overflow-y-auto p-2 no-scrollbar">
                             {customDecks.map((deck: any) => (
                                 <div key={deck.id} className="poke-list-item"><div className="w-8 h-8 bg-[#F8F8F8] border border-gray-300 rounded flex items-center justify-center mr-2 text-lg">💿</div><div className="flex-1"><div className="text-[10px]">{deck.name || '????'}</div><div className="text-[8px] text-gray-500">x{deck.prompts.length}</div></div><button onClick={() => setEditingDeck(deck)} className="text-[8px] text-blue-500 mr-2">USE</button><button onClick={() => deleteDeck(deck.id)} className="text-[8px] text-red-500">TOSS</button></div>
@@ -183,27 +179,37 @@ export const PokemonDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <input className="w-full bg-white border-2 border-[#C0C0C0] p-2 text-xs outline-none focus:border-[#6890F0]" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="TM NAME" />
                         <textarea className="w-full bg-white border-2 border-[#C0C0C0] p-2 text-xs outline-none focus:border-[#6890F0] resize-none h-16" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="TM DESCRIPTION" />
                         <div className="flex gap-2">
-                            <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="flex-1 bg-white border-2 border-[#C0C0C0] p-2 text-[10px] outline-none">
-                                <option value="TruthOrDare">T/D</option>
-                                <option value="NeverHaveIEver">NHIE</option>
-                            </select>
-                            <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="flex-1 bg-white border-2 border-[#C0C0C0] p-2 text-[10px] outline-none">
-                                <option value="SOFT">SOFT</option>
-                                <option value="HOT">HOT</option>
-                                <option value="VULGAR">VULGAR</option>
-                            </select>
+                            <div className="flex-1 bg-white border-2 border-[#C0C0C0] p-2 text-[10px] text-center cursor-default">
+                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'FIGHT' : 'NHIE'}
+                                <div className="text-[6px] text-gray-400 mt-1">MODE</div>
+                            </div>
+                            <div className="flex-1 bg-white border-2 border-[#C0C0C0] p-2 text-[10px] text-center cursor-default">
+                                {editingDeck.intensity}
+                                <div className="text-[6px] text-gray-400 mt-1">LVL</div>
+                            </div>
                         </div>
                         <div className="bg-white border-2 border-[#C0C0C0] rounded h-[30vh] overflow-y-auto p-2 no-scrollbar space-y-2">
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="bg-[#F8F8F8] border border-[#E0E0E0] p-2 rounded">
                                     <div className="flex gap-2 mb-1">
-                                        <select className="bg-white border border-[#C0C0C0] text-[8px] p-1 rounded" value={p.type} onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                            {editingDeck.gameMode === 'TruthOrDare' ? (
-                                                <><option value="Truth">Truth</option><option value="Dare">Dare</option></>
-                                            ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
-                                            )}
-                                        </select>
+                                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                    className={`px-2 py-1 text-[8px] border transition-all ${p.type === 'Truth' ? 'bg-[#6890F0] text-white border-[#405080]' : 'bg-white text-[#6890F0] border-[#A8C0D8]'}`}
+                                                >
+                                                    FIGHT
+                                                </button>
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                    className={`px-2 py-1 text-[8px] border transition-all ${p.type === 'Dare' ? 'bg-[#C03028] text-white border-[#802020]' : 'bg-white text-[#C03028] border-[#E0A0A0]'}`}
+                                                >
+                                                    STATUS
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="text-[8px] text-[#A8A878] font-bold px-2 py-1 border border-[#A8A878] rounded bg-white">MOVE</div>
+                                        )}
                                         <div className="text-[8px] text-gray-500 font-bold flex items-center px-1 border border-[#C0C0C0] rounded bg-[#E0E0E0]">{editingDeck.intensity}</div>
                                         <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="ml-auto text-red-500 text-xs font-bold leading-none">×</button>
                                     </div>
@@ -215,6 +221,29 @@ export const PokemonDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#F8D030',
+                    bg: '#F8F8D0',
+                    textColor: '#404040',
+                    cardBg: '#F8F8D0',
+                    fontFamily: '"Press Start 2P", cursive'
+                }}
+            />
         </AnimatePresence>
     );
 };

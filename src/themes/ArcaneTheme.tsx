@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'TOPSIDE (PILTOVER)', desc: 'CITY OF PROGRESS', color: '#c79b3b' },
@@ -220,29 +221,16 @@ export const ArcanePromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =>
 
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col h-full justify-center space-y-4 p-4 max-w-4xl mx-auto w-full">
-            <div className="w-full mb-4">
-                <div className="flex justify-between items-center mb-2 px-2">
-                    <span className="arcane-text-body text-[#c79b3b] font-bold text-xs tracking-widest uppercase">SELECT BLUEPRINT</span>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="w-10 h-10 bg-[#1a1c23] border border-[#c79b3b] flex items-center justify-center shadow-[0_0_10px_rgba(199,155,59,0.2)] hover:bg-[#c79b3b]/10 hover:shadow-[0_0_15px_#c79b3b] transition-all"
-                    >
-                        🔍
-                    </button>
-                </div>
+            <h2 className="text-3xl sm:text-4xl text-center font-bold text-[#00ffcc] drop-shadow-[0_0_5px_rgba(0,255,204,0.5)] tracking-wider">INITIATE SEQUENCE: {intensity}</h2>
+
+            <div className="w-full mb-8">
                 <DeckCarousel
                     decks={customDecks.filter(d => d.intensity === intensity)}
                     activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#c79b3b"
+                    onSelect={setActiveDeckId}
+                    variant="arcane"
                 />
             </div>
-
-            <h2 className="text-3xl sm:text-4xl text-center font-bold text-[#00ffcc] drop-shadow-[0_0_5px_rgba(0,255,204,0.5)] tracking-wider">INITIATE SEQUENCE: {intensity}</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
@@ -297,6 +285,12 @@ export const ArcanePromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) =>
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#c79b3b',
+                    bg: '#0a1118',
+                    textColor: '#ffffff',
+                    cardBg: '#1a1c23'
+                }}
             />
         </motion.div>
     );
@@ -353,6 +347,9 @@ export const ArcanePlayButton: React.FC<{ label: string; onClick: () => void; is
 
 export const ArcaneDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, activeDeckId, setActiveDeckId, setEditingDeck, editingDeck, generateId, deleteDeck, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -360,7 +357,7 @@ export const ArcaneDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="flex justify-between items-end border-b-2 border-[#c79b3b]/30 pb-4 mb-8">
                         <h2 className="text-4xl font-bold text-[#c79b3b] tracking-wider">SCHEMATICS</h2>
                         <button
-                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="bg-[#c79b3b] text-[#1a1c23] px-4 py-2 font-bold text-sm tracking-widest hover:brightness-110"
                         >
                             + NEW BLUEPRINT
@@ -412,18 +409,15 @@ export const ArcaneDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-4">
                             <div className="flex-1 flex flex-col gap-1">
                                 <label className="text-[10px] text-[#c79b3b] font-bold">MODE</label>
-                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-2 text-[#00ffcc] font-bold outline-none">
-                                    <option value="TruthOrDare">TRUTH/DARE</option>
-                                    <option value="NeverHaveIEver">NHIE</option>
-                                </select>
+                                <div className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-2 text-[#00ffcc] font-bold tracking-widest text-center cursor-default">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'TRUTH/DARE' : 'NHIE'}
+                                </div>
                             </div>
                             <div className="flex-1 flex flex-col gap-1">
                                 <label className="text-[10px] text-[#c79b3b] font-bold">INTENSITY</label>
-                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-2 text-[#9000ff] font-bold outline-none">
-                                    <option value="SOFT">SOFT</option>
-                                    <option value="HOT">HOT</option>
-                                    <option value="VULGAR">VULGAR</option>
-                                </select>
+                                <div className="w-full bg-[#0a1118] border border-[#c79b3b]/30 p-2 text-[#9000ff] font-bold tracking-widest text-center cursor-default">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
 
@@ -431,17 +425,24 @@ export const ArcaneDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="p-4 border border-white/10 bg-[#0a1118] space-y-3 relative group">
                                     <div className="flex justify-between items-center">
-                                        <select
-                                            className="bg-[#1a1c23] text-[#00ffcc] text-[10px] font-bold border border-white/10 px-2 py-1 outline-none"
-                                            value={p.type}
-                                            onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                        >
-                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                            ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
-                                            )}
-                                        </select>
+                                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                    className={`px-3 py-1 text-[10px] font-bold border transition-all ${p.type === 'Truth' ? 'bg-[#c79b3b] text-[#1a1c23] border-[#c79b3b]' : 'bg-transparent text-[#c79b3b] border-[#c79b3b]/30'}`}
+                                                >
+                                                    COUNCIL
+                                                </button>
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                    className={`px-3 py-1 text-[10px] font-bold border transition-all ${p.type === 'Dare' ? 'bg-[#9000ff] text-white border-[#9000ff]' : 'bg-transparent text-[#9000ff] border-[#9000ff]/30'}`}
+                                                >
+                                                    SHIMMER
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-[#1a1c23] text-[#00ffcc] text-[10px] font-bold border border-[#00ffcc]/30 px-3 py-1">GOSSIP</div>
+                                        )}
                                         <span className="text-[10px] font-bold bg-[#c79b3b]/10 text-[#c79b3b] px-2 py-1">{editingDeck.intensity}</span>
                                         <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#9000ff] hover:text-white font-bold">×</button>
                                     </div>
@@ -462,6 +463,29 @@ export const ArcaneDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#c79b3b',
+                    bg: '#0a1118',
+                    textColor: '#ffffff',
+                    cardBg: '#1a1c23',
+                    fontFamily: 'Cinzel, serif'
+                }}
+            />
         </AnimatePresence>
     );
 };

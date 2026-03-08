@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'CAM 1A-SHOW STAGE', desc: 'LOW RISK', color: '#ffffff' },
@@ -225,29 +226,17 @@ export const FnafPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full justify-center px-4 sm:px-12 w-full max-w-4xl mx-auto space-y-8">
-            <div className="w-full">
-                <div className="flex justify-between items-center mb-2 px-2">
-                    <span className="text-sm opacity-50 uppercase tracking-widest">CAM DATA SOURCE</span>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="w-10 h-10 border-2 border-white/30 flex items-center justify-center hover:bg-white hover:text-black transition-all"
-                    >
-                        🔍
-                    </button>
-                </div>
+
+            <h2 className="text-3xl sm:text-4xl font-bold text-center drop-shadow-[0_0_2px_#fff]">MONITOR FEED DETECTED: {intensity}</h2>
+
+            <div className="w-full mb-8">
                 <DeckCarousel
                     decks={customDecks.filter(d => d.intensity === intensity)}
                     activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#cc0000"
+                    onSelect={setActiveDeckId}
+                    variant="fnaf"
                 />
             </div>
-
-            <h2 className="text-3xl sm:text-4xl font-bold text-center drop-shadow-[0_0_2px_#fff]">MONITOR FEED DETECTED: {intensity}</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
@@ -300,6 +289,12 @@ export const FnafPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => {
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#cc0000',
+                    bg: '#050505',
+                    textColor: '#ffffff',
+                    borderColor: 'rgba(255, 255, 255, 0.2)'
+                }}
             />
         </motion.div>
     );
@@ -352,6 +347,8 @@ export const FnafPlayButton: React.FC<{ label: string; onClick: () => void; isPr
 export const FnafDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
 
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -362,15 +359,7 @@ export const FnafDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <p className="text-sm opacity-50 font-mono mt-1">&gt; STATUS: SYSTEMS_STABLE // STORAGE: 99%</p>
                         </div>
                         <button
-                            onClick={() => setEditingDeck({
-                                id: generateId(),
-                                name: '',
-                                description: '',
-                                prompts: [],
-                                isCustom: true,
-                                intensity: logic.intensity || Intensity.SOFT,
-                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                            })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="p-3 border-2 border-white hover:bg-white hover:text-black transition-all font-bold text-lg"
                         >
                             [ CREATE_NEW_FILE ]
@@ -444,26 +433,15 @@ export const FnafDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="grid grid-cols-2 gap-12">
                             <div className="space-y-2">
                                 <label className="text-xl opacity-50 tracking-widest">&gt; SYSTEM_MODE</label>
-                                <select
-                                    value={editingDeck.gameMode}
-                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
-                                    className="w-full bg-black text-white p-4 border-2 border-white/30 focus:border-white outline-none font-bold text-2xl cursor-pointer"
-                                >
-                                    <option value={GameMode.TRUTH_OR_DARE}>CAM_TRUTH_DARE</option>
-                                    <option value={GameMode.NEVER_HAVE_I_EVER}>CAM_NHIE_LOGS</option>
-                                </select>
+                                <div className="w-full bg-black text-white p-4 border-2 border-white/30 font-bold text-2xl text-center uppercase">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'CAM_TRUTH_DARE' : 'CAM_NHIE_LOGS'}
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-xl opacity-50 tracking-widest">&gt; RISK_INTENSITY</label>
-                                <select
-                                    value={editingDeck.intensity}
-                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
-                                    className="w-full bg-black text-[#cc0000] p-4 border-2 border-[#cc0000]/30 focus:border-[#cc0000] outline-none font-bold text-2xl cursor-pointer"
-                                >
-                                    <option value={Intensity.SOFT}>LOW_RISK (SOFT)</option>
-                                    <option value={Intensity.HOT}>MED_RISK (HOT)</option>
-                                    <option value={Intensity.VULGAR}>MAX_SEC (VULGAR)</option>
-                                </select>
+                                <div className="w-full bg-black text-[#cc0000] p-4 border-2 border-[#cc0000]/30 font-bold text-2xl text-center uppercase">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -483,19 +461,28 @@ export const FnafDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="p-8 fnaf-border bg-black/60 group hover:border-white transition-all relative">
                                     <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                                        <div className="flex gap-6 items-center">
-                                            <select
-                                                className="bg-black text-white text-2xl font-bold rounded px-4 py-1 border border-white/20 outline-none cursor-pointer"
-                                                value={p.type}
-                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option value="Truth">LOG_TRUTH</option><option value="Dare">LOG_DARE</option></>
-                                                ) : (
-                                                    <option value="NeverHaveIEver">LOG_NHIE</option>
-                                                )}
-                                            </select>
-                                            <div className="text-xl font-mono text-white/30 italic">[{editingDeck.intensity}]</div>
+                                        <div className="flex gap-6 items-center flex-1">
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <div className="flex gap-4 flex-1">
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`flex-1 py-1 border-2 font-bold transition-all ${p.type === 'Truth' ? 'bg-white text-black border-white' : 'border-white/20 text-white/40'}`}
+                                                    >
+                                                        LOG_TRUTH
+                                                    </button>
+                                                    <button
+                                                        onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`flex-1 py-1 border-2 font-bold transition-all ${p.type === 'Dare' ? 'bg-[#cc0000] text-white border-[#cc0000]' : 'border-white/20 text-white/40'}`}
+                                                    >
+                                                        LOG_DARE
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex-1 py-1 border-2 border-white/10 text-white/30 font-bold text-center uppercase">
+                                                    LOG_NHIE
+                                                </div>
+                                            )}
+                                            <div className="text-xl font-mono text-white/30 italic shrink-0">[{editingDeck.intensity}]</div>
                                         </div>
                                         <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#cc0000]/50 hover:text-[#cc0000] text-4xl transition-all">×</button>
                                     </div>
@@ -521,6 +508,29 @@ export const FnafDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#cc0000',
+                    bg: '#050505',
+                    textColor: '#ffffff',
+                    cardBg: 'rgba(5, 5, 5, 0.9)',
+                    fontFamily: 'VT323, monospace'
+                }}
+            />
         </AnimatePresence>
     );
 };

@@ -4,6 +4,7 @@ import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'ACT 1', desc: 'CHILL ZONE', color: '#0122e5', secondary: '#ffde00', icon: '🌀' },
@@ -212,31 +213,18 @@ export const SonicPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => 
 
     return (
         <motion.div key="type" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-6 py-6">
-            <div className="w-full mb-6">
-                <div className="flex justify-between items-center mb-2 px-6">
-                    <span className="bg-white text-black px-4 py-1 italic font-black transform -skew-x-12 border-4 border-black shadow-[4px_4px_0_#000] text-xs">SOURCE SELECTION</span>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="w-10 h-10 bg-[#ffde00] border-4 border-black flex items-center justify-center shadow-[4px_4px_0_#000] hover:bg-[#e10000] hover:text-white transition-all transform -skew-x-6"
-                    >
-                        🔍
-                    </button>
-                </div>
-                <DeckCarousel
-                    decks={customDecks.filter(d => d.intensity === intensity)}
-                    activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#ffde00"
-                />
-            </div>
-
             <div className="text-center relative mb-4">
                 <h2 className="text-6xl italic font-black text-white drop-shadow-[8px_8px_0_black]" style={{ WebkitTextStroke: '2px black' }}>{intensity}</h2>
                 <div className="w-[120%] h-4 bg-[#ffde00] transform -skew-x-12 border-4 border-black absolute -bottom-2 -left-[10%] -z-10 shadow-[4px_4px_0_#e10000]"></div>
+            </div>
+
+            <div className="w-full max-w-md mb-8">
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={setActiveDeckId}
+                    variant="sonic"
+                />
             </div>
 
             <div className="grid grid-cols-1 gap-6 w-full max-w-sm">
@@ -268,6 +256,12 @@ export const SonicPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) => 
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#ffde00',
+                    bg: '#0122e5',
+                    textColor: '#ffffff',
+                    cardBg: '#0122e5'
+                }}
             />
         </motion.div>
     );
@@ -311,13 +305,21 @@ export const SonicPlayButton: React.FC<{ label: string; onClick: () => void; isP
 
 export const SonicDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck } = logic;
+
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
                 <div className="space-y-6">
                     <div className="flex justify-between items-end border-b-[8px] border-black pb-2 drop-shadow-[4px_4px_0_#000]">
                         <h2 className="text-5xl italic font-black text-white" style={{ WebkitTextStroke: '2px black' }}>ZONE SELECT</h2>
-                        <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || 'SOFT', gameMode: logic.gameMode || 'TruthOrDare' })} className="sonic-button secondary text-sm py-2 px-4">+ NEW</button>
+                        <button
+                            onClick={() => setIsIntensitySelectOpen(true)}
+                            className="sonic-button secondary text-sm py-2 px-4"
+                        >
+                            + NEW
+                        </button>
                     </div>
                     <div className="space-y-5">
                         {customDecks.map((deck: any) => (
@@ -335,27 +337,35 @@ export const SonicDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <input className="w-full bg-white border-[6px] border-black p-4 text-3xl italic font-black focus:outline-none shadow-[6px_6px_0_#000] transform -skew-x-6" value={editingDeck.name} onChange={e => setEditingDeck({ ...editingDeck, name: e.target.value })} placeholder="ZONE IDENTIFIER" />
                         <textarea className="w-full bg-white border-[6px] border-black p-4 text-xl italic font-black focus:outline-none shadow-[6px_6px_0_#000] transform -skew-x-6 h-24" value={editingDeck.description} onChange={e => setEditingDeck({ ...editingDeck, description: e.target.value })} placeholder="ZONE DESCRIPTION" />
                         <div className="flex gap-4">
-                            <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-1/2 bg-white border-[6px] border-black p-4 text-2xl italic font-black focus:outline-none shadow-[6px_6px_0_#000] transform -skew-x-6">
-                                <option value="TruthOrDare">TRUTH / DARE</option>
-                                <option value="NeverHaveIEver">NHIE</option>
-                            </select>
-                            <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-1/2 bg-white border-[6px] border-black p-4 text-2xl italic font-black focus:outline-none shadow-[6px_6px_0_#000] transform -skew-x-6">
-                                <option value="SOFT">SOFT</option>
-                                <option value="HOT">HOT</option>
-                                <option value="VULGAR">VULGAR</option>
-                            </select>
+                            <div className="w-1/2 bg-white border-[6px] border-black p-4 text-2xl italic font-black text-center cursor-default shadow-[6px_6px_0_#000] transform -skew-x-6">
+                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'TRUTH / DARE' : 'NHIE'}
+                            </div>
+                            <div className="w-1/2 bg-white border-[6px] border-black p-4 text-2xl italic font-black text-center cursor-default shadow-[6px_6px_0_#000] transform -skew-x-6">
+                                {editingDeck.intensity}
+                            </div>
                         </div>
                         <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="bg-white border-[6px] border-black p-5 space-y-4 shadow-[4px_4px_0_#000]">
                                     <div className="flex gap-2 justify-between items-stretch">
-                                        <select className="bg-black text-white p-2 italic font-black text-sm border-[3px] border-[#ffde00]" value={p.type} onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value)}>
-                                            {editingDeck.gameMode === 'TruthOrDare' ? (
-                                                <><option value="Truth">Truth</option><option value="Dare">Dare</option></>
-                                            ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
-                                            )}
-                                        </select>
+                                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                    className={`px-3 py-1 italic font-black text-sm border-[3px] transition-all transform -skew-x-6 ${p.type === 'Truth' ? 'bg-[#0122e5] text-white border-black' : 'bg-white text-[#0122e5] border-black/20'}`}
+                                                >
+                                                    TRUTH
+                                                </button>
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                    className={`px-3 py-1 italic font-black text-sm border-[3px] transition-all transform -skew-x-6 ${p.type === 'Dare' ? 'bg-[#e10000] text-white border-black' : 'bg-white text-[#e10000] border-black/20'}`}
+                                                >
+                                                    DARE
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-black text-white px-3 py-1 italic font-black text-sm border-[3px] border-[#ffde00] transform -skew-x-6">ACT</div>
+                                        )}
                                         <div className="bg-black text-white px-3 flex items-center justify-center italic font-black text-sm border-[3px] border-[#ffde00] opacity-80">{editingDeck.intensity}</div>
                                         <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="bg-[#e10000] text-white px-3 py-1 font-black text-xl border-4 border-black shadow-[2px_2px_0_#000] hover:scale-110 ml-auto">×</button>
                                     </div>

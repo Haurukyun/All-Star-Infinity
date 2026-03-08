@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'EASY MODE', desc: 'SLOW TEMPO', color: '#39C5BB' },
@@ -162,31 +163,18 @@ export const VocaloidPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) 
 
     return (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col h-full justify-center space-y-6 sm:space-y-8 px-4 sm:px-0">
-            <div className="w-full max-w-2xl mx-auto">
-                <div className="flex justify-between items-center mb-4 px-2">
-                    <span className="text-xs font-black tracking-[3px] text-[#39C5BB]">SELECT TRACKLIST</span>
-                    <button
-                        onClick={() => setIsSearchOpen(true)}
-                        className="w-8 h-8 rounded-lg border-2 border-[#39C5BB] flex items-center justify-center text-[#39C5BB] hover:bg-[#39C5BB] hover:text-[#111] transition-all vocaloid-glow"
-                    >
-                        🔍
-                    </button>
-                </div>
-                <DeckCarousel
-                    decks={customDecks.filter(d => d.intensity === intensity)}
-                    activeDeckId={activeDeckId}
-                    onSelect={(id) => {
-                        const deck = customDecks.find(d => d.id === id);
-                        if (deck) setGameMode(deck.gameMode);
-                        setActiveDeckId(id);
-                    }}
-                    accentColor="#39C5BB"
-                />
-            </div>
-
             <div className="text-center">
                 <div className="inline-block px-4 py-1 bg-[#39C5BB] text-[#111] font-bold rounded-full text-xs tracking-widest mb-4 uppercase">{intensity} MODE ACTIVE</div>
                 <h2 className="text-3xl sm:text-4xl text-white font-black drop-shadow-[0_0_5px_rgba(57,197,187,0.8)]">CHOOSE TRACK</h2>
+            </div>
+
+            <div className="w-full mb-8 px-4">
+                <DeckCarousel
+                    decks={customDecks.filter(d => d.intensity === intensity)}
+                    activeDeckId={activeDeckId}
+                    onSelect={setActiveDeckId}
+                    variant="vocaloid"
+                />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -237,6 +225,12 @@ export const VocaloidPromptTypeSelector: React.FC<{ logic: any }> = ({ logic }) 
                 }}
                 gameMode={gameMode}
                 intensity={intensity}
+                styles={{
+                    accent: '#39C5BB',
+                    bg: '#111',
+                    textColor: '#fff',
+                    borderColor: '#39C5BB'
+                }}
             />
         </motion.div>
     );
@@ -290,6 +284,7 @@ export const VocaloidPlayButton: React.FC<{ label: string; onClick: () => void; 
 
 export const VocaloidDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
 
     return (
         <AnimatePresence mode="wait">
@@ -301,15 +296,7 @@ export const VocaloidDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             <p className="text-[10px] text-[#FF1493] tracking-[4px] mt-1">AVAILABLE STORAGE: 393.9 MB</p>
                         </div>
                         <button
-                            onClick={() => setEditingDeck({
-                                id: generateId(),
-                                name: '',
-                                description: '',
-                                prompts: [],
-                                isCustom: true,
-                                intensity: logic.intensity || Intensity.SOFT,
-                                gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE
-                            })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="px-4 py-2 bg-[#39C5BB] text-[#111] font-bold rounded-lg hover:shadow-[0_0_15px_rgba(57,197,187,0.8)] transition-all text-sm"
                         >
                             + NEW_TRACK
@@ -382,26 +369,15 @@ export const VocaloidDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-[#39C5BB] tracking-[2px] opacity-70">SYNTH_PROTOCOL</label>
-                                <select
-                                    value={editingDeck.gameMode}
-                                    onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })}
-                                    className="w-full bg-black text-[#39C5BB] p-3 rounded-lg border border-[#39C5BB]/30 focus:border-[#39C5BB] outline-none font-bold text-sm cursor-pointer"
-                                >
-                                    <option value={GameMode.TRUTH_OR_DARE}>V_TRUTH_DARE</option>
-                                    <option value={GameMode.NEVER_HAVE_I_EVER}>V_NHIE_PROT</option>
-                                </select>
+                                <div className="w-full bg-black text-[#39C5BB] p-3 rounded-lg border border-[#39C5BB]/30 font-bold text-sm">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'V_TRUTH_DARE' : 'V_NHIE_PROT'}
+                                </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-[#39C5BB] tracking-[2px] opacity-70">BPM_INTENSITY</label>
-                                <select
-                                    value={editingDeck.intensity}
-                                    onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })}
-                                    className="w-full bg-black text-[#FF1493] p-3 rounded-lg border border-[#FF1493]/30 focus:border-[#FF1493] outline-none font-bold text-sm cursor-pointer"
-                                >
-                                    <option value={Intensity.SOFT}>SLOW (SOFT)</option>
-                                    <option value={Intensity.HOT}>UPBEAT (HOT)</option>
-                                    <option value={Intensity.VULGAR}>EXTREME (VULGAR)</option>
-                                </select>
+                                <div className="w-full bg-black text-[#FF1493] p-3 rounded-lg border border-[#FF1493]/30 font-bold text-sm uppercase">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -421,21 +397,28 @@ export const VocaloidDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="p-5 rounded-xl bg-[#1a1a1a] border border-white/10 group hover:border-[#39C5BB]/50 transition-all">
                                     <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-3">
-                                        <div className="flex gap-4 items-center">
-                                            <select
-                                                className="bg-black text-[#39C5BB] text-xs font-black rounded-md px-2 py-1 border border-[#39C5BB]/30 outline-none"
-                                                value={p.type}
-                                                onChange={e => logic.updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option value="Truth">CH_TRUTH</option><option value="Dare">CH_DARE</option></>
-                                                ) : (
-                                                    <option value="NeverHaveIEver">CH_NHIE</option>
-                                                )}
-                                            </select>
-                                            <div className="text-[10px] font-bold text-white/30 italic">[{editingDeck.intensity}]</div>
+                                        <div className="flex gap-4 items-center flex-1">
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <div className="flex gap-2 flex-1">
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`flex-1 text-[10px] font-black rounded-md px-2 py-1 transition-all border ${p.type === 'Truth' ? 'bg-[#39C5BB] text-[#111] border-[#39C5BB]' : 'bg-black text-[#39C5BB] border-[#39C5BB]/30'}`}
+                                                    >
+                                                        CH_TRUTH
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`flex-1 text-[10px] font-black rounded-md px-2 py-1 transition-all border ${p.type === 'Dare' ? 'bg-[#FF1493] text-white border-[#FF1493]' : 'bg-black text-[#39C5BB] border-[#39C5BB]/30'}`}
+                                                    >
+                                                        CH_DARE
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="text-[10px] font-bold text-white/20 italic flex-1">CH_NHIE_SEGMENT</div>
+                                            )}
+                                            <div className="text-[10px] font-bold text-white/30 italic shrink-0">[{editingDeck.intensity}]</div>
                                         </div>
-                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#FF1493]/50 hover:text-[#FF1493] text-xl transition-colors">×</button>
+                                        <button onClick={() => logic.removePromptFromEditingDeck(p.id)} className="text-[#FF1493]/50 hover:text-[#FF1493] text-xl transition-colors ml-4 shrink-0">×</button>
                                     </div>
                                     <textarea
                                         className="w-full bg-transparent text-white focus:outline-none text-xl font-bold italic resize-none h-20 placeholder-white/5"
@@ -459,6 +442,29 @@ export const VocaloidDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#39C5BB',
+                    bg: '#111',
+                    textColor: '#fff',
+                    cardBg: '#1a1a1a',
+                    fontFamily: 'Orbitron, sans-serif'
+                }}
+            />
         </AnimatePresence>
     );
 };

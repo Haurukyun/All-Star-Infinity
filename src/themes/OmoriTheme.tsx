@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'WHITE SPACE', desc: 'CALM AND EMPTY', color: '#FFFFFF', text: '#000000' },
@@ -171,32 +172,18 @@ export const OmoriPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 </motion.div>
             ) : !prompt ? (
                 <div className="flex flex-col items-center gap-6 py-4">
-                    <div className="omori-panel w-full p-4 relative">
-                        <div className="flex justify-between items-center mb-2 px-2">
-                            <h3 className="text-sm font-bold border-b border-black">MEMORIES</h3>
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="w-8 h-8 rounded-none border-2 border-black flex items-center justify-center hover:bg-black hover:text-white transition-colors"
-                            >
-                                🔍
-                            </button>
-                        </div>
-                        <DeckCarousel
-                            decks={customDecks.filter(d => d.intensity === intensity)}
-                            activeDeckId={activeDeckId}
-                            onSelect={(id) => {
-                                const deck = customDecks.find(d => d.id === id);
-                                if (deck) setGameMode(deck.gameMode);
-                                setActiveDeckId(id);
-                            }}
-                            accentColor="#000"
-                        />
-                    </div>
-
                     <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="text-center">
                         <p className="text-sm opacity-60 mb-1 leading-none">WHERE ARE YOU?</p>
                         <h2 className="text-3xl font-bold">{intensity}</h2>
                     </motion.div>
+                    <div className="w-full mb-8">
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={setActiveDeckId}
+                            variant="omori"
+                        />
+                    </div>
 
                     <div className="grid grid-cols-1 gap-4 w-full">
                         {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
@@ -225,6 +212,12 @@ export const OmoriPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         }}
                         gameMode={gameMode}
                         intensity={intensity}
+                        styles={{
+                            accent: '#000',
+                            bg: '#fff',
+                            textColor: '#000',
+                            borderColor: '#000'
+                        }}
                     />
                 </div>
             ) : (
@@ -250,6 +243,8 @@ export const OmoriPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const OmoriDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -257,7 +252,7 @@ export const OmoriDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="flex justify-between items-end border-b-2 border-black pb-1">
                         <h2 className="text-3xl font-bold uppercase tracking-tighter italic">SKETCHBOOK</h2>
                         <button
-                            onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })}
+                            onClick={() => setIsIntensitySelectOpen(true)}
                             className="omori-button text-xs font-bold"
                         >
                             + NEW SKETCH
@@ -296,18 +291,15 @@ export const OmoriDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <label className="text-[10px] uppercase font-bold text-black/40 mb-1 block">Reality Type</label>
-                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full border-2 border-black p-2 focus:outline-none font-bold text-sm">
-                                    <option value="TruthOrDare">DREAM (T/D)</option>
-                                    <option value="NeverHaveIEver">NHIE</option>
-                                </select>
+                                <div className="w-full border-2 border-black p-2 font-bold text-sm text-center uppercase">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'DREAM (T/D)' : 'NHIE'}
+                                </div>
                             </div>
                             <div className="flex-1">
                                 <label className="text-[10px] uppercase font-bold text-black/40 mb-1 block">Dream Depth</label>
-                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full border-2 border-black p-2 focus:outline-none font-bold text-sm">
-                                    <option value="SOFT">WHITE SPACE</option>
-                                    <option value="HOT">HEADSPACE</option>
-                                    <option value="VULGAR">BLACK SPACE</option>
-                                </select>
+                                <div className="w-full border-2 border-black p-2 font-bold text-sm text-center uppercase">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -320,21 +312,30 @@ export const OmoriDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="omori-panel p-4 space-y-3 relative group">
                                     <div className="flex justify-between items-center">
-                                        <div className="flex gap-2">
-                                            <select
-                                                className="border border-black text-[10px] p-1 font-bold"
-                                                value={p.type}
-                                                onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                                ) : (
-                                                    <option value="NeverHaveIEver">NHIE</option>
-                                                )}
-                                            </select>
-                                            <span className="text-[10px] font-bold border border-black/20 px-2 py-1 flex items-center bg-black/5 opacity-60 rounded-sm">{editingDeck.intensity}</span>
+                                        <div className="flex gap-2 flex-1">
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`flex-1 omori-button text-[10px] py-1 ${p.type === 'Truth' ? 'active' : ''}`}
+                                                    >
+                                                        TRUTH
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`flex-1 omori-button text-[10px] py-1 ${p.type === 'Dare' ? 'active' : ''}`}
+                                                    >
+                                                        DARE
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <div className="flex-1 py-1 text-[10px] font-bold border-2 border-black/10 text-black/30 text-center uppercase">
+                                                    NHIE SHARD
+                                                </div>
+                                            )}
+                                            <span className="text-[10px] font-bold border border-black/20 px-2 py-1 flex items-center bg-black/5 opacity-60 rounded-sm shrink-0">{editingDeck.intensity}</span>
                                         </div>
-                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 font-bold text-lg leading-none">×</button>
+                                        <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-500 font-bold text-lg leading-none ml-2 shrink-0">×</button>
                                     </div>
                                     <textarea
                                         className="w-full border-b border-black text-sm p-1 focus:outline-none italic resize-none bg-transparent"
@@ -352,6 +353,29 @@ export const OmoriDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </motion.div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#000',
+                    bg: '#fff',
+                    textColor: '#000',
+                    cardBg: '#fff',
+                    fontFamily: 'Gloria Hallelujah, cursive'
+                }}
+            />
         </AnimatePresence>
     );
 };

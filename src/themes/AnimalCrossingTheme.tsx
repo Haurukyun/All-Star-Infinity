@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode, PromptType } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, PromptType, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'DAILY TASK', desc: 'EASY PEASY', color: '#88E0EF', text: '#546E7A', icon: '✈️' },
@@ -188,31 +189,18 @@ export const AnimalCrossingPlayScreen: React.FC<{ logic: any }> = ({ logic }) =>
                 </motion.div>
             ) : !prompt ? (
                 <div className="flex flex-col items-center justify-start min-h-[60vh] relative pt-4">
-                    <div className="w-full mb-6">
-                        <div className="flex justify-between items-center mb-2 px-2">
-                            <h3 className="text-sm font-black text-[#5D4037] uppercase tracking-widest">Selected Nest</h3>
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="w-8 h-8 rounded-full bg-white border-2 border-[#81D4FA] flex items-center justify-center shadow-sm"
-                            >
-                                🔍
-                            </button>
-                        </div>
-                        <DeckCarousel
-                            decks={customDecks.filter(d => d.intensity === intensity)}
-                            activeDeckId={activeDeckId}
-                            onSelect={(id) => {
-                                const deck = customDecks.find(d => d.id === id);
-                                if (deck) logic.setGameMode(deck.gameMode);
-                                setActiveDeckId(id);
-                            }}
-                            accentColor="#81D4FA"
-                        />
-                    </div>
-
                     <div className="ac-bubble w-full text-center mb-8">
                         <p className="text-lg font-bold text-[#00BCD4] mb-1">Tom Nook says:</p>
                         <p className="text-sm text-[#5D4037]">"Level: {intensity}. Choose your fate, yes, yes!"</p>
+                    </div>
+
+                    <div className="w-full mb-6">
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={setActiveDeckId}
+                            variant="island"
+                        />
                     </div>
 
                     <div className="flex gap-4 w-full px-4 mb-4">
@@ -226,23 +214,6 @@ export const AnimalCrossingPlayScreen: React.FC<{ logic: any }> = ({ logic }) =>
                         )}
                     </div>
                     <button onClick={() => setIntensity(null)} className="text-sm font-bold text-white bg-[#8D6E63] px-4 py-2 rounded-full shadow-sm hover:bg-[#795548]">Back to Island</button>
-
-                    <DeckSearchModal
-                        isOpen={isSearchOpen}
-                        onClose={() => setIsSearchOpen(false)}
-                        decks={customDecks}
-                        activeDeckId={activeDeckId}
-                        onSelect={(id) => {
-                            const deck = customDecks.find(d => d.id === id);
-                            if (deck) {
-                                logic.setGameMode(deck.gameMode);
-                                logic.setIntensity(deck.intensity);
-                            }
-                            setActiveDeckId(id);
-                        }}
-                        gameMode={logic.gameMode}
-                        intensity={intensity}
-                    />
                 </div>
             ) : (
                 <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative mt-4">
@@ -271,6 +242,9 @@ export const AnimalCrossingPlayScreen: React.FC<{ logic: any }> = ({ logic }) =>
 
 export const AnimalCrossingDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
+
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -278,7 +252,10 @@ export const AnimalCrossingDecksScreen: React.FC<{ logic: any }> = ({ logic }) =
                     <div className="ac-panel p-4 bg-[#FFF3E0]">
                         <div className="flex justify-between items-center mb-4 border-b-2 border-white pb-2">
                             <h2 className="text-xl font-bold text-[#E65100]">DIY Recipes</h2>
-                            <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })} className="bg-[#FFB74D] text-white px-4 py-2 rounded-full text-sm font-bold shadow-sm border-2 border-white hover:scale-105 active:scale-95 transition-all">
+                            <button
+                                onClick={() => setIsIntensitySelectOpen(true)}
+                                className="bg-[#FFB74D] text-white px-4 py-2 rounded-full text-sm font-bold shadow-sm border-2 border-white hover:scale-105 active:scale-95 transition-all"
+                            >
                                 + Create
                             </button>
                         </div>
@@ -329,18 +306,15 @@ export const AnimalCrossingDecksScreen: React.FC<{ logic: any }> = ({ logic }) =
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <label className="text-[10px] font-black text-[#E65100] opacity-40 pl-2 uppercase tracking-tighter">Mode</label>
-                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-white rounded-2xl p-3 text-sm font-bold text-[#E65100] outline-none shadow-sm border-4 border-white cursor-pointer">
-                                    <option value="TruthOrDare">ISLAND LIFE (T/D)</option>
-                                    <option value="NeverHaveIEver">CONFESSIONS</option>
-                                </select>
+                                <div className="w-full bg-white rounded-2xl p-3 text-sm font-bold text-[#E65100] border-4 border-white text-center cursor-default">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'ISLAND LIFE (T/D)' : 'CONFESSIONS'}
+                                </div>
                             </div>
                             <div className="flex-1">
                                 <label className="text-[10px] font-black text-[#E65100] opacity-40 pl-2 uppercase tracking-tighter">Spiciness</label>
-                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-white rounded-2xl p-3 text-sm font-bold text-[#E65100] outline-none shadow-sm border-4 border-white cursor-pointer">
-                                    <option value="SOFT">DAILY TASK</option>
-                                    <option value="HOT">EXCITING</option>
-                                    <option value="VULGAR">DANGEROUS</option>
-                                </select>
+                                <div className="w-full bg-white rounded-2xl p-3 text-sm font-bold text-[#E65100] border-4 border-white text-center cursor-default">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -354,17 +328,24 @@ export const AnimalCrossingDecksScreen: React.FC<{ logic: any }> = ({ logic }) =
                             {editingDeck.prompts.map((p: any) => (
                                 <div key={p.id} className="bg-white rounded-[20px] p-4 space-y-3 shadow-sm border-2 border-white group relative">
                                     <div className="flex items-center gap-3">
-                                        <select
-                                            className="bg-[#F1F8E9] text-[#689F38] text-[10px] font-black rounded-lg px-3 py-1.5 outline-none border-2 border-transparent focus:border-[#C5E1A5] transition-all"
-                                            value={p.type}
-                                            onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                        >
-                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                            ) : (
-                                                <option value="NeverHaveIEver">NHIE</option>
-                                            )}
-                                        </select>
+                                        {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                            <div className="flex gap-1">
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                    className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${p.type === 'Truth' ? 'bg-[#4DD0E1] text-white' : 'bg-[#F1F8E9] text-[#689F38]'}`}
+                                                >
+                                                    TRUTH
+                                                </button>
+                                                <button
+                                                    onClick={() => logic.updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                    className={`px-3 py-1 text-[10px] font-black rounded-lg transition-all ${p.type === 'Dare' ? 'bg-[#FF7043] text-white' : 'bg-[#F1F8E9] text-[#689F38]'}`}
+                                                >
+                                                    DARE
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-[#F1F8E9] text-[#689F38] text-[10px] font-black rounded-lg px-3 py-1.5 border-2 border-transparent">DIY</div>
+                                        )}
                                         <div className="bg-[#FFF8E1] text-[#FFB300] text-[9px] font-black rounded-lg px-2 py-1 flex items-center justify-center opacity-70 border border-[#FFE082]/30 uppercase">{editingDeck.intensity}</div>
                                         <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-red-300 font-black text-xl hover:text-red-500 transition-colors ml-auto leading-none">×</button>
                                     </div>
@@ -385,6 +366,29 @@ export const AnimalCrossingDecksScreen: React.FC<{ logic: any }> = ({ logic }) =
                     </div>
                 </motion.div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#81D4FA',
+                    bg: '#F0F4C3',
+                    textColor: '#5D4037',
+                    cardBg: '#ffffff',
+                    fontFamily: 'Varela Round, sans-serif'
+                }}
+            />
         </AnimatePresence>
     );
 };

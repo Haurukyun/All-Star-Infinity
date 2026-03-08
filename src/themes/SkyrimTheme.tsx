@@ -4,6 +4,7 @@ import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'NOVICE', desc: 'Apprentice Level', color: '#FFFFFF', text: '#FFFFFF' },
@@ -108,31 +109,17 @@ export const SkyrimPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         </svg>
                     </div>
 
-                    <div className="w-full max-w-md bg-black/40 backdrop-blur-sm p-4 border-y border-white/10 relative z-20">
-                        <div className="flex justify-between items-center mb-4 px-2">
-                            <span className="skyrim-font-title text-xs tracking-[2px] opacity-60 uppercase">Select Quest Item</span>
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="text-white/40 hover:text-white transition-colors"
-                            >
-                                🔍
-                            </button>
-                        </div>
-                        <DeckCarousel
-                            decks={customDecks.filter(d => d.intensity === intensity)}
-                            activeDeckId={activeDeckId}
-                            onSelect={(id) => {
-                                const deck = customDecks.find(d => d.id === id);
-                                if (deck) setGameMode(deck.gameMode);
-                                setActiveDeckId(id);
-                            }}
-                            accentColor="#FFD700"
-                        />
-                    </div>
-
                     <div className="text-center relative z-20">
                         <h2 className="skyrim-font-title text-4xl mb-2 tracking-[8px] text-white/90">{intensity}</h2>
                         <div className="w-48 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto"></div>
+                    </div>
+                    <div className="w-full max-w-lg mb-8 relative z-20">
+                        <DeckCarousel
+                            decks={customDecks.filter(d => d.intensity === intensity)}
+                            activeDeckId={activeDeckId}
+                            onSelect={setActiveDeckId}
+                            variant="skyrim"
+                        />
                     </div>
 
                     <div className="flex gap-16 relative z-20">
@@ -180,6 +167,12 @@ export const SkyrimPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         }}
                         gameMode={gameMode}
                         intensity={intensity}
+                        styles={{
+                            accent: '#FFD700',
+                            bg: '#0a0a0a',
+                            textColor: '#fff',
+                            borderColor: 'rgba(255,255,255,0.2)'
+                        }}
                     />
                 </div>
             ) : (
@@ -201,6 +194,7 @@ export const SkyrimPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const SkyrimDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -208,7 +202,7 @@ export const SkyrimDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="md:col-span-1 border-r border-white/10 pr-4">
                         <h2 className="skyrim-font-title text-2xl mb-6 px-4">INVENTORY</h2>
                         <div className="flex flex-col">
-                            <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })} className="skyrim-btn text-yellow-100">+ CRAFT NEW ITEM</button>
+                            <button onClick={() => setIsIntensitySelectOpen(true)} className="skyrim-btn text-yellow-100">+ CRAFT NEW ITEM</button>
                             <div className="h-px bg-white/20 my-2 mx-4"></div>
                             {customDecks.length === 0 ? (
                                 <div className="px-4 py-8 text-white/20 italic text-sm text-center">Your pack is empty...</div>
@@ -265,18 +259,15 @@ export const SkyrimDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         <div className="flex gap-8">
                             <div className="flex-1 group">
                                 <label className="text-[10px] uppercase tracking-[3px] opacity-40 block mb-2">Nature</label>
-                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="skyrim-input text-sm w-full bg-[#0a0a0a] border-white/10 cursor-pointer">
-                                    <option value="TruthOrDare">ADVENTURE (T/D)</option>
-                                    <option value="NeverHaveIEver">NHIE</option>
-                                </select>
+                                <div className="skyrim-input text-sm w-full bg-[#0a0a0a] border-white/10 py-1">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'ADVENTURE (T/D)' : 'CONFESS (NHIE)'}
+                                </div>
                             </div>
                             <div className="flex-1 group">
                                 <label className="text-[10px] uppercase tracking-[3px] opacity-40 block mb-2">Magnitude</label>
-                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="skyrim-input text-sm w-full bg-[#0a0a0a] border-white/10 cursor-pointer">
-                                    <option value="SOFT">NOVICE</option>
-                                    <option value="HOT">ADEPT</option>
-                                    <option value="VULGAR">MASTER</option>
-                                </select>
+                                <div className="skyrim-input text-sm w-full bg-[#0a0a0a] border-white/10 py-1 uppercase">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
                         <div className="pt-4">
@@ -288,21 +279,28 @@ export const SkyrimDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                                 {editingDeck.prompts.map((p: any) => (
                                     <div key={p.id} className="bg-white/[0.02] p-4 flex flex-col gap-3 border border-white/5 hover:border-white/20 transition-colors group">
                                         <div className="flex items-center justify-between">
-                                            <div className="flex gap-4">
-                                                <select
-                                                    className="bg-black border border-white/20 text-[10px] uppercase tracking-widest p-1 outline-none focus:border-yellow-200/50"
-                                                    value={p.type}
-                                                    onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                                >
-                                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                        <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                                    ) : (
-                                                        <option value="NeverHaveIEver">NHIE</option>
-                                                    )}
-                                                </select>
-                                                <div className="text-[9px] uppercase tracking-[2px] opacity-30 flex items-center px-3 border-l border-white/10">{editingDeck.intensity} MAGNITUDE</div>
+                                            <div className="flex gap-4 flex-1">
+                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                    <div className="flex gap-4 flex-1">
+                                                        <button
+                                                            onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                            className={`text-[10px] uppercase tracking-widest p-1 border transition-colors ${p.type === 'Truth' ? 'bg-white/10 border-white text-yellow-100' : 'bg-black border-white/20 text-white/50 hover:border-white/40'}`}
+                                                        >
+                                                            TRUTH
+                                                        </button>
+                                                        <button
+                                                            onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                            className={`text-[10px] uppercase tracking-widest p-1 border transition-colors ${p.type === 'Dare' ? 'bg-white/10 border-white text-yellow-100' : 'bg-black border-white/20 text-white/50 hover:border-white/40'}`}
+                                                        >
+                                                            DARE
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-[10px] uppercase tracking-widest p-1 border border-white/5 text-white/20 flex-1 italic">NHIE ENCHANT</div>
+                                                )}
+                                                <div className="text-[9px] uppercase tracking-[2px] opacity-30 flex items-center px-3 border-l border-white/10 shrink-0">{editingDeck.intensity} MAGNITUDE</div>
                                             </div>
-                                            <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-xs opacity-30 hover:opacity-100 hover:text-red-400 p-1 transition-all">✕</button>
+                                            <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-xs opacity-30 hover:opacity-100 hover:text-red-400 p-1 transition-all ml-4 shrink-0">✕</button>
                                         </div>
                                         <textarea
                                             className="bg-transparent border-b border-white/5 flex-1 text-sm outline-none focus:border-white/30 py-1 transition-all resize-none italic"
@@ -322,6 +320,29 @@ export const SkyrimDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#FFD700',
+                    bg: '#0a0a0a',
+                    textColor: '#fff',
+                    cardBg: 'rgba(0, 0, 0, 0.8)',
+                    fontFamily: 'Cinzel, serif'
+                }}
+            />
         </AnimatePresence>
     );
 };

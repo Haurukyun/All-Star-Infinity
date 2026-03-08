@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Intensity, Theme, ThemeDefinition, GameMode } from '../types';
+import { Intensity, Theme, ThemeDefinition, GameMode, CustomDeck } from '../types';
 import { allThemesList } from './allThemesList';
 import { DeckCarousel } from '../components/DeckCarousel';
 import { DeckSearchModal } from '../components/DeckSearchModal';
+import { ThemedIntensitySelect } from '../components/ThemedIntensitySelect';
 
 const STAGES = [
     { id: Intensity.SOFT, title: 'PEACEFUL', desc: 'VILLAGE LIFE', color: '#55FF55', text: '#000000', icon: '🌿' },
@@ -255,34 +256,20 @@ export const MinecraftPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                 </motion.div>
             ) : !prompt ? (
                 <div className="flex flex-col items-center justify-start h-full pt-4">
-                    <div className="rpg-panel w-full mb-6 relative">
-                        <div className="rpg-ribbon">INVENTORY</div>
-                        <div className="flex justify-between items-center mb-2 px-2">
-                            <h3 className="text-[10px] pixel-font text-gray-400">SELECT ITEM</h3>
-                            <button
-                                onClick={() => setIsSearchOpen(true)}
-                                className="w-8 h-8 rpg-slot flex items-center justify-center hover:bg-[#333]"
-                            >
-                                🔍
-                            </button>
-                        </div>
-                        <DeckCarousel
-                            decks={customDecks.filter(d => d.intensity === intensity)}
-                            activeDeckId={activeDeckId}
-                            onSelect={(id) => {
-                                const deck = customDecks.find(d => d.id === id);
-                                if (deck) logic.setGameMode(deck.gameMode);
-                                setActiveDeckId(id);
-                            }}
-                            accentColor="#ffb300"
-                        />
-                    </div>
-
                     <div className="rpg-panel w-full text-center space-y-4">
                         <div className="rpg-ribbon">QUEST STARTED</div>
                         <div className="py-4">
                             <div className="text-gray-400 text-[10px] mb-1 pixel-font uppercase">Current Difficulty</div>
                             <div className="text-3xl gold-title">{intensity}</div>
+                        </div>
+
+                        <div className="w-full mb-8">
+                            <DeckCarousel
+                                decks={customDecks.filter(d => d.intensity === intensity)}
+                                activeDeckId={activeDeckId}
+                                onSelect={setActiveDeckId}
+                                variant="minecraft"
+                            />
                         </div>
 
                         <div className="grid grid-cols-1 gap-4 px-4">
@@ -313,6 +300,12 @@ export const MinecraftPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         }}
                         gameMode={logic.gameMode}
                         intensity={intensity}
+                        styles={{
+                            accent: '#ffb300',
+                            bg: '#111',
+                            textColor: '#ffffff',
+                            borderColor: '#444'
+                        }}
                     />
                 </div>
             ) : (
@@ -341,6 +334,8 @@ export const MinecraftPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
 
 export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { customDecks, setEditingDeck, deleteDeck, editingDeck, generateId, saveDeck, addNewPromptToEditingDeck, updatePromptInEditingDeck, removePromptFromEditingDeck, activeDeckId, setActiveDeckId } = logic;
+
+    const [isIntensitySelectOpen, setIsIntensitySelectOpen] = useState(false);
     return (
         <AnimatePresence mode="wait">
             {!editingDeck ? (
@@ -348,7 +343,7 @@ export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     <div className="rpg-panel">
                         <div className="rpg-ribbon">INVENTORY</div>
                         <div className="flex justify-end mb-2">
-                            <button onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: logic.intensity || Intensity.SOFT, gameMode: logic.gameMode || GameMode.TRUTH_OR_DARE })} className="rpg-btn rpg-btn-primary px-4 py-1 text-sm">+ CRAFT NEW</button>
+                            <button onClick={() => setIsIntensitySelectOpen(true)} className="rpg-btn rpg-btn-primary px-4 py-1 text-sm">+ CRAFT NEW</button>
                         </div>
                         <div className="space-y-2">
                             {customDecks.length === 0 ? <div className="text-center py-8 text-gray-500 italic">No items found in your inventory...</div> :
@@ -392,20 +387,17 @@ export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                         </div>
 
                         <div className="flex gap-4">
-                            <div className="space-y-2 flex-1">
+                            <div className="space-y-2 flex-1 text-center">
                                 <label className="text-xs text-[#ffb300] pixel-font">MODE</label>
-                                <select value={editingDeck.gameMode} onChange={e => setEditingDeck({ ...editingDeck, gameMode: e.target.value as any })} className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]">
-                                    <option value="TruthOrDare">ADVENTURE (T/D)</option>
-                                    <option value="NeverHaveIEver">NHIE</option>
-                                </select>
+                                <div className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none">
+                                    {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? 'ADVENTURE' : 'NHIE'}
+                                </div>
                             </div>
-                            <div className="space-y-2 flex-1">
+                            <div className="space-y-2 flex-1 text-center">
                                 <label className="text-xs text-[#ffb300] pixel-font">LVL</label>
-                                <select value={editingDeck.intensity} onChange={e => setEditingDeck({ ...editingDeck, intensity: e.target.value as any })} className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none focus:border-[#ffb300]">
-                                    <option value="SOFT">PEACEFUL</option>
-                                    <option value="HOT">NETHER</option>
-                                    <option value="VULGAR">THE END</option>
-                                </select>
+                                <div className="w-full bg-[#111] border-2 border-[#555] p-2 text-white outline-none">
+                                    {editingDeck.intensity}
+                                </div>
                             </div>
                         </div>
 
@@ -418,19 +410,28 @@ export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                                 {editingDeck.prompts.map((p: any) => (
                                     <div key={p.id} className="rpg-slot p-2 gap-2 flex-col items-stretch">
                                         <div className="flex gap-2">
-                                            <select
-                                                className="bg-[#222] text-white border border-[#555] text-xs p-1"
-                                                value={p.type}
-                                                onChange={e => updatePromptInEditingDeck(p.id, 'type', e.target.value as any)}
-                                            >
-                                                {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
-                                                    <><option value="Truth">TRUTH</option><option value="Dare">DARE</option></>
-                                                ) : (
-                                                    <option value="NeverHaveIEver">NHIE</option>
-                                                )}
-                                            </select>
-                                            <div className="text-[#ffb300] text-[9px] pixel-font opacity-70 flex items-center px-2">{editingDeck.intensity}</div>
-                                            <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#c62828] font-black ml-auto">×</button>
+                                            {editingDeck.gameMode === GameMode.TRUTH_OR_DARE ? (
+                                                <div className="flex gap-2 flex-1">
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Truth')}
+                                                        className={`flex-1 rpg-btn py-1 text-xs ${p.type === 'Truth' ? 'rpg-btn-primary' : 'opacity-40'}`}
+                                                    >
+                                                        TRUTH
+                                                    </button>
+                                                    <button
+                                                        onClick={() => updatePromptInEditingDeck(p.id, 'type', 'Dare')}
+                                                        className={`flex-1 rpg-btn py-1 text-xs bg-[#c62828] border-top-[#ef5350] border-left-[#ef5350] shadow-[0_2px_0_#8e0000] active:shadow-none active:bg-[#b71c1c] ${p.type === 'Dare' ? '' : 'opacity-40'}`}
+                                                    >
+                                                        DARE
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex-1 rpg-btn py-1 text-xs opacity-40 text-center cursor-default">
+                                                    NHIE SHARD
+                                                </div>
+                                            )}
+                                            <div className="text-[#ffb300] text-[9px] pixel-font opacity-70 flex items-center px-2 shrink-0">{editingDeck.intensity}</div>
+                                            <button onClick={() => removePromptFromEditingDeck(p.id)} className="text-[#c62828] font-black ml-auto shrink-0">×</button>
                                         </div>
                                         <textarea
                                             className="flex-1 bg-transparent border-b border-[#555] text-sm outline-none resize-none py-1"
@@ -449,6 +450,29 @@ export const MinecraftDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
                     </div>
                 </div>
             )}
+            <ThemedIntensitySelect
+                isOpen={isIntensitySelectOpen}
+                onClose={() => setIsIntensitySelectOpen(false)}
+                onSelect={(intensity, gameMode) => {
+                    setEditingDeck({
+                        id: generateId(),
+                        name: '',
+                        description: '',
+                        prompts: [],
+                        isCustom: true,
+                        intensity,
+                        gameMode
+                    });
+                    setIsIntensitySelectOpen(false);
+                }}
+                styles={{
+                    accent: '#ffb300',
+                    bg: '#111',
+                    textColor: '#ffffff',
+                    cardBg: '#212121',
+                    fontFamily: 'VT323, monospace'
+                }}
+            />
         </AnimatePresence>
     );
 };
