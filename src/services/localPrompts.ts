@@ -270,6 +270,186 @@ export const DEFAULT_PROMPTS: GamePrompt[] = [
   { id: 'nv-23', type: 'NeverHaveIEver', intensity: Intensity.VULGAR, text: 'Never have I ever sneaked out of someone’s window or balcony to avoid being seen by their family/roommates.', penalty: 'Reenact the stealth climb' },
   { id: 'nv-24', type: 'NeverHaveIEver', intensity: Intensity.VULGAR, text: 'Never have I ever had a spicy dream so realistic I woke up genuinely confused about where I was.', penalty: 'Take a drink' },
   { id: 'nv-25', type: 'NeverHaveIEver', intensity: Intensity.VULGAR, text: 'Never have I ever had intimacy in a workplace after hours or during a shift.', penalty: 'Take a shot and don’t name the company' },
+
+  // ==========================================
+  // MOST LIKELY TO - SOFT (ml-s-1 to ml-s-15)
+  // Relatable quirks, funny habits, social fun
+  // ==========================================
+  { id: 'ml-s-1', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to trip over their own feet on completely flat ground.', penalty: 'Walk across the room like a penguin' },
+  { id: 'ml-s-2', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to cry during an animated or Pixar movie.', penalty: 'Pretend to sob dramatically for 10 seconds' },
+  { id: 'ml-s-3', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to blow their entire paycheck on takeout food in 3 days.', penalty: 'List the last 3 food orders you made' },
+  { id: 'ml-s-4', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to accidentally join a cult because the snacks were top-tier.', penalty: 'Invent a 5-second cult greeting chant' },
+  { id: 'ml-s-5', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to wander around a parking lot for 30 minutes looking for their car.', penalty: 'Beep like a lost car key fob' },
+  { id: 'ml-s-6', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to adopt 5 stray animals without asking their roommates or partner.', penalty: 'Make your best animal sound impression' },
+  { id: 'ml-s-7', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to fall asleep at a loud house party or live concert.', penalty: 'Fake snore for 10 seconds' },
+  { id: 'ml-s-8', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to speak in a foreign accent after watching one overseas show.', penalty: 'Speak in an exaggerated accent for the next round' },
+  { id: 'ml-s-9', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to send a screenshot back to the person who originally sent it.', penalty: 'Show the room your latest saved photo' },
+  { id: 'ml-s-10', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to laugh at the most inappropriate, serious moment imaginable.', penalty: 'Try not to laugh while everyone stares at you for 15s' },
+  { id: 'ml-s-11', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to get locked out of their own house wearing pajamas.', penalty: 'Mime knocking on an imaginary door in desperation' },
+  { id: 'ml-s-12', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to become a viral TikTok meme for doing something completely silly.', penalty: 'Perform a 10-second TikTok dance trend' },
+  { id: 'ml-s-13', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to stay in bed for 16 consecutive hours on a weekend.', penalty: 'Yawn loudly and stretch like a cat' },
+  { id: 'ml-s-14', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to microwave metal foil or set off the smoke alarm boiling pasta.', penalty: 'Take a penalty sip' },
+  { id: 'ml-s-15', type: 'MostLikelyTo', intensity: Intensity.SOFT, text: 'Most likely to spend 45 minutes picking a movie and then fall asleep during the intro.', penalty: 'Recommend a movie with zero hesitation' },
+
+  // ==========================================
+  // MOST LIKELY TO - HOT (ml-h-1 to ml-h-15)
+  // Spicy gossip, messy dating, chaotic romance
+  // ==========================================
+  { id: 'ml-h-1', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to drunk text their toxic ex at 3 AM with zero regrets.', penalty: 'Take 2 penalty sips' },
+  { id: 'ml-h-2', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to fall madly in love on the very first date.', penalty: 'Declare your love to an inanimate object in the room' },
+  { id: 'ml-h-3', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to ghost someone because of their astrology sign or a petty ick.', penalty: 'Confess your weirdest dating ick' },
+  { id: 'ml-h-4', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to juggle a secret roster of three talking stages at once.', penalty: 'Admit how many people you are currently texting' },
+  { id: 'ml-h-5', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to wake up in another city or party with no idea how they got there.', penalty: 'Take 2 sips of your drink' },
+  { id: 'ml-h-6', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to kiss someone at a club and forget their name within 10 minutes.', penalty: 'Spell your name backwards out loud' },
+  { id: 'ml-h-7', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to flirt their way out of a speeding ticket or parking fine.', penalty: 'Wink at the person across from you' },
+  { id: 'ml-h-8', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to deep-stalk a crush’s Spotify listening activity and Venmo history.', penalty: 'Take a drink of shame' },
+  { id: 'ml-h-9', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to end up as the villain on a reality dating show.', penalty: 'Give a 15-second reality show villain speech' },
+  { id: 'ml-h-10', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to get kicked out of a club for being way too chaotic on the speakers.', penalty: 'Do a dramatic dance move right now' },
+  { id: 'ml-h-11', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to stay in an on-again off-again situationship for two full years.', penalty: 'Take 2 sips and sigh deeply' },
+  { id: 'ml-h-12', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to slide into a verified celebrity’s Instagram DMs with total confidence.', penalty: 'Read the draft message aloud' },
+  { id: 'ml-h-13', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to go home with someone solely because their apartment has a cute dog.', penalty: 'Pet the imaginary dog with excitement' },
+  { id: 'ml-h-14', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to accidentally spill someone else’s biggest romantic secret while tipsy.', penalty: 'Apologize to the room in advance' },
+  { id: 'ml-h-15', type: 'MostLikelyTo', intensity: Intensity.HOT, text: 'Most likely to start a dramatic public argument with their date in a restaurant.', penalty: 'Take a penalty drink' },
+
+  // ==========================================
+  // MOST LIKELY TO - VULGAR (ml-v-1 to ml-v-15)
+  // Unhinged, wild nightlife, NSFW escapades
+  // ==========================================
+  { id: 'ml-v-1', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to hook up with someone in a single-stall bathroom at a packed party.', penalty: 'Take a full shot of your drink' },
+  { id: 'ml-v-2', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to have an accidental wardrobe malfunction in the middle of a dancefloor.', penalty: 'Take a shot and strike a pose' },
+  { id: 'ml-v-3', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to have a secret spicy burner account or spicy photo vault on their phone.', penalty: 'Show how many hidden photos you have' },
+  { id: 'ml-v-4', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to get caught in the act by a friend, roommate, or landlord.', penalty: 'Take a shot in silence' },
+  { id: 'ml-v-5', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to hook up with someone purely for revenge on an ex.', penalty: 'Take a double shot of regret' },
+  { id: 'ml-v-6', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to suggest an impromptu threesome after two tequila shots.', penalty: 'Take a penalty sip and look innocent' },
+  { id: 'ml-v-7', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to own an entire locked nightstand dedicated to adult toys and restraints.', penalty: 'State the color of your favorite device' },
+  { id: 'ml-v-8', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to accidentally send a spicy selfie to a family group chat.', penalty: 'Take a shot and pray it never happens' },
+  { id: 'ml-v-9', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to date someone twice their age for the luxury lifestyle.', penalty: 'State your ideal sugar partner criteria' },
+  { id: 'ml-v-10', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to secretly have the highest body count in this entire circle.', penalty: 'Take a confident sip' },
+  { id: 'ml-v-11', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to do a walk of shame with mismatched shoes and inside-out pants.', penalty: 'Walk across the room with a confident stride' },
+  { id: 'ml-v-12', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to lose their underwear during an adventurous night out.', penalty: 'Take a shot' },
+  { id: 'ml-v-13', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to make noises so loud during intimacy that the neighbors file a noise complaint.', penalty: 'Do a muffled giggle into your sleeve' },
+  { id: 'ml-v-14', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to get blacklisted from an Airbnb for excessive late-night partying.', penalty: 'Take two sips' },
+  { id: 'ml-v-15', type: 'MostLikelyTo', intensity: Intensity.VULGAR, text: 'Most likely to hook up in a car parked in a grocery store parking lot.', penalty: 'Honk an imaginary car horn twice' },
+
+  // ==========================================
+  // WOULD YOU RATHER - SOFT (wyr-s-1 to wyr-s-15)
+  // Dilemmas formatted as Option A || Option B
+  // ==========================================
+  { id: 'wyr-s-1', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Always narrate your inner thoughts out loud || Have everyone hear whatever song is stuck in your head 24/7.', penalty: 'Sing your current earworm' },
+  { id: 'wyr-s-2', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Only be able to whisper || Only be able to shout whenever you speak.', penalty: 'Whisper your next answer' },
+  { id: 'wyr-s-3', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Wear permanent squeaky clown shoes everywhere || Have a referee whistle blow every time you take a step.', penalty: 'Squeak twice' },
+  { id: 'wyr-s-4', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Fight 100 duck-sized horses || Fight 1 horse-sized duck.', penalty: 'Quack or neigh loudly' },
+  { id: 'wyr-s-5', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Never eat pizza again for life || Never eat tacos or burritos again for life.', penalty: 'Name your favorite comfort food' },
+  { id: 'wyr-s-6', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Have hands where your feet should be || Have feet where your hands should be.', penalty: 'Touch your toes without bending knees' },
+  { id: 'wyr-s-7', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Live without internet for an entire month || Live without hot water for an entire month.', penalty: 'Take a sip of water' },
+  { id: 'wyr-s-8', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Communicate only through interpretive dance || Communicate only in operatic singing.', penalty: 'Do a 5-second dance move' },
+  { id: 'wyr-s-9', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Sweat pure maple syrup || Cry carbonated fizzy soda.', penalty: 'Pretend to lick maple syrup off your wrist' },
+  { id: 'wyr-s-10', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Be stuck in an elevator for 4 hours with your nemesis || With your ex’s overbearing parents.', penalty: 'Take a deep breath and take 1 sip' },
+  { id: 'wyr-s-11', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Have taste buds on your fingertips || Have your stomach growl like a megaphone every hour.', penalty: 'Pat your stomach gently' },
+  { id: 'wyr-s-12', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Always smell faintly of wet dog || Always smell faintly of pungent raw garlic.', penalty: 'Sniff the air and make a face' },
+  { id: 'wyr-s-13', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Wear a full suit of medieval armor to work for a week || Wear a giant furry mascot suit.', penalty: 'Salute like a knight' },
+  { id: 'wyr-s-14', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Have loud hiccups for 2 hours every single day || Sneeze violently every time someone says your name.', penalty: 'Do a fake hiccup' },
+  { id: 'wyr-s-15', type: 'WouldYouRather', intensity: Intensity.SOFT, text: 'Be able to fly but only at 2 mph || Be able to teleport but only directly into public restrooms.', penalty: 'Flap your arms in slow motion' },
+
+  // ==========================================
+  // WOULD YOU RATHER - HOT (wyr-h-1 to wyr-h-15)
+  // Spicy, social cringe, awkward romance
+  // ==========================================
+  { id: 'wyr-h-1', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Read your entire search history aloud to the room || Hand your unlocked phone to the person on your left for 60 seconds.', penalty: 'Take 2 penalty sips' },
+  { id: 'wyr-h-2', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Get back together with your most toxic ex for 6 months || Go on a blind date organized by your grandparents.', penalty: 'Take a drink' },
+  { id: 'wyr-h-3', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Have your secret crush hear your unfiltered thoughts for 5 minutes || Read your crush’s private diary.', penalty: 'Look down in embarrassment' },
+  { id: 'wyr-h-4', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Accidentally call your boss "baby" on a team Zoom call || Accidentally call your date your mom’s name.', penalty: 'Bury your face in your hands' },
+  { id: 'wyr-h-5', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Never be kissed with passion ever again || Never hear the words "I love you" ever again.', penalty: 'Take a sip of your drink' },
+  { id: 'wyr-h-6', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Have your most bitter ex give a speech at your wedding || Have your partner’s ex be your next-door neighbor.', penalty: 'Take 2 sips' },
+  { id: 'wyr-h-7', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Date someone who is insanely attractive but has zero sense of humor || Date someone hilarious but completely chaotic and messy.', penalty: 'Tell a quick joke' },
+  { id: 'wyr-h-8', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Send a spicy text to your 1st contact by mistake || Accidentally like a 4-year-old vacation photo of your ex’s new partner.', penalty: 'Take a drink' },
+  { id: 'wyr-h-9', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Have the group know your exact body count || Have the group know the exact dollar balance in your checking account.', penalty: 'Take 2 sips' },
+  { id: 'wyr-h-10', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Be caught picking your nose on an elevator security camera || Fart audibly during a romantic first kiss.', penalty: 'Laugh it off and take a drink' },
+  { id: 'wyr-h-11', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Only meet romantic partners through arranged family setups || Only meet partners through a televised reality dating show.', penalty: 'Take a sip' },
+  { id: 'wyr-h-12', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Have an ex write a bestselling tell-all book about your relationship || Have your parents review your dating history on a podcast.', penalty: 'Take 2 sips' },
+  { id: 'wyr-h-13', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Never be able to tell a lie again || Have your nose glow bright crimson whenever you tell a lie.', penalty: 'Touch your nose' },
+  { id: 'wyr-h-14', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Find your absolute soulmate only after turning 50 || Have 5 fun, memorable relationships throughout your 20s and 30s.', penalty: 'Share your romantic philosophy' },
+  { id: 'wyr-h-15', type: 'WouldYouRather', intensity: Intensity.HOT, text: 'Kiss the cheek of the person to your left right now || Take 3 full penalty sips without breathing.', penalty: 'Do the chosen forfeit' },
+
+  // ==========================================
+  // WOULD YOU RATHER - VULGAR (wyr-v-1 to wyr-v-15)
+  // Extreme taboos, unhinged adult dilemmas
+  // ==========================================
+  { id: 'wyr-v-1', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Accidentally walk in on your parents doing the deed || Have your parents walk in on you in the middle of passion.', penalty: 'Take a full shot of your drink' },
+  { id: 'wyr-v-2', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Never be allowed to use your hands during intimacy || Only be allowed one single position for the rest of your life.', penalty: 'Take a solid drink' },
+  { id: 'wyr-v-3', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Have your most private spicy video leaked onto the internet || Have your entire text message history forwarded to your boss.', penalty: 'Take two shots' },
+  { id: 'wyr-v-4', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Have sex in a haunted abandoned hospital || Have sex in a glass elevator in broad daylight.', penalty: 'Take a shot' },
+  { id: 'wyr-v-5', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Date someone with terrible breath || Date someone with a humiliating kink they demand you participate in daily.', penalty: 'Take 2 sips' },
+  { id: 'wyr-v-6', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Be handcuffed to your ex for 48 hours || Be handcuffed to a complete stranger at a wild music festival.', penalty: 'Take a shot' },
+  { id: 'wyr-v-7', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Hook up with someone in a public park at night || Hook up in an empty office conference room during business hours.', penalty: 'Take a sip' },
+  { id: 'wyr-v-8', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Hook up with someone who talks baby talk during intimacy || Someone who maintains unblinking, aggressive eye contact the entire time.', penalty: 'Do the unblinking stare for 10s' },
+  { id: 'wyr-v-9', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Have your partner find your secret adult toy collection || Have your roommate accidentally find it and use it as a prank.', penalty: 'Take a drink' },
+  { id: 'wyr-v-10', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'All your future climaxes make an air horn sound effect || Make a distressed goat scream sound effect.', penalty: 'Make the sound effect right now' },
+  { id: 'wyr-v-11', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Lose all your swimwear at a crowded public beach || Walk into work completely unclothed for 10 seconds before realizing.', penalty: 'Take a shot' },
+  { id: 'wyr-v-12', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Hook up with your best friend’s ex with their blessing || Hook up with your worst enemy in total secret.', penalty: 'Take 2 sips' },
+  { id: 'wyr-v-13', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Only ever have intimacy with bright stadium lights on || Only ever have intimacy in pitch darkness where you can’t see anything.', penalty: 'Blink three times' },
+  { id: 'wyr-v-14', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Have a spicy dream about a friend in this room and confess it to them || Have them tell you they had one about you.', penalty: 'Take a drink' },
+  { id: 'wyr-v-15', type: 'WouldYouRather', intensity: Intensity.VULGAR, text: 'Never be able to pleasure yourself ever again || Never be able to watch adult entertainment ever again.', penalty: 'Take a shot' },
+
+  // ==========================================
+  // THE HOT SEAT - SOFT (hs-s-1 to hs-s-15)
+  // Rapid-fire 60s speedrun questions
+  // ==========================================
+  { id: 'hs-s-1', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What is the most useless talent you possess? Answer in 3 seconds!', penalty: 'Do 5 jumping jacks' },
+  { id: 'hs-s-2', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What is your biggest irrational fear? Quick!', penalty: 'Make a startled noise' },
+  { id: 'hs-s-3', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What food will you refuse to eat even if you are starving?', penalty: 'Take 1 sip' },
+  { id: 'hs-s-4', type: 'HotSeat', intensity: Intensity.SOFT, text: 'Who in this room survives a zombie apocalypse the longest?', penalty: 'Point at them immediately' },
+  { id: 'hs-s-5', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What is your number one guilty pleasure TV show?', penalty: 'Confess with pride' },
+  { id: 'hs-s-6', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What was the worst haircut you ever paid money for?', penalty: 'Touch your hair' },
+  { id: 'hs-s-7', type: 'HotSeat', intensity: Intensity.SOFT, text: 'If you had to marry a cartoon character, who is it?', penalty: 'Say the name out loud' },
+  { id: 'hs-s-8', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What was your very first cringey screen name or gamertag?', penalty: 'Spell it out loud' },
+  { id: 'hs-s-9', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What is something you do that you think is normal, but others find weird?', penalty: 'Take 1 sip' },
+  { id: 'hs-s-10', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What is the dumbest purchase you made this entire year?', penalty: 'State the price' },
+  { id: 'hs-s-11', type: 'HotSeat', intensity: Intensity.SOFT, text: 'Who was your very first childhood celebrity crush?', penalty: 'Blush or drink' },
+  { id: 'hs-s-12', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What song do you sing at maximum volume when alone in the car or shower?', penalty: 'Sing the first line' },
+  { id: 'hs-s-13', type: 'HotSeat', intensity: Intensity.SOFT, text: 'What is the pettiest white lie you told this past week?', penalty: 'Apologize to the universe' },
+  { id: 'hs-s-14', type: 'HotSeat', intensity: Intensity.SOFT, text: 'Which friend in this room is the biggest drama queen?', penalty: 'Bow to them' },
+  { id: 'hs-s-15', type: 'HotSeat', intensity: Intensity.SOFT, text: 'If you had to change your legal first name right this second, what is it?', penalty: 'Say your new name' },
+
+  // ==========================================
+  // THE HOT SEAT - HOT (hs-h-1 to hs-h-15)
+  // Rapid-fire dating, romance, brutally honest
+  // ==========================================
+  { id: 'hs-h-1', type: 'HotSeat', intensity: Intensity.HOT, text: 'Who in this room would you date if you were both single? Answer in 3 seconds!', penalty: 'Take 2 penalty sips' },
+  { id: 'hs-h-2', type: 'HotSeat', intensity: Intensity.HOT, text: 'What is your biggest personal dating red flag? Quick!', penalty: 'Take a drink' },
+  { id: 'hs-h-3', type: 'HotSeat', intensity: Intensity.HOT, text: 'What is the most toxic trait you secretly possess?', penalty: 'Take a sip of truth' },
+  { id: 'hs-h-4', type: 'HotSeat', intensity: Intensity.HOT, text: 'Have you stalked an ex’s social media within the last 30 days? Yes or no!', penalty: 'Take 2 sips if yes' },
+  { id: 'hs-h-5', type: 'HotSeat', intensity: Intensity.HOT, text: 'What was the cringiest pickup line someone used on you that actually worked?', penalty: 'Recite it aloud' },
+  { id: 'hs-h-6', type: 'HotSeat', intensity: Intensity.HOT, text: 'Who was your worst kiss of all time and what went wrong?', penalty: 'Describe it in 3 words' },
+  { id: 'hs-h-7', type: 'HotSeat', intensity: Intensity.HOT, text: 'What is an immediate "ick" that terminates a talking stage instantly for you?', penalty: 'State your top ick' },
+  { id: 'hs-h-8', type: 'HotSeat', intensity: Intensity.HOT, text: 'Have you ever lied about your age or romantic past? Yes or no!', penalty: 'Take a penalty sip' },
+  { id: 'hs-h-9', type: 'HotSeat', intensity: Intensity.HOT, text: 'If you had to unfollow one person in this room forever right now, who?', penalty: 'Take a drink and apologize' },
+  { id: 'hs-h-10', type: 'HotSeat', intensity: Intensity.HOT, text: 'What is the riskiest place you have ever made out with someone?', penalty: 'Say the location' },
+  { id: 'hs-h-11', type: 'HotSeat', intensity: Intensity.HOT, text: 'Have you ever had secret romantic feelings for a friend’s partner?', penalty: 'Take 2 penalty sips' },
+  { id: 'hs-h-12', type: 'HotSeat', intensity: Intensity.HOT, text: 'Rank the top 2 most charismatic people in this room in 3 seconds!', penalty: 'Point at both' },
+  { id: 'hs-h-13', type: 'HotSeat', intensity: Intensity.HOT, text: 'What was your most humiliating romantic rejection?', penalty: 'Take a sip' },
+  { id: 'hs-h-14', type: 'HotSeat', intensity: Intensity.HOT, text: 'Have you ever ghosted someone and genuinely regretted it later?', penalty: 'Say yes or no' },
+  { id: 'hs-h-15', type: 'HotSeat', intensity: Intensity.HOT, text: 'Do you currently have a crush on someone? Yes or no right now!', penalty: 'Take 2 sips if yes' },
+
+  // ==========================================
+  // THE HOT SEAT - VULGAR (hs-v-1 to hs-v-15)
+  // Rapid-fire NSFW confessions, zero hesitation
+  // ==========================================
+  { id: 'hs-v-1', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is your favorite intimate position? Say it in 3 seconds!', penalty: 'Take a shot' },
+  { id: 'hs-v-2', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is your wildest guilty pleasure fantasy? Quick!', penalty: 'Take a drink' },
+  { id: 'hs-v-3', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'Have you ever done the deed in public or outdoors? Where?', penalty: 'Name the place' },
+  { id: 'hs-v-4', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is an unusual turn-on you secretly have?', penalty: 'Take a shot' },
+  { id: 'hs-v-5', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'Have you ever sent a spicy photo to the wrong contact?', penalty: 'Take a double shot' },
+  { id: 'hs-v-6', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is the highest number of intimate sessions you had in 24 hours?', penalty: 'Say the number' },
+  { id: 'hs-v-7', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'Have you ever hooked up with someone purely because you were bored?', penalty: 'Take a sip' },
+  { id: 'hs-v-8', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is the wildest piece of furniture you have ever broken during passion?', penalty: 'Take a shot' },
+  { id: 'hs-v-9', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'Have you ever faked an orgasm with a partner? Say yes or no in 2 seconds!', penalty: 'Take a drink if yes' },
+  { id: 'hs-v-10', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is an item in your bedroom you would frantically hide if your parents visited?', penalty: 'Describe it' },
+  { id: 'hs-v-11', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'Have you ever had a one-night stand you immediately regretted in the morning?', penalty: 'Take a shot' },
+  { id: 'hs-v-12', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is the most unhinged thing you have ever said during passion?', penalty: 'Take 2 sips' },
+  { id: 'hs-v-13', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'Have you ever walked in on someone or been walked in on during intimacy?', penalty: 'Say who caught who' },
+  { id: 'hs-v-14', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'What is your exact body count? State the number in 3 seconds!', penalty: 'Take a full shot if you pass' },
+  { id: 'hs-v-15', type: 'HotSeat', intensity: Intensity.VULGAR, text: 'Have you ever kissed more than two different people in a single 24-hour day?', penalty: 'Take a drink' },
 ];
 
 export const getRandomPrompt = (type: PromptType, intensity: Intensity): GamePrompt => {

@@ -4,6 +4,7 @@ import { Theme, GameMode } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
 import { getThemeDefinition } from './themes';
 import { getFontForTheme } from './themes/allThemesList';
+import { hapticService } from './services/haptics';
 
 const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
   const {
@@ -23,6 +24,7 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
   const MenuButton = themeDef.MenuButton;
 
   const handleStartMode = (mode: GameMode) => {
+    hapticService.medium();
     setGameMode(mode);
     if (playersEnabled) {
       logic.setView('player-setup');
@@ -30,6 +32,14 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
       logic.setView('game');
     }
   };
+
+  const GAME_MODES = [
+    { mode: GameMode.TRUTH_OR_DARE, label: 'TRUTH OR DARE', icon: '🎭', desc: 'Classic confessions & physical dares' },
+    { mode: GameMode.NEVER_HAVE_I_EVER, label: 'NEVER HAVE I EVER', icon: '🙈', desc: 'Exposing secrets & drinking forfeits' },
+    { mode: GameMode.MOST_LIKELY_TO, label: 'MOST LIKELY TO', icon: '🗳️', desc: 'Point fingers & call out your friends' },
+    { mode: GameMode.WOULD_YOU_RATHER, label: 'WOULD YOU RATHER', icon: '⚖️', desc: 'Cursed dilemmas & minority penalties' },
+    { mode: GameMode.HOT_SEAT, label: 'HOT SEAT (60s)', icon: '🔥', desc: 'Rapid-fire interrogation speedrun' },
+  ];
 
   // Show theme selection if no theme is explicitly selected yet
   if (!hasExplicitlySelectedTheme) {
@@ -88,14 +98,19 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
   };
 
   const genericModeOverlay = (
-    <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-8 space-y-6">
-      <h2 className="text-4xl text-white font-black italic tracking-widest uppercase">SELECT GAMEMODE</h2>
+    <div className="absolute inset-0 bg-black/90 backdrop-blur-md z-50 flex flex-col items-center justify-center p-4 sm:p-8 space-y-4 overflow-y-auto">
+      <h2 className="text-3xl sm:text-4xl text-white font-black italic tracking-widest uppercase">
+        SELECT GAMEMODE
+      </h2>
 
       {/* Pass & Play mode toggle switch */}
-      <div className="flex items-center gap-3 bg-white/10 px-4 py-2.5 rounded-full border border-white/20">
-        <span className="text-white text-xs font-bold uppercase tracking-wider">👥 Pass & Play Mode:</span>
+      <div className="flex items-center gap-3 bg-white/10 px-4 py-2 rounded-full border border-white/20">
+        <span className="text-white text-xs font-bold uppercase tracking-wider">👥 Pass & Play:</span>
         <button
-          onClick={() => setPlayersEnabled(!playersEnabled)}
+          onClick={() => {
+            hapticService.light();
+            setPlayersEnabled(!playersEnabled);
+          }}
           className={`px-3 py-1 rounded-full text-xs font-black uppercase transition-all ${
             playersEnabled ? 'bg-red-600 text-white shadow-md shadow-red-600/50' : 'bg-white/20 text-white/60'
           }`}
@@ -104,28 +119,43 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
         </button>
       </div>
 
-      <button
-        onClick={() => handleStartMode(GameMode.TRUTH_OR_DARE)}
-        className="w-full max-w-sm bg-white text-black p-4 text-2xl font-bold uppercase transition hover:scale-105 active:scale-95"
-      >
-        TRUTH OR DARE
-      </button>
-      <button
-        onClick={() => handleStartMode(GameMode.NEVER_HAVE_I_EVER)}
-        className="w-full max-w-sm bg-white text-black p-4 text-2xl font-bold uppercase transition hover:scale-105 active:scale-95"
-      >
-        NEVER HAVE I EVER
-      </button>
+      {/* 5 Game Modes */}
+      <div className="grid grid-cols-1 gap-2.5 w-full max-w-md max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar">
+        {GAME_MODES.map((item) => (
+          <button
+            key={item.mode}
+            onClick={() => handleStartMode(item.mode)}
+            className="w-full bg-white text-black p-3.5 sm:p-4 text-left border-2 border-black hover:border-red-600 hover:bg-zinc-100 transition-all hover:scale-[1.02] active:scale-95 shadow-md flex items-center gap-3.5 group"
+          >
+            <span className="text-2xl sm:text-3xl group-hover:scale-110 transition-transform">{item.icon}</span>
+            <div className="flex-1">
+              <div className="text-base sm:text-lg font-black uppercase tracking-wide leading-none group-hover:text-red-600 transition-colors">
+                {item.label}
+              </div>
+              <div className="text-[11px] text-black/60 font-medium mt-1">
+                {item.desc}
+              </div>
+            </div>
+            <span className="text-xs font-black opacity-30 group-hover:opacity-100 text-red-600">▶</span>
+          </button>
+        ))}
+      </div>
 
-      <div className="flex items-center gap-4 mt-4">
+      <div className="flex items-center gap-4 mt-2">
         <button
-          onClick={() => logic.setView('player-setup')}
+          onClick={() => {
+            hapticService.light();
+            logic.setView('player-setup');
+          }}
           className="text-amber-400 text-xs font-bold uppercase tracking-wider hover:underline"
         >
           ⚙️ Manage Players ({players.length})
         </button>
         <button
-          onClick={() => setIsSelectingMode(false)}
+          onClick={() => {
+            hapticService.light();
+            setIsSelectingMode(false);
+          }}
           className="text-white/50 text-xs hover:text-white transition uppercase tracking-widest"
         >
           [ GO BACK ]
@@ -148,10 +178,11 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
             <MenuLayout logic={logic}>
               {!isSelectingMode ? (
                 <>
-                  <MenuButton label="START ADVENTURE" onClick={() => setIsSelectingMode(true)} isPrimary={true} />
+                  <MenuButton label="START ADVENTURE" onClick={() => { hapticService.light(); setIsSelectingMode(true); }} isPrimary={true} />
                   <MenuButton
                     label={playersEnabled ? `ROSTER (${players.length})` : 'PASS & PLAY'}
                     onClick={() => {
+                      hapticService.light();
                       setPlayersEnabled(true);
                       logic.setView('player-setup');
                     }}
@@ -163,7 +194,10 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                 <>
                   <div className="flex justify-center mb-2">
                     <button
-                      onClick={() => setPlayersEnabled(!playersEnabled)}
+                      onClick={() => {
+                        hapticService.light();
+                        setPlayersEnabled(!playersEnabled);
+                      }}
                       className={`px-3 py-1 rounded-full text-[10px] font-black uppercase transition-all border ${
                         playersEnabled ? 'bg-red-600 text-white border-red-400' : 'bg-black/60 text-white/60 border-white/20'
                       }`}
@@ -173,7 +207,10 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
                   </div>
                   <MenuButton label="TRUTH OR DARE" onClick={() => handleStartMode(GameMode.TRUTH_OR_DARE)} isPrimary={true} />
                   <MenuButton label="NEVER HAVE I EVER" onClick={() => handleStartMode(GameMode.NEVER_HAVE_I_EVER)} isPrimary={true} />
-                  <MenuButton label="GO BACK" onClick={() => setIsSelectingMode(false)} isPrimary={false} />
+                  <MenuButton label="MOST LIKELY TO" onClick={() => handleStartMode(GameMode.MOST_LIKELY_TO)} isPrimary={true} />
+                  <MenuButton label="WOULD YOU RATHER" onClick={() => handleStartMode(GameMode.WOULD_YOU_RATHER)} isPrimary={true} />
+                  <MenuButton label="HOT SEAT (60s)" onClick={() => handleStartMode(GameMode.HOT_SEAT)} isPrimary={true} />
+                  <MenuButton label="GO BACK" onClick={() => { hapticService.light(); setIsSelectingMode(false); }} isPrimary={false} />
                 </>
               )}
             </MenuLayout>
@@ -183,20 +220,27 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
               {isSelectingMode && genericModeOverlay}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full w-full bg-black text-white p-8 space-y-8">
-              <h2 className="text-4xl font-black italic">FALLBACK MENU</h2>
+            <div className="flex flex-col items-center justify-center h-full w-full bg-black text-white p-8 space-y-4">
+              <h2 className="text-4xl font-black italic">ALL★STAR INFINITY</h2>
               {!isSelectingMode ? (
                 <>
-                  <button onClick={() => setIsSelectingMode(true)} className="bg-white text-black px-6 py-3 text-2xl font-bold">START ADVENTURE</button>
-                  <button onClick={() => { setPlayersEnabled(true); logic.setView('player-setup'); }} className="bg-zinc-800 text-white px-6 py-3 text-xl font-bold">PASS & PLAY ROSTER</button>
+                  <button onClick={() => { hapticService.light(); setIsSelectingMode(true); }} className="bg-white text-black px-6 py-3 text-2xl font-bold">START ADVENTURE</button>
+                  <button onClick={() => { hapticService.light(); setPlayersEnabled(true); logic.setView('player-setup'); }} className="bg-zinc-800 text-white px-6 py-3 text-xl font-bold">PASS & PLAY ROSTER</button>
                   <button onClick={() => setTheme(Theme.NONE)} className="bg-gray-800 text-white px-6 py-3 text-2xl font-bold">THEMES</button>
                 </>
               ) : (
-                <>
-                  <button onClick={() => handleStartMode(GameMode.TRUTH_OR_DARE)} className="bg-white text-black px-6 py-3 text-2xl font-bold">TRUTH OR DARE</button>
-                  <button onClick={() => handleStartMode(GameMode.NEVER_HAVE_I_EVER)} className="bg-white text-black px-6 py-3 text-2xl font-bold">NEVER HAVE I EVER</button>
-                  <button onClick={() => setIsSelectingMode(false)} className="bg-gray-800 text-white px-6 py-3 text-2xl font-bold">GO BACK</button>
-                </>
+                <div className="w-full max-w-sm space-y-2">
+                  {GAME_MODES.map((item) => (
+                    <button
+                      key={item.mode}
+                      onClick={() => handleStartMode(item.mode)}
+                      className="w-full bg-white text-black p-3 font-bold text-lg text-left"
+                    >
+                      {item.icon} {item.label}
+                    </button>
+                  ))}
+                  <button onClick={() => setIsSelectingMode(false)} className="w-full bg-gray-800 text-white p-2 text-sm mt-4">GO BACK</button>
+                </div>
               )}
             </div>
           )}

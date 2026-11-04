@@ -38,8 +38,8 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         playersEnabled, setPlayersEnabled,
         activePlayer, targetPlayer,
         nextPlayer, prevPlayer,
-        incrementChicken,
-        addPlayer, removePlayer, resetRosterScores,
+        incrementChicken, incrementScore, resetRosterScores,
+        addPlayer, removePlayer,
         // Countdown Timer
         timerEnabled,
         timerDuration, setTimerDuration,
@@ -58,11 +58,63 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
     const [shareModalMode, setShareModalMode] = useState<'export' | 'import'>('export');
     const [deckToShare, setDeckToShare] = useState<CustomDeck | null>(null);
 
+    // Most Likely To Countdown state
+    const [pointCountdown, setPointCountdown] = useState<number | string | null>(null);
+
+    // Would You Rather Selected Option
+    const [selectedWyrOption, setSelectedWyrOption] = useState<'A' | 'B' | null>(null);
+
+    // Hot Seat 60s Speedrun state
+    const [hotSeatTimeLeft, setHotSeatTimeLeft] = useState<number>(60);
+    const [isHotSeatRunning, setIsHotSeatRunning] = useState<boolean>(false);
+    const [hotSeatAnswered, setHotSeatAnswered] = useState<number>(0);
+    const [hotSeatPassed, setHotSeatPassed] = useState<number>(0);
+    const [isHotSeatFinished, setIsHotSeatFinished] = useState<boolean>(false);
+
+    // Auto-draw prompts for single-action modes when intensity is chosen
     useEffect(() => {
-        if (gameMode === GameMode.NEVER_HAVE_I_EVER && intensity && !prompt) {
-            handleDraw('NeverHaveIEver');
+        if (intensity && !prompt) {
+            if (gameMode === GameMode.NEVER_HAVE_I_EVER) {
+                handleDraw('NeverHaveIEver');
+            } else if (gameMode === GameMode.MOST_LIKELY_TO) {
+                handleDraw('MostLikelyTo');
+            } else if (gameMode === GameMode.WOULD_YOU_RATHER) {
+                handleDraw('WouldYouRather');
+            } else if (gameMode === GameMode.HOT_SEAT) {
+                handleDraw('HotSeat');
+            }
         }
     }, [gameMode, intensity, prompt, handleDraw]);
+
+    // Reset prompt-specific interaction states when prompt changes
+    useEffect(() => {
+        setSelectedWyrOption(null);
+        setPointCountdown(null);
+    }, [prompt?.id]);
+
+    // Hot Seat 60s interval
+    useEffect(() => {
+        if (gameMode !== GameMode.HOT_SEAT || !isHotSeatRunning || hotSeatTimeLeft <= 0) {
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setHotSeatTimeLeft((prev) => {
+                if (prev <= 1) {
+                    setIsHotSeatRunning(false);
+                    setIsHotSeatFinished(true);
+                    hapticService.error();
+                    return 0;
+                }
+                if (prev <= 5) {
+                    hapticService.warning();
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [gameMode, isHotSeatRunning, hotSeatTimeLeft]);
 
     const themeDef = getThemeDefinition(theme);
 
@@ -85,6 +137,23 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         setGameMode(deck.gameMode);
         setIntensity(deck.intensity);
         setActiveTab('play');
+    };
+
+    const triggerPointCountdown = () => {
+        hapticService.light();
+        setPointCountdown(3);
+        setTimeout(() => {
+            hapticService.light();
+            setPointCountdown(2);
+            setTimeout(() => {
+                hapticService.light();
+                setPointCountdown(1);
+                setTimeout(() => {
+                    hapticService.heavy();
+                    setPointCountdown('POINT! 👉');
+                }, 750);
+            }, 750);
+        }, 750);
     };
 
     // Default Views if Theme doesn't provide them
@@ -162,6 +231,357 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             </div>
         </div>
     );
+
+    // ==========================================
+    // 🗳️ MOST LIKELY TO DISPLAY
+    // ==========================================
+    const MostLikelyToDisplay = () => (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="theme-panel p-6 sm:p-8 mt-4 space-y-6"
+        >
+            <div className="flex justify-between items-center">
+                <span className="theme-badge px-3 py-1 font-bold italic">🗳️ MOST LIKELY TO</span>
+                <span className="theme-text-header text-[10px] opacity-40 italic">ENTRY_{history.length}</span>
+            </div>
+
+            <p className="theme-text-prompt text-2xl sm:text-3xl leading-tight font-black">
+                "{prompt?.text}"
+            </p>
+
+            {/* Point Countdown Interactive Button */}
+            <div className="py-2 flex flex-col items-center justify-center">
+                {pointCountdown === null ? (
+                    <button
+                        onClick={triggerPointCountdown}
+                        className="theme-button p-4 text-base font-black w-full uppercase tracking-wider"
+                    >
+                        👉 3, 2, 1... TAP TO POINT!
+                    </button>
+                ) : (
+                    <motion.div
+                        key={String(pointCountdown)}
+                        initial={{ scale: 0.7, opacity: 0 }}
+                        animate={{ scale: [1, 1.15, 1], opacity: 1 }}
+                        className="p-5 text-center font-black text-3xl sm:text-4xl text-[var(--theme-accent,#ef4444)] uppercase tracking-wider"
+                    >
+                        {pointCountdown}
+                    </motion.div>
+                )}
+            </div>
+
+            {/* Quick Player Target / Voter (Pass & Play) */}
+            {playersEnabled && players.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-black/10">
+                    <p className="text-[10px] uppercase font-bold opacity-60">Who got the most points?</p>
+                    <div className="flex flex-wrap gap-2">
+                        {players.map((p) => (
+                            <button
+                                key={p.id}
+                                onClick={() => {
+                                    incrementChicken(p.id);
+                                    hapticService.heavy();
+                                }}
+                                className="px-3 py-1.5 rounded-full text-xs font-bold bg-black/10 hover:bg-black/20 dark:bg-white/10 dark:hover:bg-white/20 transition-all active:scale-95 flex items-center gap-1.5"
+                            >
+                                <span>{p.name}</span>
+                                <span className="opacity-50 text-[10px]">🐔 {p.chickenCount}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="theme-penalty-box p-4 border-t-2 border-dashed border-black/20">
+                <p className="theme-text-header text-xs text-[var(--theme-accent)] mb-1">PENALTY FOR MOST VOTES</p>
+                <p className="text-sm italic opacity-80">{prompt?.penalty}</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-6">
+                <button
+                    onClick={() => {
+                        if (playersEnabled) nextPlayer();
+                        setIntensity(null);
+                        setPrompt(null);
+                    }}
+                    className="theme-button p-4 text-xl"
+                >
+                    DONE
+                </button>
+                <button
+                    onClick={() => {
+                        if (playersEnabled) nextPlayer();
+                        handleDraw('MostLikelyTo');
+                    }}
+                    className="theme-button theme-button-alt p-4 text-xl"
+                >
+                    NEXT
+                </button>
+            </div>
+        </motion.div>
+    );
+
+    // ==========================================
+    // ⚖️ WOULD YOU RATHER DISPLAY
+    // ==========================================
+    const WouldYouRatherDisplay = () => {
+        const parts = prompt?.text.split('||') || [];
+        const optionA = parts[0]?.trim() || prompt?.text || '';
+        const optionB = parts[1]?.trim() || 'Do the penalty instead.';
+
+        const handleSelectOption = (opt: 'A' | 'B') => {
+            hapticService.medium();
+            setSelectedWyrOption(opt);
+        };
+
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="theme-panel p-6 sm:p-8 mt-4 space-y-6"
+            >
+                <div className="flex justify-between items-center">
+                    <span className="theme-badge px-3 py-1 font-bold italic">⚖️ WOULD YOU RATHER</span>
+                    <span className="theme-text-header text-[10px] opacity-40 italic">ENTRY_{history.length}</span>
+                </div>
+
+                {/* 2 Interactive Choice Cards */}
+                <div className="grid grid-cols-1 gap-3.5">
+                    {/* Option A */}
+                    <motion.div
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleSelectOption('A')}
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                            selectedWyrOption === 'A'
+                                ? 'bg-red-600 text-white border-red-400 shadow-lg scale-[1.02]'
+                                : 'bg-black/5 dark:bg-white/5 border-black/20 dark:border-white/20 hover:border-red-500'
+                        }`}
+                    >
+                        <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-xs font-black uppercase tracking-wider opacity-60">OPTION A</span>
+                            {selectedWyrOption === 'A' && <span className="text-sm">✓ YOUR VOTE</span>}
+                        </div>
+                        <p className="text-lg sm:text-xl font-bold leading-snug">{optionA}</p>
+                    </motion.div>
+
+                    <div className="text-center font-black italic text-xs opacity-50 uppercase tracking-widest">— OR —</div>
+
+                    {/* Option B */}
+                    <motion.div
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => handleSelectOption('B')}
+                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                            selectedWyrOption === 'B'
+                                ? 'bg-red-600 text-white border-red-400 shadow-lg scale-[1.02]'
+                                : 'bg-black/5 dark:bg-white/5 border-black/20 dark:border-white/20 hover:border-red-500'
+                        }`}
+                    >
+                        <div className="flex justify-between items-center mb-1.5">
+                            <span className="text-xs font-black uppercase tracking-wider opacity-60">OPTION B</span>
+                            {selectedWyrOption === 'B' && <span className="text-sm">✓ YOUR VOTE</span>}
+                        </div>
+                        <p className="text-lg sm:text-xl font-bold leading-snug">{optionB}</p>
+                    </motion.div>
+                </div>
+
+                <div className="theme-penalty-box p-4 border-t-2 border-dashed border-black/20">
+                    <p className="theme-text-header text-xs text-[var(--theme-accent)] mb-1">MINORITY FORFEIT</p>
+                    <p className="text-sm italic opacity-80">{prompt?.penalty || 'Minority voters take 1 sip.'}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                    <button
+                        onClick={() => {
+                            if (playersEnabled) nextPlayer();
+                            setIntensity(null);
+                            setPrompt(null);
+                        }}
+                        className="theme-button p-4 text-xl"
+                    >
+                        DONE
+                    </button>
+                    <button
+                        onClick={() => {
+                            if (playersEnabled) nextPlayer();
+                            handleDraw('WouldYouRather');
+                        }}
+                        className="theme-button theme-button-alt p-4 text-xl"
+                    >
+                        NEXT
+                    </button>
+                </div>
+            </motion.div>
+        );
+    };
+
+    // ==========================================
+    // 🔥 THE HOT SEAT (60s SPEEDRUN) DISPLAY
+    // ==========================================
+    const HotSeatDisplay = () => {
+        const handleStartHotSeat = () => {
+            hapticService.success();
+            setHotSeatTimeLeft(60);
+            setHotSeatAnswered(0);
+            setHotSeatPassed(0);
+            setIsHotSeatFinished(false);
+            setIsHotSeatRunning(true);
+            handleDraw('HotSeat');
+        };
+
+        const handleHotSeatAnswer = () => {
+            hapticService.success();
+            setHotSeatAnswered(prev => prev + 1);
+            incrementScore();
+            handleDraw('HotSeat');
+        };
+
+        const handleHotSeatPass = () => {
+            hapticService.heavy();
+            setHotSeatPassed(prev => prev + 1);
+            incrementChicken();
+            handleDraw('HotSeat');
+        };
+
+        const handleNextRound = () => {
+            if (playersEnabled) nextPlayer();
+            setHotSeatTimeLeft(60);
+            setHotSeatAnswered(0);
+            setHotSeatPassed(0);
+            setIsHotSeatFinished(false);
+            setIsHotSeatRunning(false);
+            setPrompt(null);
+        };
+
+        if (isHotSeatFinished) {
+            return (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="theme-panel p-6 sm:p-8 mt-4 text-center space-y-6"
+                >
+                    <div className="inline-block p-3 rounded-full bg-red-600 text-white text-3xl shadow-lg mb-1">
+                        🔥
+                    </div>
+                    <h3 className="theme-text-header text-3xl font-black italic">HOT SEAT COMPLETE!</h3>
+
+                    <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-black/10 dark:bg-white/5 border border-black/10">
+                        <div>
+                            <div className="text-3xl font-black text-emerald-500">{hotSeatAnswered}</div>
+                            <div className="text-xs uppercase font-bold opacity-60">Answered</div>
+                        </div>
+                        <div>
+                            <div className="text-3xl font-black text-amber-500">{hotSeatPassed}</div>
+                            <div className="text-xs uppercase font-bold opacity-60">Chickened Out</div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-3 pt-2">
+                        <button
+                            onClick={handleNextRound}
+                            className="w-full theme-button p-4 text-lg font-black"
+                        >
+                            PASS TO NEXT PLAYER ➔
+                        </button>
+                        <button
+                            onClick={handleStartHotSeat}
+                            className="w-full theme-button theme-button-alt p-3 text-sm font-bold opacity-80"
+                        >
+                            RETRY ROUND (60s)
+                        </button>
+                        <button
+                            onClick={() => {
+                                setIntensity(null);
+                                setPrompt(null);
+                            }}
+                            className="text-xs opacity-50 hover:opacity-100 uppercase tracking-widest"
+                        >
+                            [ QUIT TO MAIN MENU ]
+                        </button>
+                    </div>
+                </motion.div>
+            );
+        }
+
+        if (!isHotSeatRunning && hotSeatTimeLeft === 60 && hotSeatAnswered === 0) {
+            return (
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="theme-panel p-6 sm:p-8 mt-4 text-center space-y-6"
+                >
+                    <div className="text-4xl">🔥</div>
+                    <h3 className="theme-text-header text-3xl font-black italic">THE HOT SEAT</h3>
+                    <p className="text-sm opacity-80 max-w-sm mx-auto leading-relaxed">
+                        {activePlayer ? (
+                            <span><strong className="text-red-500">{activePlayer.name}</strong> is in the Hot Seat! </span>
+                        ) : null}
+                        Answer as many rapid-fire questions as you can in <strong>60 seconds</strong> without hesitating!
+                    </p>
+
+                    <button
+                        onClick={handleStartHotSeat}
+                        className="w-full py-5 theme-button text-2xl font-black uppercase tracking-wider hover:scale-105 active:scale-95 shadow-xl"
+                    >
+                        ⚡ START 60s SPEEDRUN
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            setIntensity(null);
+                            setPrompt(null);
+                        }}
+                        className="text-xs opacity-40 hover:opacity-100 uppercase tracking-widest block mx-auto"
+                    >
+                        [ CANCEL ]
+                    </button>
+                </motion.div>
+            );
+        }
+
+        return (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="theme-panel p-6 sm:p-8 mt-4 space-y-5"
+            >
+                {/* 60s Speedrun Top Clock */}
+                <div className="flex justify-between items-center p-3 rounded-xl bg-black/10 dark:bg-white/10 border border-black/10">
+                    <div className="flex items-center gap-2">
+                        <span className="text-xl">⏰</span>
+                        <span className="font-mono text-2xl font-black text-red-500">{hotSeatTimeLeft}s</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-xs font-bold">
+                        <span className="text-emerald-500">⭐ {hotSeatAnswered}</span>
+                        <span className="text-amber-500">🐔 {hotSeatPassed}</span>
+                    </div>
+                </div>
+
+                <div className="py-2">
+                    <span className="theme-badge px-3 py-1 font-bold italic text-xs mb-3 inline-block">RAPID FIRE</span>
+                    <p className="theme-text-prompt text-2xl sm:text-3xl leading-snug font-black">
+                        "{prompt?.text}"
+                    </p>
+                </div>
+
+                {/* Big Rapid Action Buttons */}
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                    <button
+                        onClick={handleHotSeatAnswer}
+                        className="theme-button p-5 text-xl font-black uppercase tracking-wider bg-emerald-600 hover:bg-emerald-500 text-white shadow-md active:scale-95"
+                    >
+                        ✅ ANSWERED
+                    </button>
+                    <button
+                        onClick={handleHotSeatPass}
+                        className="theme-button theme-button-alt p-5 text-xl font-black uppercase tracking-wider bg-amber-600/80 hover:bg-amber-600 text-white shadow-md active:scale-95"
+                    >
+                        🐔 PASS (+1)
+                    </button>
+                </div>
+            </motion.div>
+        );
+    };
 
     const DefaultPromptDisplay = () => (
         <motion.div
@@ -247,6 +667,19 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         </motion.div>
     );
 
+    const renderGameModePrompt = () => {
+        if (gameMode === GameMode.MOST_LIKELY_TO) {
+            return <MostLikelyToDisplay />;
+        }
+        if (gameMode === GameMode.WOULD_YOU_RATHER) {
+            return <WouldYouRatherDisplay />;
+        }
+        if (gameMode === GameMode.HOT_SEAT) {
+            return <HotSeatDisplay />;
+        }
+        return <DefaultPromptDisplay />;
+    };
+
     return (
         <AnimatePresence mode="wait">
             {activeTab === 'play' && (
@@ -267,14 +700,17 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 </div>
                             ) : <div />}
 
-                            <CountdownTimer
-                                enabled={timerEnabled}
-                                duration={timerDuration}
-                                onToggleEnabled={toggleTimerEnabled}
-                                onChangeDuration={setTimerDuration}
-                                promptId={prompt?.id}
-                                isPromptActive={!!prompt}
-                            />
+                            {/* Corner Timer: Only show if not in 60s Hot Seat mode (which has its own big clock) */}
+                            {gameMode !== GameMode.HOT_SEAT && (
+                                <CountdownTimer
+                                    enabled={timerEnabled}
+                                    duration={timerDuration}
+                                    onToggleEnabled={toggleTimerEnabled}
+                                    onChangeDuration={setTimerDuration}
+                                    promptId={prompt?.id}
+                                    isPromptActive={!!prompt}
+                                />
+                            )}
                         </div>
 
                         {/* Pass & Play Roster Turn Banner (when active) */}
@@ -292,58 +728,19 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         )}
                     </div>
 
-                    {themeDef.PlayScreen ? (
+                    {/* Custom Theme PlayScreen is reserved for legacy TOD / NHIE; new modes always use specialized interactive engines */}
+                    {themeDef.PlayScreen && (gameMode === GameMode.TRUTH_OR_DARE || gameMode === GameMode.NEVER_HAVE_I_EVER) ? (
                         <themeDef.PlayScreen logic={logic} />
                     ) : (
                         <>
                             {!intensity && !prompt ? (
                                 themeDef.IntensitySelector ? <themeDef.IntensitySelector logic={logic} /> : <DefaultIntensitySelector />
                             ) : !prompt ? (
-                                gameMode === GameMode.NEVER_HAVE_I_EVER ? null : (
+                                gameMode === GameMode.TRUTH_OR_DARE ? (
                                     themeDef.PromptTypeSelector ? <themeDef.PromptTypeSelector logic={logic} /> : <DefaultPromptTypeSelector />
-                                )
+                                ) : null
                             ) : (
-                                themeDef.PromptLayout && themeDef.PlayButton ? (
-                                    <themeDef.PromptLayout logic={logic}>
-                                        {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
-                                            <>
-                                                <themeDef.PlayButton
-                                                    label="DONE"
-                                                    onClick={() => {
-                                                        if (playersEnabled) nextPlayer();
-                                                        setIntensity(null);
-                                                        setPrompt(null);
-                                                    }}
-                                                    isPrimary={true}
-                                                />
-                                                <themeDef.PlayButton
-                                                    label="NEXT"
-                                                    onClick={() => {
-                                                        if (playersEnabled) nextPlayer();
-                                                        handleDraw('NeverHaveIEver');
-                                                    }}
-                                                    isPrimary={false}
-                                                />
-                                            </>
-                                        ) : (
-                                            <>
-                                                <themeDef.PlayButton
-                                                    label="DONE"
-                                                    onClick={() => {
-                                                        if (playersEnabled) nextPlayer();
-                                                        setPrompt(null);
-                                                    }}
-                                                    isPrimary={true}
-                                                />
-                                                <themeDef.PlayButton label="REROLL" onClick={() => handleDraw(prompt!.type)} isPrimary={false} />
-                                            </>
-                                        )}
-                                    </themeDef.PromptLayout>
-                                ) : themeDef.PromptDisplay ? (
-                                    <themeDef.PromptDisplay logic={logic} />
-                                ) : (
-                                    <DefaultPromptDisplay />
-                                )
+                                renderGameModePrompt()
                             )}
                         </>
                     )}
@@ -393,6 +790,9 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                                     <option value="Truth">Truth</option>
                                                     <option value="Dare">Dare</option>
                                                     <option value="NeverHaveIEver">Never</option>
+                                                    <option value="MostLikelyTo">Most Likely</option>
+                                                    <option value="WouldYouRather">Rather</option>
+                                                    <option value="HotSeat">Hot Seat</option>
                                                 </select>
                                                 <select
                                                     className="bg-black text-white text-[10px] p-1 uppercase"
@@ -408,7 +808,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                                 className="w-full bg-white/10 p-2 text-xs focus:outline-none"
                                                 value={p.text}
                                                 onChange={(e) => updatePromptInEditingDeck(p.id, 'text', e.target.value)}
-                                                placeholder="PROMPT TEXT..."
+                                                placeholder={editingDeck.gameMode === GameMode.WOULD_YOU_RATHER ? "Option A || Option B" : "PROMPT TEXT..."}
                                             />
                                             <input
                                                 className="w-full bg-white/5 p-1 text-[10px] italic border-b border-black/10 focus:outline-none"
@@ -671,7 +1071,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                     history.map((item, i) => (
                                         <div key={i} className="theme-panel p-4 flex gap-4 items-start">
                                             <div className="w-10 h-10 theme-badge shrink-0 flex items-center justify-center text-lg">
-                                                {item.type === 'Truth' ? '?' : '!'}
+                                                {item.type === 'Truth' ? '?' : item.type === 'Dare' ? '!' : '🎴'}
                                             </div>
                                             <div>
                                                 <div className="flex justify-between items-center mb-1">

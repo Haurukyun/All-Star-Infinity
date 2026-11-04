@@ -31,10 +31,13 @@ export enum Theme {
 
 export enum GameMode {
   TRUTH_OR_DARE = 'TruthOrDare',
-  NEVER_HAVE_I_EVER = 'NeverHaveIEver'
+  NEVER_HAVE_I_EVER = 'NeverHaveIEver',
+  MOST_LIKELY_TO = 'MostLikelyTo',
+  WOULD_YOU_RATHER = 'WouldYouRather',
+  HOT_SEAT = 'HotSeat'
 }
 
-export type PromptType = 'Truth' | 'Dare' | 'NeverHaveIEver';
+export type PromptType = 'Truth' | 'Dare' | 'NeverHaveIEver' | 'MostLikelyTo' | 'WouldYouRather' | 'HotSeat';
 
 export interface Player {
   id: string;

@@ -244,11 +244,19 @@ export const useGameLogic = () => {
   }, [activeDeckId, customDecks, intensity, prompt]);
 
   const saveDeck = useCallback((deck: CustomDeck) => {
-    const sanitizedPrompts = deck.prompts.map(p => ({
-      ...p,
-      intensity: deck.intensity,
-      type: deck.gameMode === GameMode.NEVER_HAVE_I_EVER ? ('NeverHaveIEver' as PromptType) : p.type
-    }));
+    const sanitizedPrompts = deck.prompts.map(p => {
+      let type: PromptType = p.type;
+      if (deck.gameMode === GameMode.NEVER_HAVE_I_EVER) type = 'NeverHaveIEver';
+      else if (deck.gameMode === GameMode.MOST_LIKELY_TO) type = 'MostLikelyTo';
+      else if (deck.gameMode === GameMode.WOULD_YOU_RATHER) type = 'WouldYouRather';
+      else if (deck.gameMode === GameMode.HOT_SEAT) type = 'HotSeat';
+
+      return {
+        ...p,
+        intensity: deck.intensity,
+        type
+      };
+    });
 
     const sanitizedDeck = { ...deck, prompts: sanitizedPrompts };
 
@@ -298,9 +306,15 @@ export const useGameLogic = () => {
 
   const addNewPromptToEditingDeck = useCallback(() => {
     if (!editingDeck) return;
+    let defaultType: PromptType = 'Truth';
+    if (editingDeck.gameMode === GameMode.NEVER_HAVE_I_EVER) defaultType = 'NeverHaveIEver';
+    else if (editingDeck.gameMode === GameMode.MOST_LIKELY_TO) defaultType = 'MostLikelyTo';
+    else if (editingDeck.gameMode === GameMode.WOULD_YOU_RATHER) defaultType = 'WouldYouRather';
+    else if (editingDeck.gameMode === GameMode.HOT_SEAT) defaultType = 'HotSeat';
+
     const newPrompt: GamePrompt = {
       id: generateId(),
-      type: editingDeck.gameMode === GameMode.NEVER_HAVE_I_EVER ? 'NeverHaveIEver' : 'Truth',
+      type: defaultType,
       intensity: editingDeck.intensity,
       text: '',
       penalty: ''
