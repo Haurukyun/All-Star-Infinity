@@ -61,12 +61,12 @@ export const DeckSearchModal: React.FC<DeckSearchModalProps> = ({
                             fontFamily: styles.fontFamily
                         }}
                     >
-                        <div className="p-6 border-b flex justify-between items-center" style={{ borderColor: `${styles.accent}22` }}>
+                        <div className="p-6 border-b flex justify-between items-center" style={{ borderColor: styles.accent + '22' }}>
                             <div>
                                 <h2 className="text-2xl font-black leading-tight" style={{ color: styles.textColor }}>CHOOSE NEST</h2>
                                 <p className="text-xs font-bold uppercase tracking-widest opacity-40" style={{ color: styles.textColor }}>{gameMode} • {intensity}</p>
                             </div>
-                            <button onClick={onClose} className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold opacity-40 hover:opacity-100" style={{ backgroundColor: `${styles.accent}11`, color: styles.textColor }}>×</button>
+                            <button onClick={onClose} className="w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold opacity-40 hover:opacity-100" style={{ backgroundColor: styles.accent + '11', color: styles.textColor }}>×</button>
                         </div>
 
                         <div className="p-4">
@@ -118,7 +118,7 @@ export const DeckSearchModal: React.FC<DeckSearchModalProps> = ({
                                             <h3 className="font-black text-lg truncate pr-4">{deck.name}</h3>
                                             <p className="text-xs font-bold opacity-50 line-clamp-1 italic">{deck.description || 'No description'}</p>
                                         </div>
-                                        <div className="px-2 py-1 rounded text-[10px] font-black" style={{ backgroundColor: `${styles.accent}22`, color: styles.accent }}>{deck.prompts.length} ITEMS</div>
+                                        <div className="px-2 py-1 rounded text-[10px] font-black" style={{ backgroundColor: styles.accent + '22', color: styles.accent }}>{deck.prompts.length} ITEMS</div>
                                     </div>
                                 </div>
                             ))}

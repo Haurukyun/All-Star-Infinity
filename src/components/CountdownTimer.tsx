@@ -132,7 +132,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
             className={`h-full transition-all duration-300 ${
               isExpired ? 'bg-red-400' : isLowTime ? 'bg-amber-400' : 'bg-emerald-400'
             }`}
-            style={{ width: `${progressPercent}%` }}
+            style={{ width: progressPercent + '%' }}
           />
         </div>
       </motion.div>

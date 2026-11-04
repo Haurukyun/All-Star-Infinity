@@ -47,7 +47,7 @@ export const ThemedIntensitySelect: React.FC<ThemedIntensitySelectProps> = ({
                         initial={{ scale: 0.9, y: 50 }}
                         animate={{ scale: 1, y: 0 }}
                         exit={{ scale: 0.9, y: 50 }}
-                        style={{ backgroundColor: styles.cardBg, border: `4px solid ${styles.accent}` }}
+                        style={{ backgroundColor: styles.cardBg, border: '4px solid ' + styles.accent }}
                     >
                         <div className="absolute top-0 left-0 w-full h-2" style={{ backgroundColor: styles.accent }}></div>
 

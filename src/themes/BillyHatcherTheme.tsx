@@ -164,20 +164,20 @@ export const BillyPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
             {!intensity && !prompt ? (
                 <motion.div key="play" initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 1.1 }} className="space-y-8 pb-10">
 
-                    <div className="billy-panel" style={{ borderColor: HERO_RED, boxShadow: `0 12px 0 ${HERO_RED}55, inset 0 0 0 4px #fff1f1` }}>
-                        <h2 className="text-2xl text-[${HERO_RED}] text-stroke-white !text-white drop-shadow-[0_2px_0_${HERO_RED}] mb-6 border-b-4 border-[#fff1f1] pb-4" style={{ color: 'white', WebkitTextStroke: `4px ${HERO_RED}` }}>HATCH DIFFICULTY</h2>
+                    <div className="billy-panel" style={{ borderColor: HERO_RED, boxShadow: '0 12px 0 ' + HERO_RED + '55, inset 0 0 0 4px #fff1f1' }}>
+                        <h2 className="text-2xl text-[${HERO_RED}] text-stroke-white !text-white drop-shadow-[0_2px_0_${HERO_RED}] mb-6 border-b-4 border-[#fff1f1] pb-4" style={{ color: 'white', WebkitTextStroke: '4px ' + HERO_RED }}>HATCH DIFFICULTY</h2>
                         <div className="grid grid-cols-1 gap-4">
                             {STAGES.map((stage) => (
                                 <button
                                     key={stage.id}
                                     onClick={() => setIntensity(stage.id)}
                                     className="billy-btn flex items-center justify-between !py-4 !px-4"
-                                    style={{ background: stage.bg, borderColor: stage.color, color: stage.color, boxShadow: `0 8px 0 ${stage.color}55` }}
+                                    style={{ background: stage.bg, borderColor: stage.color, color: stage.color, boxShadow: '0 8px 0 ' + stage.color + '55' }}
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-full flex items-center justify-center text-3xl text-white bg-white/20">{stage.icon}</div>
                                         <div className="text-left mt-1">
-                                            <div className="text-2xl text-white tracking-wide" style={{ WebkitTextStroke: `2px ${stage.color === '#ffffff' ? HERO_RED : stage.bg}` }}>{stage.title}</div>
+                                            <div className="text-2xl text-white tracking-wide" style={{ WebkitTextStroke: '2px ' + (stage.color === '#ffffff' ? HERO_RED : stage.bg) }}>{stage.title}</div>
                                             <div className="text-sm opacity-90">{stage.desc}</div>
                                         </div>
                                     </div>
@@ -300,10 +300,10 @@ export const BillyDecksScreen: React.FC<{ logic: any }> = ({ logic }) => {
         <AnimatePresence mode="wait">
             {!editingDeck ? (
                 <motion.div key="decks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6 pb-20">
-                    <div className="billy-panel !py-4" style={{ borderColor: HERO_BLUE, boxShadow: `0 8px 0 ${HERO_BLUE}44`, backgroundColor: EGG_WHITE }}>
+                    <div className="billy-panel !py-4" style={{ borderColor: HERO_BLUE, boxShadow: '0 8px 0 ' + HERO_BLUE + '44', backgroundColor: EGG_WHITE }}>
                         <div className="flex justify-between items-center px-2">
                             <div>
-                                <h2 className="text-3xl font-black text-white text-stroke-blue !text-white drop-shadow-[2px_2px_0_1873CA]" style={{ WebkitTextStroke: `4px ${HERO_BLUE}` }}>YOUR NESTS</h2>
+                                <h2 className="text-3xl font-black text-white text-stroke-blue !text-white drop-shadow-[2px_2px_0_1873CA]" style={{ WebkitTextStroke: '4px ' + HERO_BLUE }}>YOUR NESTS</h2>
                                 <p className="text-xs text-[#1873CA] font-bold tracking-widest uppercase">Incubating custom challenges</p>
                             </div>
                             <button
@@ -502,7 +502,7 @@ export const BillyHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { history } = logic;
     return (
         <div className="space-y-6">
-            <h2 className="text-5xl text-white text-stroke-blue !text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.1)] mb-8 text-center mt-2 font-black" style={{ color: 'white', WebkitTextStroke: `6px ${HERO_BLUE}` }}>ALBUM</h2>
+            <h2 className="text-5xl text-white text-stroke-blue !text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.1)] mb-8 text-center mt-2 font-black" style={{ color: 'white', WebkitTextStroke: '6px ' + HERO_BLUE }}>ALBUM</h2>
             {history.length === 0 ? (
                 <div className="text-center p-12 bg-white/80 rounded-[40px] border-[8px] border-[${HERO_BLUE}] border-dashed text-[${HERO_BLUE}]" style={{ borderColor: HERO_BLUE, color: HERO_BLUE }}>
                     <p className="text-3xl font-black">Album is empty!</p>
@@ -510,8 +510,8 @@ export const BillyHistoryScreen: React.FC<{ logic: any }> = ({ logic }) => {
             ) : (
                 <div className="space-y-6 pb-20">
                     {history.map((h: any, i: number) => (
-                        <div key={i} className="billy-panel !pt-12 relative" style={{ borderColor: HERO_YELLOW, boxShadow: `0 12px 0 ${HERO_YELLOW}55` }}>
-                            <div className="absolute -top-6 -left-4 w-16 h-16 bg-white rounded-full flex items-center justify-center border-[6px] border-[${HERO_BLUE}] shadow-[0_6px_0_${HERO_BLUE}] text-2xl text-[${HERO_BLUE}] font-black z-10" style={{ borderColor: HERO_BLUE, color: HERO_BLUE, boxShadow: `0 6px 0 ${HERO_BLUE}` }}>
+                        <div key={i} className="billy-panel !pt-12 relative" style={{ borderColor: HERO_YELLOW, boxShadow: '0 12px 0 ' + HERO_YELLOW + '55' }}>
+                            <div className="absolute -top-6 -left-4 w-16 h-16 bg-white rounded-full flex items-center justify-center border-[6px] border-[${HERO_BLUE}] shadow-[0_6px_0_${HERO_BLUE}] text-2xl text-[${HERO_BLUE}] font-black z-10" style={{ borderColor: HERO_BLUE, color: HERO_BLUE, boxShadow: '0 6px 0 ' + HERO_BLUE }}>
                                 #{history.length - i}
                             </div>
                             <span className={`absolute top-4 right-4 text-white px-5 py-2 rounded-[16px] border-[4px] text-sm font-black shadow-sm ${h.type === 'Truth' ? 'bg-[${SPOT_BLUE}] border-[${HERO_BLUE}]' : 'bg-[${HERO_RED}] border-white'}`} style={{ backgroundColor: h.type === 'Truth' ? SPOT_BLUE : HERO_RED, borderColor: h.type === 'Truth' ? HERO_BLUE : 'white' }}>
@@ -533,7 +533,7 @@ export const BillyThemesScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setTheme, theme } = logic;
     return (
         <div className="space-y-6">
-            <h2 className="text-4xl text-white text-stroke-blue !text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.1)] mb-8 text-center mt-2 leading-none font-black" style={{ color: 'white', WebkitTextStroke: `5px ${HERO_BLUE}` }}>THEME SELECT</h2>
+            <h2 className="text-4xl text-white text-stroke-blue !text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.1)] mb-8 text-center mt-2 leading-none font-black" style={{ color: 'white', WebkitTextStroke: '5px ' + HERO_BLUE }}>THEME SELECT</h2>
             <div className="grid grid-cols-2 gap-4 pb-24">
                 {allThemesList.map(t => (
                     <button
@@ -563,7 +563,7 @@ export const BillySettingsScreen: React.FC<{ logic: any }> = ({ logic }) => {
     const { setView } = logic;
     return (
         <div className="space-y-6">
-            <h2 className="text-4xl text-white text-stroke-blue !text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.1)] mb-8 text-center mt-2 font-black" style={{ color: 'white', WebkitTextStroke: `5px ${HERO_BLUE}` }}>PAUSE</h2>
+            <h2 className="text-4xl text-white text-stroke-blue !text-white drop-shadow-[0_4px_0_rgba(0,0,0,0.1)] mb-8 text-center mt-2 font-black" style={{ color: 'white', WebkitTextStroke: '5px ' + HERO_BLUE }}>PAUSE</h2>
             <div className="billy-panel space-y-6 text-center">
                 <span className="text-7xl mb-4 block filter drop-shadow-lg">🎮</span>
                 <button onClick={() => setView('menu')} className="w-full billy-btn billy-btn-red !py-6 text-3xl font-black">MAIN MENU</button>

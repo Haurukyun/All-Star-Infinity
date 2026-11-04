@@ -310,7 +310,7 @@ export const PokemonMenu: React.FC<{ logic: any }> = ({ logic }) => {
             `}</style>
             <div className="absolute inset-0 z-0">
                 {[...Array(10)].map((_, i) => (
-                    <motion.div key={i} className="absolute bg-white/20" style={{ width: 8, height: 8, left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%` }} animate={{ y: [-20, -120], opacity: [0, 1, 0] }} transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, ease: "linear" }} />
+                    <motion.div key={i} className="absolute bg-white/20" style={{ width: 8, height: 8, left: (Math.random() * 100) + '%', top: (Math.random() * 100) + '%' }} animate={{ y: [-20, -120], opacity: [0, 1, 0] }} transition={{ duration: 3 + Math.random() * 2, repeat: Infinity, ease: "linear" }} />
                 ))}
             </div>
             <div className="z-10 w-full max-w-2xl flex flex-col gap-6">

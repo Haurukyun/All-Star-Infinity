@@ -171,7 +171,7 @@ export const SanrioLayout: React.FC<{ children: React.ReactNode; activeTab: stri
 
       {/* Background Decorative Sparkles */}
       {sparkles.map(s => (
-        <div key={s.id} className="star-sparkle font-black text-white drop-shadow-md" style={{ left: `${s.x}%`, top: `${s.y}%`, fontSize: `${s.size}px`, animationDelay: `${s.delay}s` }}>
+        <div key={s.id} className="star-sparkle font-black text-white drop-shadow-md" style={{ left: s.x + '%', top: s.y + '%', fontSize: s.size + 'px', animationDelay: s.delay + 's' }}>
           {s.id % 3 === 0 ? '✨' : s.id % 2 === 0 ? '☁️' : '🌸'}
         </div>
       ))}

@@ -98,7 +98,7 @@ export const VocaloidMenuLayout: React.FC<{ children: React.ReactNode; logic: an
 
             <div className="absolute bottom-0 left-0 w-full h-32 flex items-end justify-center gap-2 opacity-20 pointer-events-none z-10">
                 {[...Array(20)].map((_, i) => (
-                    <div key={i} className="w-8 bg-[#39C5BB] rounded-t-md" style={{ animation: `eq-bar ${Math.random() * 1 + 0.5}s infinite ease-in-out`, height: `${Math.random() * 80 + 20}%` }}></div>
+                    <div key={i} className="w-8 bg-[#39C5BB] rounded-t-md" style={{ animation: 'eq-bar ' + (Math.random() * 1 + 0.5) + 's infinite ease-in-out', height: (Math.random() * 80 + 20) + '%' }}></div>
                 ))}
             </div>
 
