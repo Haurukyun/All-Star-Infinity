@@ -5,51 +5,42 @@ budget_tokens: 1000
 # STATUS — All★Star Infinity (phantom:-obsidian)
 
 > Single source of truth for resuming work. Read this FIRST when starting a session.
-> Last updated: 2026-11-04 (Cleanup & Build Restoration completed)
+> Last updated: 2026-11-04 (Content Expansion & Android Build Verified)
 
 ---
 
 ## ✅ Done
 
-- **Codebase Cleanup:**
-  - Verified and safely removed `RESTORATION PROJECT/` (all 19 themes already ported and modular in `src/themes/`).
-  - Removed abandoned `rn-app/` React Native experiment.
-  - Removed dead root-level `services/` directory (`src/services/localPrompts.ts` is the active module).
-  - Removed obsolete migration and log files (`build.txt`, `errors.txt`, `fix_css.mjs`, `patch-themes.cjs`).
-  - Updated `.gitignore` with Android outputs, environment files, OS files, and scratch logs.
-- **Type Safety & Build Fixes:**
-  - Installed `@types/react` and `@types/react-dom` for React 19.
-  - Refactored `ErrorBoundary.tsx` for React 19 class component typing.
-  - Updated `DeckSearchModal.tsx` props (`cardBg?: string`, `borderColor?: string`, `fontFamily?: string`) resolving 10 theme type errors.
-  - Fixed new deck initialization in `UnifiedGame.tsx` to supply `intensity` and `gameMode`.
-  - Added `as const` to Framer Motion spring transitions in `PersonaTheme.tsx`.
-  - Configured `tsconfig.json` `include` and `exclude` paths.
-- **Verification:**
+- **Content Expansion (Core Gameplay):**
+  - Expanded `src/services/localPrompts.ts` from 19 prompts to **225 high-quality prompts** across all 9 matrix categories (Soft/Hot/Vulgar × Truth/Dare/NeverHaveIEver; 25 per category with custom penalties).
+  - Updated `useGameLogic.ts` `handleDraw` to prevent immediate back-to-back duplicate prompt draws.
+- **Android APK Build Verification:**
+  - Resolved Gradle 9.7.1 incompatible internal API crash with AGP 8.13.0 by restoring `gradle-8.14.3-all.zip`.
+  - Configured Android SDK location in `android/local.properties` (gitignored).
+  - Verified `./gradlew assembleDebug` successfully produces `app-debug.apk` (4.38 MB).
+- **Codebase & Types:**
   - `npx tsc --noEmit` exits with **0 errors**.
-  - `npm run build` (Vite 6) compiles production bundle in ~2.3s with **0 errors**.
-  - `npx cap sync android` successfully syncs web build to Android app with **0 errors**.
+  - `npm run build` exits with **0 errors** (~2.5s).
+  - `npx cap sync android` syncs cleanly in <0.1s.
 
 ---
 
 ## 🚀 Next phase
 
-**Goal:** Expand gameplay content (prompts & game modes) and perform visual testing / UX polish on Android.
+**Goal:** Visual & interactive review of all themes, audio/haptics, and Google Play release prep.
 
 ### Priority order
-1. 🔴 **Content Expansion:** Massively expand `src/services/localPrompts.ts` (currently only 19 prompts; target 180+ across Truth/Dare/NHIE and Soft/Hot/Vulgar).
-2. 🟠 **AI Generation Decision:** Decide whether to re-introduce an AI prompt generation option inside the UI (with modern model e.g. `gemini-2.0-flash` or `gemini-2.5-flash`).
-3. 🟡 **Theme UI Audit:** Test all 19 themes in the browser to ensure animations, deck carousels, and dialogs look crisp.
-4. 🟢 **Android Testing:** Run `./gradlew assembleDebug` or test on device via Android Studio / Device Hub.
+1. 🟡 **Theme UI & Visual Pass:** Audit animations, typography, and card carousels across the 19 themes in browser.
+2. 🟠 **AI Prompt Option (Optional):** Decide whether to offer a toggleable Gemini prompt generation button (using modern `gemini-2.0-flash` or `gemini-2.5-flash`).
+3. 🟢 **App Branding & Release Packaging:** Custom app icon, adaptive splash screen, and release keystore signing.
 
 ---
 
 ## 📁 Active architecture
 
 - **Stack:** React 19, TypeScript 5.8, Vite 6, Framer Motion 12, Capacitor 8 (Android)
-- **App entry:** `index.tsx` → `App.tsx` → `useGameLogic` + `MainMenu` / `Layout` + `UnifiedGame`
-- **Theme system:** `src/themes/index.ts` (registry) + `src/themes/allThemesList.ts` (metadata) + 19 `*Theme.tsx` files
-- **State:** Single `useGameLogic` hook; persisted to localStorage (`phantom_theme`, `phantom_custom_decks`)
-- **Android Target:** Capacitor project at `android/`, bundle id `com.allstarinfinity.app`
+- **Content:** 225 curated prompts in `src/services/localPrompts.ts` + Custom deck builder in `useGameLogic.ts`.
+- **Android Target:** Gradle 8.14.3, AGP 8.13.0, Compile SDK 36, Min SDK 24. Debug APK builds to `android/app/build/outputs/apk/debug/app-debug.apk`.
 - **Commit Pattern:** ALWAYS include a descriptive commit title and a bulleted list of what was done and when.
 
 ---
@@ -57,7 +48,7 @@ budget_tokens: 1000
 ## 🔧 Useful commands
 
 ```bash
-# Development server (http://localhost:3000)
+# Run web dev server
 npm run dev
 
 # Full TypeScript check
@@ -68,6 +59,9 @@ npm run build
 
 # Sync web bundle to Android native project
 npx cap sync android
+
+# Build Android debug APK
+cd android; ./gradlew assembleDebug
 ```
 
 ---

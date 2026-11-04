@@ -81,7 +81,8 @@ export const useGameLogic = () => {
       setPrompt(next);
       setHistory(prev => [next, ...prev]);
     } else {
-      const next = filtered[Math.floor(Math.random() * filtered.length)];
+      const pool = (filtered.length > 1 && prompt) ? filtered.filter(p => p.id !== prompt.id) : filtered;
+      const next = pool[Math.floor(Math.random() * pool.length)];
       setPrompt(next);
       setHistory(prev => [next, ...prev]);
     }

@@ -44,6 +44,17 @@
       "occurrences": 1,
       "first_seen": "2026-11-04",
       "resolved": "2026-11-04"
+    },
+    {
+      "id": "bug-005",
+      "error_message": "Plugin 'com.android.internal.application' relies on 'org.gradle.api.problems.internal.InternalProblems', a Gradle internal API that was removed in Gradle 9.6.0",
+      "file": "android/gradle/wrapper/gradle-wrapper.properties",
+      "root_cause": "Gradle 9.7.1 is incompatible with Android Gradle Plugin (AGP) 8.13.0 because AGP 8.x relies on internal problems API removed in Gradle 9.6+.",
+      "fix": "Pointed distributionUrl to gradle-8.14.3-all.zip, matching AGP 8.13 and OpenJDK 25 compatibility.",
+      "tags": ["android", "gradle", "agp", "build"],
+      "occurrences": 1,
+      "first_seen": "2026-11-04",
+      "resolved": "2026-11-04"
     }
   ]
 }
