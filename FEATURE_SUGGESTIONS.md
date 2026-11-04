@@ -120,3 +120,4 @@ Add curated built-in bonus decks users can activate:
 | **Phase 3** | Countdown timer on prompts (optional 15s/30s) | Low (1-2 hrs) | ⭐⭐⭐⭐ High party tension |
 | **Phase 4** | "Most Likely To" game mode | Medium (2-3 hrs) | ⭐⭐⭐⭐ Expands replayability |
 | **Phase 5** | Deck Export / Import (QR code & string) | Medium (3 hrs) | ⭐⭐⭐⭐⭐ Word-of-mouth sharing |
+

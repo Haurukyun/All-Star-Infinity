@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export enum Intensity {
@@ -37,6 +36,17 @@ export enum GameMode {
 
 export type PromptType = 'Truth' | 'Dare' | 'NeverHaveIEver';
 
+export interface Player {
+  id: string;
+  name: string;
+  chickenCount: number;
+  score: number;
+}
+
+export type TimerDuration = 15 | 30 | 60;
+
+export type GameView = 'menu' | 'player-setup' | 'game';
+
 export interface GamePrompt {
   id: string;
   type: PromptType;
@@ -55,6 +65,7 @@ export interface CustomDeck {
   gameMode: GameMode;
   isFavorite?: boolean;
 }
+
 export interface ThemeDefinition {
   id: Theme;
   name: string;

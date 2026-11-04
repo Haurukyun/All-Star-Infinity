@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameLogic } from '../hooks/useGameLogic';
-import { Intensity, Theme, GameMode } from '../types';
+import { Intensity, Theme, GameMode, TimerDuration } from '../types';
 import { getThemeDefinition } from '../themes';
+import { CountdownTimer } from './CountdownTimer';
+import { PlayerTurnBanner } from './PlayerTurnBanner';
 
 interface UnifiedGameProps {
     logic: ReturnType<typeof useGameLogic>;
@@ -24,14 +26,23 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         addNewPromptToEditingDeck,
         updatePromptInEditingDeck,
         removePromptFromEditingDeck,
-        generateId
+        generateId,
+        // Pass & Play Roster
+        players,
+        playersEnabled, setPlayersEnabled,
+        activePlayer, targetPlayer,
+        nextPlayer, prevPlayer,
+        incrementChicken,
+        addPlayer, removePlayer, resetRosterScores,
+        // Countdown Timer
+        timerEnabled,
+        timerDuration, setTimerDuration,
+        toggleTimerEnabled,
+        setView,
     } = logic;
 
     useEffect(() => {
         if (gameMode === GameMode.NEVER_HAVE_I_EVER && intensity && !prompt) {
-            // If the user selects an intensity, but we don't have a prompt,
-            // check if they just finished. The "Finished" button should clear intensity too.
-            // Leaving this useEffect here, but changing the finish buttons in themes to clear intensity.
             handleDraw('NeverHaveIEver');
         }
     }, [gameMode, intensity, prompt, handleDraw]);
@@ -109,6 +120,20 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className="theme-panel p-6 sm:p-8 mt-4"
         >
+            {playersEnabled && activePlayer && (
+                <div className="flex justify-between items-center pb-3 mb-3 border-b border-black/10">
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-black uppercase tracking-wider text-[var(--theme-accent,#d90429)]">
+                            🎮 {activePlayer.name}'s Turn
+                        </span>
+                    </div>
+                    {targetPlayer && (
+                        <span className="text-[11px] font-bold opacity-75">
+                            🎯 Target: {targetPlayer.name}
+                        </span>
+                    )}
+                </div>
+            )}
             <div className="flex justify-between items-center mb-6">
                 <span className="theme-badge px-3 py-1 font-bold italic">{prompt?.type}</span>
                 <span className="theme-text-header text-[10px] opacity-40 italic">ENTRY_{history.length}</span>
@@ -123,16 +148,53 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             <div className="grid grid-cols-2 gap-4 mt-8">
                 {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
                     <>
-                        <button onClick={() => { setIntensity(null); setPrompt(null); }} className="theme-button p-4 text-xl">DONE</button>
-                        <button onClick={() => handleDraw('NeverHaveIEver')} className="theme-button theme-button-alt p-4 text-xl">NEXT</button>
+                        <button
+                            onClick={() => {
+                                if (playersEnabled) nextPlayer();
+                                setIntensity(null);
+                                setPrompt(null);
+                            }}
+                            className="theme-button p-4 text-xl"
+                        >
+                            DONE
+                        </button>
+                        <button
+                            onClick={() => {
+                                if (playersEnabled) nextPlayer();
+                                handleDraw('NeverHaveIEver');
+                            }}
+                            className="theme-button theme-button-alt p-4 text-xl"
+                        >
+                            NEXT
+                        </button>
                     </>
                 ) : (
                     <>
-                        <button onClick={() => setPrompt(null)} className="theme-button p-4 text-xl">DONE</button>
-                        <button onClick={() => handleDraw(prompt!.type)} className="theme-button theme-button-alt p-4 text-xl">REROLL</button>
+                        <button
+                            onClick={() => {
+                                if (playersEnabled) nextPlayer();
+                                setPrompt(null);
+                            }}
+                            className="theme-button p-4 text-xl"
+                        >
+                            DONE
+                        </button>
+                        <button onClick={() => handleDraw(prompt!.type)} className="theme-button theme-button-alt p-4 text-xl">
+                            REROLL
+                        </button>
                     </>
                 )}
             </div>
+            {playersEnabled && activePlayer && (
+                <div className="mt-4 pt-3 border-t border-black/10 flex justify-center">
+                    <button
+                        onClick={() => incrementChicken(activePlayer.id)}
+                        className="text-xs font-bold opacity-70 hover:opacity-100 transition-opacity uppercase tracking-wider text-amber-500"
+                    >
+                        🐔 Chickened Out (+1 Chicken)
+                    </button>
+                </div>
+            )}
         </motion.div>
     );
 
@@ -144,8 +206,43 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="h-full"
+                    className="h-full flex flex-col"
                 >
+                    {/* Universal Top Bar for Play screen: Quick Player Pill & Countdown Timer */}
+                    <div className="flex flex-col gap-2 mb-2 shrink-0">
+                        <div className="flex justify-between items-center gap-2">
+                            {playersEnabled && activePlayer ? (
+                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20 text-white text-xs font-bold">
+                                    <span>🎮</span>
+                                    <span className="text-red-400 font-black">{activePlayer.name}'s Turn</span>
+                                </div>
+                            ) : <div />}
+
+                            <CountdownTimer
+                                enabled={timerEnabled}
+                                duration={timerDuration}
+                                onToggleEnabled={toggleTimerEnabled}
+                                onChangeDuration={setTimerDuration}
+                                promptId={prompt?.id}
+                                isPromptActive={!!prompt}
+                            />
+                        </div>
+
+                        {/* Pass & Play Roster Turn Banner (when active) */}
+                        {playersEnabled && players.length > 0 && (
+                            <PlayerTurnBanner
+                                players={players}
+                                activePlayer={activePlayer}
+                                targetPlayer={targetPlayer}
+                                onNextPlayer={nextPlayer}
+                                onPrevPlayer={prevPlayer}
+                                onIncrementChicken={incrementChicken}
+                                onAddPlayer={addPlayer}
+                                onRemovePlayer={removePlayer}
+                            />
+                        )}
+                    </div>
+
                     {themeDef.PlayScreen ? (
                         <themeDef.PlayScreen logic={logic} />
                     ) : (
@@ -161,12 +258,34 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                     <themeDef.PromptLayout logic={logic}>
                                         {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
                                             <>
-                                                <themeDef.PlayButton label="DONE" onClick={() => { setIntensity(null); setPrompt(null); }} isPrimary={true} />
-                                                <themeDef.PlayButton label="NEXT" onClick={() => handleDraw('NeverHaveIEver')} isPrimary={false} />
+                                                <themeDef.PlayButton
+                                                    label="DONE"
+                                                    onClick={() => {
+                                                        if (playersEnabled) nextPlayer();
+                                                        setIntensity(null);
+                                                        setPrompt(null);
+                                                    }}
+                                                    isPrimary={true}
+                                                />
+                                                <themeDef.PlayButton
+                                                    label="NEXT"
+                                                    onClick={() => {
+                                                        if (playersEnabled) nextPlayer();
+                                                        handleDraw('NeverHaveIEver');
+                                                    }}
+                                                    isPrimary={false}
+                                                />
                                             </>
                                         ) : (
                                             <>
-                                                <themeDef.PlayButton label="DONE" onClick={() => setPrompt(null)} isPrimary={true} />
+                                                <themeDef.PlayButton
+                                                    label="DONE"
+                                                    onClick={() => {
+                                                        if (playersEnabled) nextPlayer();
+                                                        setPrompt(null);
+                                                    }}
+                                                    isPrimary={true}
+                                                />
                                                 <themeDef.PlayButton label="REROLL" onClick={() => handleDraw(prompt!.type)} isPrimary={false} />
                                             </>
                                         )}
@@ -348,30 +467,113 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     animate={{ opacity: 1 }}
                     className="pt-4 space-y-6 pb-20"
                 >
+                    {/* Gameplay Controls Panel (Always visible across all themes) */}
+                    <div className="theme-panel p-5 space-y-4">
+                        <h3 className="theme-text-header text-xl font-bold italic border-b border-black/10 pb-2">
+                            GAMEPLAY OPTIONS
+                        </h3>
+
+                        {/* Countdown Timer Setting */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <div className="font-bold text-sm">⏱️ COUNTDOWN TIMER</div>
+                                    <div className="text-[10px] opacity-60">Timer for answering or completing prompts</div>
+                                </div>
+                                <button
+                                    onClick={toggleTimerEnabled}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${
+                                        timerEnabled
+                                            ? 'bg-red-600 text-white shadow-md'
+                                            : 'bg-black/20 text-black/60 dark:text-white/40'
+                                    }`}
+                                >
+                                    {timerEnabled ? 'ON' : 'OFF'}
+                                </button>
+                            </div>
+
+                            {timerEnabled && (
+                                <div className="flex items-center justify-between pt-1 text-xs">
+                                    <span className="opacity-60 text-[10px] uppercase font-semibold">Timer Duration:</span>
+                                    <div className="flex gap-1.5">
+                                        {([15, 30, 60] as TimerDuration[]).map((d) => (
+                                            <button
+                                                key={d}
+                                                onClick={() => setTimerDuration(d)}
+                                                className={`px-3 py-1 rounded text-xs font-bold transition-all ${
+                                                    timerDuration === d
+                                                        ? 'bg-red-600 text-white shadow'
+                                                        : 'bg-black/10 hover:bg-black/20 opacity-70'
+                                                }`}
+                                            >
+                                                {d}s
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Pass & Play Roster Setting */}
+                        <div className="space-y-3 pt-3 border-t border-black/10">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <div className="font-bold text-sm">👥 PASS & PLAY ROSTER</div>
+                                    <div className="text-[10px] opacity-60">Turn tracker & chicken counter ({players.length} players)</div>
+                                </div>
+                                <button
+                                    onClick={() => setPlayersEnabled(!playersEnabled)}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${
+                                        playersEnabled
+                                            ? 'bg-red-600 text-white shadow-md'
+                                            : 'bg-black/20 text-black/60 dark:text-white/40'
+                                    }`}
+                                >
+                                    {playersEnabled ? 'ON' : 'OFF'}
+                                </button>
+                            </div>
+
+                            {playersEnabled && (
+                                <div className="flex gap-2 pt-1">
+                                    <button
+                                        onClick={() => setView('player-setup')}
+                                        className="flex-1 theme-button py-2 text-xs font-bold"
+                                    >
+                                        MANAGE ROSTER ({players.length})
+                                    </button>
+                                    <button
+                                        onClick={resetRosterScores}
+                                        title="Reset all chicken counts to 0"
+                                        className="theme-button theme-button-alt px-3 py-2 text-xs font-bold opacity-75 hover:opacity-100"
+                                    >
+                                        RESET STATS
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
                     {themeDef.SettingsScreen ? (
                         <themeDef.SettingsScreen logic={logic} />
                     ) : (
-                        <>
-                            <h2 className="theme-text-header text-4xl font-bold italic">SETTINGS</h2>
-                            <div className="theme-panel p-6 space-y-6">
-                                <div className="space-y-4">
-                                    <div className="flex justify-between items-center">
-                                        <span className="theme-text-header">COGNITION</span>
-                                        <span className="font-bold text-[var(--theme-accent)]">STABLE</span>
-                                    </div>
-                                    <div className="flex justify-between items-center opacity-40">
-                                        <span className="theme-text-header">SYNC_RATE</span>
-                                        <span className="font-mono">99.8%</span>
-                                    </div>
+                        <div className="theme-panel p-6 space-y-6">
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="theme-text-header">COGNITION</span>
+                                    <span className="font-bold text-[var(--theme-accent)]">STABLE</span>
                                 </div>
-                                <button
-                                    onClick={() => logic.setView('menu')}
-                                    className="w-full theme-button theme-button-alt p-4 font-bold"
-                                >
-                                    RETURN TO TITLE
-                                </button>
+                                <div className="flex justify-between items-center opacity-40">
+                                    <span className="theme-text-header">SYNC_RATE</span>
+                                    <span className="font-mono">99.8%</span>
+                                </div>
                             </div>
-                        </>
+                            <button
+                                onClick={() => logic.setView('menu')}
+                                className="w-full theme-button theme-button-alt p-4 font-bold"
+                            >
+                                RETURN TO TITLE
+                            </button>
+                        </div>
                     )}
                 </motion.div>
             )}
