@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TimerDuration } from '../types';
 import { hapticService } from '../services/haptics';
+import { soundService } from '../services/soundFx';
 
 interface CountdownTimerProps {
   enabled: boolean;
@@ -50,10 +51,14 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
       setTimeLeft((prev) => {
         if (prev <= 1) {
           hapticService.error();
+          soundService.buzzer();
           return 0;
         }
         if (prev <= 4) {
           hapticService.warning();
+          soundService.countdownStep(1.3);
+        } else {
+          soundService.tick();
         }
         return prev - 1;
       });

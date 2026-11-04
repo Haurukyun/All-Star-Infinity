@@ -7,6 +7,7 @@ import { CountdownTimer } from './CountdownTimer';
 import { PlayerTurnBanner } from './PlayerTurnBanner';
 import { DeckShareModal } from './DeckShareModal';
 import { hapticService } from '../services/haptics';
+import { soundService } from '../services/soundFx';
 
 interface UnifiedGameProps {
     logic: ReturnType<typeof useGameLogic>;
@@ -44,9 +45,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         timerEnabled,
         timerDuration, setTimerDuration,
         toggleTimerEnabled,
-        // Easy Font & Haptics
+        // Easy Font, Haptics & Sound FX
         useEasyFont, toggleEasyFont,
         hapticsEnabled, toggleHapticsEnabled,
+        soundEnabled, toggleSoundEnabled,
         setView,
     } = logic;
 
@@ -104,10 +106,14 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     setIsHotSeatRunning(false);
                     setIsHotSeatFinished(true);
                     hapticService.error();
+                    soundService.buzzer();
                     return 0;
                 }
                 if (prev <= 5) {
                     hapticService.warning();
+                    soundService.countdownStep(1.2);
+                } else {
+                    soundService.tick();
                 }
                 return prev - 1;
             });
@@ -141,15 +147,19 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
     const triggerPointCountdown = () => {
         hapticService.light();
+        soundService.countdownStep(0.9);
         setPointCountdown(3);
         setTimeout(() => {
             hapticService.light();
+            soundService.countdownStep(1.1);
             setPointCountdown(2);
             setTimeout(() => {
                 hapticService.light();
+                soundService.countdownStep(1.3);
                 setPointCountdown(1);
                 setTimeout(() => {
                     hapticService.heavy();
+                    soundService.buzzer();
                     setPointCountdown('POINT! 👉');
                 }, 750);
             }, 750);
@@ -332,6 +342,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
         const handleSelectOption = (opt: 'A' | 'B') => {
             hapticService.medium();
+            soundService.click();
             setSelectedWyrOption(opt);
         };
 
@@ -421,6 +432,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
     const HotSeatDisplay = () => {
         const handleStartHotSeat = () => {
             hapticService.success();
+            soundService.chime();
             setHotSeatTimeLeft(60);
             setHotSeatAnswered(0);
             setHotSeatPassed(0);
@@ -431,6 +443,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
         const handleHotSeatAnswer = () => {
             hapticService.success();
+            soundService.chime();
             setHotSeatAnswered(prev => prev + 1);
             incrementScore();
             handleDraw('HotSeat');
@@ -438,6 +451,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
         const handleHotSeatPass = () => {
             hapticService.heavy();
+            soundService.passSlide();
             setHotSeatPassed(prev => prev + 1);
             incrementChicken();
             handleDraw('HotSeat');
@@ -1138,6 +1152,27 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 }`}
                             >
                                 {hapticsEnabled ? 'ON' : 'OFF'}
+                            </button>
+                        </div>
+
+                        {/* Procedural Sound FX Toggle */}
+                        <div className="flex justify-between items-center pt-2 border-t border-black/10">
+                            <div>
+                                <div className="font-bold text-sm">🔊 SOUND EFFECTS</div>
+                                <div className="text-[10px] opacity-60">Procedural audio for card flips, ticks, buzzers & chimes</div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    toggleSoundEnabled();
+                                    if (!soundEnabled) soundService.click();
+                                }}
+                                className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${
+                                    soundEnabled
+                                        ? 'bg-red-600 text-white shadow-md'
+                                        : 'bg-black/20 text-black/60 dark:text-white/40'
+                                }`}
+                            >
+                                {soundEnabled ? 'ON' : 'OFF'}
                             </button>
                         </div>
 

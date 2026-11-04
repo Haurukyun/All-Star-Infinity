@@ -5,6 +5,7 @@ import { useGameLogic } from './hooks/useGameLogic';
 import { getThemeDefinition } from './themes';
 import { getFontForTheme } from './themes/allThemesList';
 import { hapticService } from './services/haptics';
+import { soundService } from './services/soundFx';
 
 const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic }) => {
   const {
@@ -25,6 +26,7 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
 
   const handleStartMode = (mode: GameMode) => {
     hapticService.medium();
+    soundService.click();
     setGameMode(mode);
     if (playersEnabled) {
       logic.setView('player-setup');

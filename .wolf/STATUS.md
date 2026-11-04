@@ -5,12 +5,24 @@ budget_tokens: 1000
 # STATUS — All★Star Infinity (phantom:-obsidian)
 
 > Single source of truth for resuming work. Read this FIRST when starting a session.
-> Last updated: 2026-11-04 (Haptics, QR Sharing, Easy Font & Themed Packs complete)
+> Last updated: 2026-11-04 (New Game Modes & Procedural Sound FX complete)
 
 ---
 
 ## ✅ Done
 
+- **3 New Game Modes:**
+  - Added `GameMode.MOST_LIKELY_TO`, `GameMode.WOULD_YOU_RATHER`, and `GameMode.HOT_SEAT` (60s speedrun).
+  - 135 new handcrafted prompts (45 per game mode, 15 per intensity tier), bringing total prompts to ~360+.
+  - Interactive "Most Likely To" UI with 3-2-1 tap-to-point countdown and player voter buttons.
+  - Interactive "Would You Rather" UI with dual option cards (A vs B) and minority forfeit box.
+  - "The Hot Seat" 60-second speedrun mode with internal countdown, rapid-fire Answered/Pass buttons, and round results.
+  - Mode selection overlay in `MainMenu.tsx` across all themes.
+- **Procedural Sound FX Engine (Web Audio API):**
+  - Handcrafted procedural synthesizer in `src/services/soundFx.ts` (0 external MP3s/audio files, 0 network requests).
+  - Procedural sound cues: card flip resonant swoosh, click blip, clock tick, countdown warning beeps, harsh party fail buzzer, and ascending victory chime.
+  - Linked to card draws, countdown timers, Hot Seat rapid-fire responses, finger pointing countdown, and chickened-out penalties.
+  - User toggle switch in Settings tab (`phantom_sound_enabled`), persisted globally.
 - **Native Haptic Feedback:**
   - Installed `@capacitor/haptics` with full native Android integration.
   - Built `src/services/haptics.ts` supporting `light`, `medium`, `heavy`, `warning`, `error`, and `success` tactile vibrations.
@@ -37,19 +49,19 @@ budget_tokens: 1000
   - 15s/30s/60s durations, default OFF, corner toggle widget, urgency pulses, and alarm.
 - **Build & Native Android:**
   - `npx tsc --noEmit` $\rightarrow$ 0 errors.
-  - `npm run build` $\rightarrow$ 0 errors.
-  - `npx cap sync android` $\rightarrow$ synced cleanly with `@capacitor/haptics`.
-  - `./gradlew assembleDebug` $\rightarrow$ `BUILD SUCCESSFUL` (`app-debug.apk`).
+  - `npm run build` $\rightarrow$ 0 errors (built in ~3.0s).
+  - `npx cap sync android` $\rightarrow$ synced cleanly.
+  - `./gradlew assembleDebug` $\rightarrow$ `BUILD SUCCESSFUL in 13s` (`app-debug.apk`).
 
 ---
 
 ## 🚀 Next phase
 
-**Goal:** Theme visual audit, audio/sound FX polish, and release signing.
+**Goal:** Theme visual pass, realm selection preview cards, and app packaging.
 
 ### Priority order
 1. 🟡 **Theme Visual Pass:** Browser audit of animations, carousels, and edge cases across the 19 themes.
-2. 🟢 **Custom Sound FX:** Handcrafted audio cues for card flip, buzzer, and timer.
+2. 🟢 **Realm Selection Preview Cards:** Mini preview badges / cards on main menu theme grid.
 3. 🟢 **App Branding & Release Packaging:** Adaptive icon, splash screen, and release keystore signing.
 
 ---

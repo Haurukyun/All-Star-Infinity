@@ -3,6 +3,7 @@ import { Intensity, PromptType, GamePrompt, CustomDeck, Theme, GameMode, Player,
 import { getRandomPrompt, DEFAULT_PROMPTS } from '../services/localPrompts';
 import { THEMED_PREBUILT_DECKS } from '../services/themedDecks';
 import { hapticService, setHapticsGlobalEnabled } from '../services/haptics';
+import { soundService, setSoundGlobalEnabled } from '../services/soundFx';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
@@ -21,6 +22,11 @@ export const useGameLogic = () => {
   // Globally persisted Native Haptic feedback
   const [hapticsEnabled, setHapticsEnabled] = useState<boolean>(() => {
     return localStorage.getItem('phantom_haptics_enabled') !== 'false'; // default true
+  });
+
+  // Globally persisted Procedural Sound FX
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('phantom_sound_enabled') !== 'false'; // default true
   });
 
   const [theme, setTheme] = useState<Theme>(() => {
@@ -91,6 +97,12 @@ export const useGameLogic = () => {
     localStorage.setItem('phantom_haptics_enabled', String(hapticsEnabled));
     setHapticsGlobalEnabled(hapticsEnabled);
   }, [hapticsEnabled]);
+
+  // Save Sound FX setting to localStorage and update global service
+  useEffect(() => {
+    localStorage.setItem('phantom_sound_enabled', String(soundEnabled));
+    setSoundGlobalEnabled(soundEnabled);
+  }, [soundEnabled]);
 
   // Save Players to localStorage
   useEffect(() => {
@@ -177,6 +189,7 @@ export const useGameLogic = () => {
     if (!targetId) return;
     setPlayers(prev => prev.map(p => p.id === targetId ? { ...p, chickenCount: p.chickenCount + 1 } : p));
     hapticService.heavy();
+    soundService.buzzer();
   }, [activePlayer?.id]);
 
   const incrementScore = useCallback((playerId?: string) => {
@@ -184,6 +197,7 @@ export const useGameLogic = () => {
     if (!targetId) return;
     setPlayers(prev => prev.map(p => p.id === targetId ? { ...p, score: p.score + 1 } : p));
     hapticService.success();
+    soundService.chime();
   }, [activePlayer?.id]);
 
   const resetRosterScores = useCallback(() => {
@@ -205,6 +219,10 @@ export const useGameLogic = () => {
 
   const toggleHapticsEnabled = useCallback(() => {
     setHapticsEnabled(prev => !prev);
+  }, []);
+
+  const toggleSoundEnabled = useCallback(() => {
+    setSoundEnabled(prev => !prev);
   }, []);
 
   const handleDraw = useCallback((type: PromptType) => {
@@ -235,12 +253,13 @@ export const useGameLogic = () => {
       setHistory(prev => [next, ...prev]);
     }
 
-    // Tactile haptic feedback on card draw
+    // Tactile haptic feedback and card flip sound on draw
     if (intensity === Intensity.VULGAR) {
       hapticService.heavy();
     } else {
       hapticService.medium();
     }
+    soundService.cardFlip();
   }, [activeDeckId, customDecks, intensity, prompt]);
 
   const saveDeck = useCallback((deck: CustomDeck) => {
@@ -380,6 +399,7 @@ export const useGameLogic = () => {
     history, setHistory,
     useEasyFont, setUseEasyFont, toggleEasyFont,
     hapticsEnabled, setHapticsEnabled, toggleHapticsEnabled,
+    soundEnabled, setSoundEnabled, toggleSoundEnabled,
     theme, setTheme: handleSetTheme,
     hasExplicitlySelectedTheme,
     view, setView: (v: GameView) => {

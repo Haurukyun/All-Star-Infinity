@@ -50,3 +50,5 @@ budget_tokens: 2000
 - **[2026-11-04]** Implemented offline Deck Export/Import via QR Code (`qrcode`) and `ASI:1:` short code string with live preview card.
 - **[2026-11-04]** Implemented global persistence for "Easy Font Mode" with universal non-destructive accessibility overrides across all 19 themes.
 - **[2026-11-04]** Created 10 handcrafted, lore-rich Pre-Built Themed Deck Packs with in-game browser, direct play, cloning, and QR export.
+- **[2026-11-04]** Implemented 3 new game modes: Most Likely To (interactive 3-2-1 countdown & finger-pointing tally), Would You Rather (two-card vote & minority forfeit), and The Hot Seat (60s speedrun with Answered/Pass rapid-fire controls and score tally). Added 135 handcrafted prompts (45 per mode, total prompt library now 360+ prompts).
+- **[2026-11-04]** Built 100% offline procedural retro Sound FX engine (`src/services/soundFx.ts`) via Web Audio API. Zero external audio assets or network requests. Synthesizes card flip whoosh, UI click, timer tick, countdown beeps, penalty fail buzzer, and victory chime. Fully togglable in Settings tab.
