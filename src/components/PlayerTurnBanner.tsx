@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Player } from '../types';
+import { hapticService } from '../services/haptics';
 
 interface PlayerTurnBannerProps {
   players: Player[];
@@ -108,7 +109,10 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           </motion.button>
 
           <button
-            onClick={() => setShowRosterModal(true)}
+            onClick={() => {
+              hapticService.light();
+              setShowRosterModal(true);
+            }}
             title="View Player Roster & Standings"
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs uppercase transition-colors"
           >
@@ -142,7 +146,10 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
                   <h3 className="font-black text-xl tracking-tight uppercase">Party Roster</h3>
                 </div>
                 <button
-                  onClick={() => setShowRosterModal(false)}
+                  onClick={() => {
+                    hapticService.light();
+                    setShowRosterModal(false);
+                  }}
                   className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm font-bold"
                 >
                   ✕
@@ -225,7 +232,10 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
 
               {/* Close Button */}
               <button
-                onClick={() => setShowRosterModal(false)}
+                onClick={() => {
+                  hapticService.light();
+                  setShowRosterModal(false);
+                }}
                 className="w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/20 font-bold uppercase text-xs tracking-wider transition-colors"
               >
                 Done

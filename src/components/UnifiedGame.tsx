@@ -1,10 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameLogic } from '../hooks/useGameLogic';
-import { Intensity, Theme, GameMode, TimerDuration } from '../types';
+import { Intensity, GameMode, TimerDuration, CustomDeck } from '../types';
 import { getThemeDefinition } from '../themes';
 import { CountdownTimer } from './CountdownTimer';
 import { PlayerTurnBanner } from './PlayerTurnBanner';
+import { DeckShareModal } from './DeckShareModal';
+import { hapticService } from '../services/haptics';
 
 interface UnifiedGameProps {
     logic: ReturnType<typeof useGameLogic>;
@@ -12,8 +14,8 @@ interface UnifiedGameProps {
 
 const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
     const {
-        activeTab,
-        gameMode,
+        activeTab, setActiveTab,
+        gameMode, setGameMode,
         intensity, setIntensity,
         prompt, setPrompt,
         handleDraw,
@@ -27,6 +29,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         updatePromptInEditingDeck,
         removePromptFromEditingDeck,
         generateId,
+        // Themed prebuilt decks
+        themedPrebuiltDecks,
+        cloneThemedDeck,
+        importCustomDeck,
         // Pass & Play Roster
         players,
         playersEnabled, setPlayersEnabled,
@@ -38,8 +44,19 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         timerEnabled,
         timerDuration, setTimerDuration,
         toggleTimerEnabled,
+        // Easy Font & Haptics
+        useEasyFont, toggleEasyFont,
+        hapticsEnabled, toggleHapticsEnabled,
         setView,
     } = logic;
+
+    // Deck Sub-tab state
+    const [deckSubTab, setDeckSubTab] = useState<'custom' | 'themed'>('custom');
+
+    // Deck Share Modal state
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [shareModalMode, setShareModalMode] = useState<'export' | 'import'>('export');
+    const [deckToShare, setDeckToShare] = useState<CustomDeck | null>(null);
 
     useEffect(() => {
         if (gameMode === GameMode.NEVER_HAVE_I_EVER && intensity && !prompt) {
@@ -49,41 +66,70 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
     const themeDef = getThemeDefinition(theme);
 
+    const handleOpenExport = (deck: CustomDeck) => {
+        hapticService.light();
+        setDeckToShare(deck);
+        setShareModalMode('export');
+        setIsShareModalOpen(true);
+    };
+
+    const handleOpenImport = () => {
+        hapticService.light();
+        setShareModalMode('import');
+        setIsShareModalOpen(true);
+    };
+
+    const handlePlayThemedDeck = (deck: CustomDeck) => {
+        hapticService.medium();
+        setActiveDeckId(deck.id);
+        setGameMode(deck.gameMode);
+        setIntensity(deck.intensity);
+        setActiveTab('play');
+    };
+
     // Default Views if Theme doesn't provide them
-    const DefaultIntensitySelector = () => (
-        <div className="space-y-6 pt-4">
-            <h2 className="theme-text-header text-4xl font-bold italic mb-6">INTENSITY</h2>
-            <div className="grid grid-cols-1 gap-4">
-                {Object.values(Intensity).map((i) => (
+    const DefaultIntensitySelector = () => {
+        const activeDeck = customDecks.find(d => d.id === activeDeckId) || themedPrebuiltDecks.find(d => d.id === activeDeckId);
+
+        return (
+            <div className="space-y-6 pt-4">
+                <h2 className="theme-text-header text-4xl font-bold italic mb-6">INTENSITY</h2>
+                <div className="grid grid-cols-1 gap-4">
+                    {Object.values(Intensity).map((i) => (
+                        <button
+                            key={i}
+                            onClick={() => {
+                                hapticService.light();
+                                setIntensity(i);
+                            }}
+                            className="theme-button p-6 text-2xl font-black italic tracking-widest uppercase hover:scale-105"
+                        >
+                            {i}
+                        </button>
+                    ))}
+                </div>
+                <div className="mt-8 space-y-3">
+                    <p className="theme-text-header text-sm opacity-50 uppercase tracking-widest">Active Deck</p>
                     <button
-                        key={i}
-                        onClick={() => setIntensity(i)}
-                        className="theme-button p-6 text-2xl font-black italic tracking-widest uppercase hover:scale-105"
+                        onClick={() => {
+                            hapticService.light();
+                            setActiveDeckId('default');
+                        }}
+                        className={`w-full p-4 theme-button justify-start text-sm ${activeDeckId === 'default' ? 'bg-white text-black' : 'opacity-60'}`}
                     >
-                        {i}
+                        PHANTOM DEFAULT POOL
                     </button>
-                ))}
+                    {activeDeck && activeDeckId !== 'default' && (
+                        <button
+                            className="w-full p-4 theme-button justify-start text-sm bg-white text-black font-black"
+                        >
+                            ⭐ {activeDeck.name.toUpperCase()} ({activeDeck.prompts.length} CARDS)
+                        </button>
+                    )}
+                </div>
             </div>
-            <div className="mt-8 space-y-3">
-                <p className="theme-text-header text-sm opacity-50 uppercase tracking-widest">Select Deck</p>
-                <button
-                    onClick={() => setActiveDeckId('default')}
-                    className={`w-full p-4 theme-button justify-start text-sm ${activeDeckId === 'default' ? 'bg-white text-black' : 'opacity-60'}`}
-                >
-                    PHANTOM DEFAULT
-                </button>
-                {customDecks.map(deck => (
-                    <button
-                        key={deck.id}
-                        onClick={() => setActiveDeckId(deck.id)}
-                        className={`w-full p-4 theme-button justify-start text-sm ${activeDeckId === deck.id ? 'bg-white text-black' : 'opacity-60'}`}
-                    >
-                        {deck.name.toUpperCase()}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
+        );
+    };
 
     const DefaultPromptTypeSelector = () => (
         <div className="flex flex-col items-center justify-center h-full gap-8 py-12">
@@ -105,7 +151,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     DARE
                 </button>
                 <button
-                    onClick={() => setIntensity(null)}
+                    onClick={() => {
+                        hapticService.light();
+                        setIntensity(null);
+                    }}
                     className="mt-4 theme-text-header text-[10px] opacity-40 hover:opacity-100 transition-opacity"
                 >
                     [ ABORT MISSION ]
@@ -306,7 +355,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     key="decks"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="pt-4 space-y-6 pb-32"
+                    className="pt-4 space-y-5 pb-32"
                 >
                     {editingDeck ? (
                         <div className="theme-panel p-6 space-y-6">
@@ -387,37 +436,217 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 </button>
                             </div>
                         </div>
-                    ) : themeDef.DecksScreen ? (
-                        <themeDef.DecksScreen logic={logic} />
                     ) : (
                         <>
-                            <div className="flex justify-between items-end mb-6">
-                                <h2 className="theme-text-header text-4xl font-bold italic">DECKS</h2>
-                                <button
-                                    onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: intensity || Intensity.SOFT, gameMode: gameMode || GameMode.TRUTH_OR_DARE })}
-                                    className="theme-button px-4 py-1 text-sm italic"
-                                >
-                                    + NEW
-                                </button>
+                            {/* Decks Sub-navigation Switcher */}
+                            <div className="flex justify-between items-center gap-2">
+                                <div className="flex p-1 bg-black/20 rounded-xl border border-black/10">
+                                    <button
+                                        onClick={() => {
+                                            hapticService.light();
+                                            setDeckSubTab('custom');
+                                        }}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
+                                            deckSubTab === 'custom'
+                                                ? 'bg-white text-black shadow-sm'
+                                                : 'text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white'
+                                        }`}
+                                    >
+                                        My Decks ({customDecks.length})
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            hapticService.light();
+                                            setDeckSubTab('themed');
+                                        }}
+                                        className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase transition-all ${
+                                            deckSubTab === 'themed'
+                                                ? 'bg-white text-black shadow-sm'
+                                                : 'text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white'
+                                        }`}
+                                    >
+                                        ⭐ Themed Packs ({themedPrebuiltDecks.length})
+                                    </button>
+                                </div>
+
+                                <div className="flex gap-1.5">
+                                    <button
+                                        onClick={handleOpenImport}
+                                        title="Import Deck via QR / Short Code"
+                                        className="theme-button px-3 py-1.5 text-xs font-bold"
+                                    >
+                                        📥 IMPORT
+                                    </button>
+                                    {deckSubTab === 'custom' && (
+                                        <button
+                                            onClick={() => {
+                                                hapticService.light();
+                                                setEditingDeck({
+                                                    id: generateId(),
+                                                    name: '',
+                                                    description: '',
+                                                    prompts: [],
+                                                    isCustom: true,
+                                                    intensity: intensity || Intensity.SOFT,
+                                                    gameMode: gameMode || GameMode.TRUTH_OR_DARE
+                                                });
+                                            }}
+                                            className="theme-button px-3 py-1.5 text-xs font-bold"
+                                        >
+                                            + NEW
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                            <div className="grid grid-cols-1 gap-4">
-                                {customDecks.length === 0 ? (
-                                    <div className="py-20 text-center opacity-20 italic">No custom decks forged yet.</div>
-                                ) : (
-                                    customDecks.map(deck => (
-                                        <div key={deck.id} className="theme-panel p-4 flex justify-between items-center group">
-                                            <div>
-                                                <h3 className="theme-text-header text-xl group-hover:text-[var(--theme-accent)] transition-colors">{deck.name || 'UNTITLED'}</h3>
-                                                <p className="text-[10px] opacity-60 uppercase tracking-widest">{deck.prompts.length} CARDS</p>
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <button onClick={() => setEditingDeck(deck)} className="theme-button px-3 py-1 text-[10px]">EDIT</button>
-                                                <button onClick={() => deleteDeck(deck.id)} className="theme-button theme-button-alt px-3 py-1 text-[10px]">DEL</button>
+
+                            {/* My Custom Decks View */}
+                            {deckSubTab === 'custom' && (
+                                <div className="grid grid-cols-1 gap-3">
+                                    {customDecks.length === 0 ? (
+                                        <div className="py-16 text-center space-y-3 bg-black/5 rounded-2xl border border-dashed border-black/10 p-6">
+                                            <p className="text-sm opacity-50 italic">No custom decks forged yet.</p>
+                                            <div className="flex justify-center gap-3">
+                                                <button
+                                                    onClick={() => setDeckSubTab('themed')}
+                                                    className="theme-button px-4 py-2 text-xs font-bold"
+                                                >
+                                                    Browse 10 Themed Packs
+                                                </button>
+                                                <button
+                                                    onClick={handleOpenImport}
+                                                    className="theme-button theme-button-alt px-4 py-2 text-xs font-bold"
+                                                >
+                                                    Import Deck Code / QR
+                                                </button>
                                             </div>
                                         </div>
-                                    ))
-                                )}
-                            </div>
+                                    ) : (
+                                        customDecks.map(deck => {
+                                            const isActive = activeDeckId === deck.id;
+                                            return (
+                                                <div
+                                                    key={deck.id}
+                                                    className={`theme-panel p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 transition-all ${
+                                                        isActive ? 'ring-2 ring-red-500 shadow-md' : ''
+                                                    }`}
+                                                >
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2">
+                                                            <h3 className="theme-text-header text-lg">{deck.name || 'UNTITLED DECK'}</h3>
+                                                            {isActive && (
+                                                                <span className="px-2 py-0.5 rounded text-[9px] bg-red-600 text-white font-black uppercase tracking-wider">
+                                                                    Active
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <p className="text-[10px] opacity-60 uppercase tracking-widest">
+                                                            {deck.prompts.length} CARDS • {deck.gameMode} • {deck.intensity}
+                                                        </p>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+                                                        <button
+                                                            onClick={() => setActiveDeckId(isActive ? 'default' : deck.id)}
+                                                            className={`theme-button px-3 py-1.5 text-xs font-bold ${
+                                                                isActive ? 'bg-red-600 text-white' : ''
+                                                            }`}
+                                                        >
+                                                            {isActive ? 'ACTIVE' : 'SELECT'}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleOpenExport(deck)}
+                                                            title="Share deck via QR code / Short Code"
+                                                            className="theme-button theme-button-alt px-2.5 py-1.5 text-xs font-bold"
+                                                        >
+                                                            📤
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingDeck(deck)}
+                                                            className="theme-button px-2.5 py-1.5 text-xs font-bold"
+                                                        >
+                                                            EDIT
+                                                        </button>
+                                                        <button
+                                                            onClick={() => deleteDeck(deck.id)}
+                                                            className="theme-button theme-button-alt px-2 py-1.5 text-xs font-bold text-red-500"
+                                                        >
+                                                            DEL
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Curated Themed Packs View */}
+                            {deckSubTab === 'themed' && (
+                                <div className="space-y-3">
+                                    <p className="text-xs opacity-60 italic">
+                                        Handcrafted expansions tailored to each realm's authentic lore, rules, and aesthetic.
+                                    </p>
+                                    <div className="grid grid-cols-1 gap-3">
+                                        {themedPrebuiltDecks.map(pack => {
+                                            const isActive = activeDeckId === pack.id;
+                                            return (
+                                                <div
+                                                    key={pack.id}
+                                                    className={`theme-panel p-4 space-y-3 transition-all ${
+                                                        isActive ? 'ring-2 ring-red-500 shadow-md' : ''
+                                                    }`}
+                                                >
+                                                    <div className="flex justify-between items-start gap-2">
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <h3 className="theme-text-header text-lg">{pack.name}</h3>
+                                                                {isActive && (
+                                                                    <span className="px-2 py-0.5 rounded text-[9px] bg-red-600 text-white font-black uppercase tracking-wider">
+                                                                        Active
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <p className="text-xs opacity-75 mt-0.5">"{pack.description}"</p>
+                                                        </div>
+                                                        <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-red-600 text-white shrink-0">
+                                                            {pack.intensity}
+                                                        </span>
+                                                    </div>
+
+                                                    <div className="flex justify-between items-center pt-2 border-t border-black/10 text-xs">
+                                                        <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">
+                                                            🎴 {pack.prompts.length} CARDS • {pack.gameMode}
+                                                        </span>
+
+                                                        <div className="flex items-center gap-1.5">
+                                                            <button
+                                                                onClick={() => handlePlayThemedDeck(pack)}
+                                                                className="theme-button px-3 py-1.5 text-xs font-black"
+                                                            >
+                                                                ▶ PLAY NOW
+                                                            </button>
+                                                            <button
+                                                                onClick={() => cloneThemedDeck(pack.id)}
+                                                                title="Clone an editable copy to My Decks"
+                                                                className="theme-button theme-button-alt px-2.5 py-1.5 text-xs font-bold"
+                                                            >
+                                                                📋 CLONE
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleOpenExport(pack)}
+                                                                title="Share this themed pack via QR code"
+                                                                className="theme-button theme-button-alt px-2.5 py-1.5 text-xs font-bold"
+                                                            >
+                                                                📤
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
                         </>
                     )}
                 </motion.div>
@@ -473,8 +702,47 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             GAMEPLAY OPTIONS
                         </h3>
 
+                        {/* Easy Font Mode Toggle */}
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <div className="font-bold text-sm">🔤 EASY FONT MODE</div>
+                                <div className="text-[10px] opacity-60">High-legibility typography across all 19 realms</div>
+                            </div>
+                            <button
+                                onClick={toggleEasyFont}
+                                className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${
+                                    useEasyFont
+                                        ? 'bg-red-600 text-white shadow-md'
+                                        : 'bg-black/20 text-black/60 dark:text-white/40'
+                                }`}
+                            >
+                                {useEasyFont ? 'ON' : 'OFF'}
+                            </button>
+                        </div>
+
+                        {/* Native Haptic Feedback Toggle */}
+                        <div className="flex justify-between items-center pt-2 border-t border-black/10">
+                            <div>
+                                <div className="font-bold text-sm">📳 HAPTIC FEEDBACK</div>
+                                <div className="text-[10px] opacity-60">Tactile vibrations on draws, timers & penalties</div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    toggleHapticsEnabled();
+                                    if (!hapticsEnabled) hapticService.light();
+                                }}
+                                className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${
+                                    hapticsEnabled
+                                        ? 'bg-red-600 text-white shadow-md'
+                                        : 'bg-black/20 text-black/60 dark:text-white/40'
+                                }`}
+                            >
+                                {hapticsEnabled ? 'ON' : 'OFF'}
+                            </button>
+                        </div>
+
                         {/* Countdown Timer Setting */}
-                        <div className="space-y-3">
+                        <div className="space-y-3 pt-2 border-t border-black/10">
                             <div className="flex justify-between items-center">
                                 <div>
                                     <div className="font-bold text-sm">⏱️ COUNTDOWN TIMER</div>
@@ -499,7 +767,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                         {([15, 30, 60] as TimerDuration[]).map((d) => (
                                             <button
                                                 key={d}
-                                                onClick={() => setTimerDuration(d)}
+                                                onClick={() => {
+                                                    hapticService.light();
+                                                    setTimerDuration(d);
+                                                }}
                                                 className={`px-3 py-1 rounded text-xs font-bold transition-all ${
                                                     timerDuration === d
                                                         ? 'bg-red-600 text-white shadow'
@@ -515,14 +786,17 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         </div>
 
                         {/* Pass & Play Roster Setting */}
-                        <div className="space-y-3 pt-3 border-t border-black/10">
+                        <div className="space-y-3 pt-2 border-t border-black/10">
                             <div className="flex justify-between items-center">
                                 <div>
                                     <div className="font-bold text-sm">👥 PASS & PLAY ROSTER</div>
                                     <div className="text-[10px] opacity-60">Turn tracker & chicken counter ({players.length} players)</div>
                                 </div>
                                 <button
-                                    onClick={() => setPlayersEnabled(!playersEnabled)}
+                                    onClick={() => {
+                                        hapticService.light();
+                                        setPlayersEnabled(!playersEnabled);
+                                    }}
                                     className={`px-4 py-1.5 rounded-full text-xs font-black uppercase transition-all ${
                                         playersEnabled
                                             ? 'bg-red-600 text-white shadow-md'
@@ -536,7 +810,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             {playersEnabled && (
                                 <div className="flex gap-2 pt-1">
                                     <button
-                                        onClick={() => setView('player-setup')}
+                                        onClick={() => {
+                                            hapticService.light();
+                                            setView('player-setup');
+                                        }}
                                         className="flex-1 theme-button py-2 text-xs font-bold"
                                     >
                                         MANAGE ROSTER ({players.length})
@@ -590,6 +867,15 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     ) : null}
                 </motion.div>
             )}
+
+            {/* Deck Export / Import QR Code Modal */}
+            <DeckShareModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                mode={shareModalMode}
+                deckToExport={deckToShare}
+                onImportSuccess={importCustomDeck}
+            />
         </AnimatePresence>
     );
 };

@@ -10,19 +10,19 @@ import { ErrorBoundary } from './ErrorBoundary';
 const App: React.FC = () => {
   const logic = useGameLogic();
 
-  if (logic.view === 'menu') {
-    return <ErrorBoundary><MainMenu logic={logic} /></ErrorBoundary>;
-  }
+  const appContent = () => {
+    if (logic.view === 'menu') {
+      return <MainMenu logic={logic} />;
+    }
 
-  if (logic.view === 'player-setup') {
-    return <ErrorBoundary><PlayerSetup logic={logic} /></ErrorBoundary>;
-  }
+    if (logic.view === 'player-setup') {
+      return <PlayerSetup logic={logic} />;
+    }
 
-  const themeDef = getThemeDefinition(logic.theme);
-  const LayoutComponent = themeDef.LayoutComponent || Layout;
+    const themeDef = getThemeDefinition(logic.theme);
+    const LayoutComponent = themeDef.LayoutComponent || Layout;
 
-  return (
-    <ErrorBoundary>
+    return (
       <LayoutComponent
         activeTab={logic.activeTab}
         setActiveTab={logic.setActiveTab}
@@ -30,6 +30,31 @@ const App: React.FC = () => {
       >
         <UnifiedGame logic={logic} />
       </LayoutComponent>
+    );
+  };
+
+  return (
+    <ErrorBoundary>
+      <div className={`w-full h-full ${logic.useEasyFont ? 'easy-font-mode' : ''}`}>
+        <style>{`
+          .easy-font-mode .theme-text-prompt,
+          .easy-font-mode .theme-text-header,
+          .easy-font-mode .font-p5-display,
+          .easy-font-mode .font-display,
+          .easy-font-mode .skyrim-font-title,
+          .easy-font-mode .sonic-button,
+          .easy-font-mode .omori-button,
+          .easy-font-mode .cyber-button,
+          .easy-font-mode h1,
+          .easy-font-mode h2,
+          .easy-font-mode h3,
+          .easy-font-mode p {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+            letter-spacing: normal !important;
+          }
+        `}</style>
+        {appContent()}
+      </div>
     </ErrorBoundary>
   );
 };

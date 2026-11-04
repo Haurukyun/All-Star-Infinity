@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Intensity, PromptType, GamePrompt, CustomDeck, Theme, GameMode, Player, TimerDuration, GameView } from '../types';
 import { getRandomPrompt, DEFAULT_PROMPTS } from '../services/localPrompts';
+import { THEMED_PREBUILT_DECKS } from '../services/themedDecks';
+import { hapticService, setHapticsGlobalEnabled } from '../services/haptics';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
@@ -10,7 +12,17 @@ export const useGameLogic = () => {
   const [intensity, setIntensity] = useState<Intensity | null>(null);
   const [prompt, setPrompt] = useState<GamePrompt | null>(null);
   const [history, setHistory] = useState<GamePrompt[]>([]);
-  const [useEasyFont, setUseEasyFont] = useState(false);
+
+  // Globally persisted Easy Font mode
+  const [useEasyFont, setUseEasyFont] = useState<boolean>(() => {
+    return localStorage.getItem('phantom_easy_font') === 'true';
+  });
+
+  // Globally persisted Native Haptic feedback
+  const [hapticsEnabled, setHapticsEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('phantom_haptics_enabled') !== 'false'; // default true
+  });
+
   const [theme, setTheme] = useState<Theme>(() => {
     const savedTheme = localStorage.getItem('phantom_theme');
     if (savedTheme && Object.values(Theme).includes(savedTheme as Theme) && savedTheme !== Theme.NONE) {
@@ -69,6 +81,17 @@ export const useGameLogic = () => {
     localStorage.setItem('phantom_theme', theme);
   }, [theme]);
 
+  // Save Easy Font to localStorage
+  useEffect(() => {
+    localStorage.setItem('phantom_easy_font', String(useEasyFont));
+  }, [useEasyFont]);
+
+  // Save Haptics setting to localStorage and update global service
+  useEffect(() => {
+    localStorage.setItem('phantom_haptics_enabled', String(hapticsEnabled));
+    setHapticsGlobalEnabled(hapticsEnabled);
+  }, [hapticsEnabled]);
+
   // Save Players to localStorage
   useEffect(() => {
     localStorage.setItem('phantom_players', JSON.stringify(players));
@@ -91,7 +114,7 @@ export const useGameLogic = () => {
   // Reset active deck if it no longer matches the current context
   useEffect(() => {
     if (activeDeckId !== 'default') {
-      const selected = customDecks.find(d => d.id === activeDeckId);
+      const selected = customDecks.find(d => d.id === activeDeckId) || THEMED_PREBUILT_DECKS.find(d => d.id === activeDeckId);
       if (selected && (selected.intensity !== intensity || selected.gameMode !== gameMode)) {
         setActiveDeckId('default');
       }
@@ -124,11 +147,13 @@ export const useGameLogic = () => {
       score: 0
     };
     setPlayers(prev => [...prev, newPlayer]);
+    hapticService.light();
   }, []);
 
   const removePlayer = useCallback((id: string) => {
     setPlayers(prev => prev.filter(p => p.id !== id));
     setActivePlayerIndex(prev => Math.max(0, prev - 1));
+    hapticService.light();
   }, []);
 
   const updatePlayerName = useCallback((id: string, name: string) => {
@@ -138,46 +163,61 @@ export const useGameLogic = () => {
   const nextPlayer = useCallback(() => {
     if (players.length === 0) return;
     setActivePlayerIndex(prev => (prev + 1) % players.length);
+    hapticService.light();
   }, [players.length]);
 
   const prevPlayer = useCallback(() => {
     if (players.length === 0) return;
     setActivePlayerIndex(prev => (prev - 1 + players.length) % players.length);
+    hapticService.light();
   }, [players.length]);
 
   const incrementChicken = useCallback((playerId?: string) => {
     const targetId = playerId || activePlayer?.id;
     if (!targetId) return;
     setPlayers(prev => prev.map(p => p.id === targetId ? { ...p, chickenCount: p.chickenCount + 1 } : p));
+    hapticService.heavy();
   }, [activePlayer?.id]);
 
   const incrementScore = useCallback((playerId?: string) => {
     const targetId = playerId || activePlayer?.id;
     if (!targetId) return;
     setPlayers(prev => prev.map(p => p.id === targetId ? { ...p, score: p.score + 1 } : p));
+    hapticService.success();
   }, [activePlayer?.id]);
 
   const resetRosterScores = useCallback(() => {
     setPlayers(prev => prev.map(p => ({ ...p, chickenCount: 0, score: 0 })));
+    hapticService.light();
   }, []);
 
   // Timer Actions
   const toggleTimerEnabled = useCallback(() => {
     setTimerEnabled(prev => !prev);
+    hapticService.light();
+  }, []);
+
+  // Easy Font & Haptics Toggles
+  const toggleEasyFont = useCallback(() => {
+    setUseEasyFont(prev => !prev);
+    hapticService.light();
+  }, []);
+
+  const toggleHapticsEnabled = useCallback(() => {
+    setHapticsEnabled(prev => !prev);
   }, []);
 
   const handleDraw = useCallback((type: PromptType) => {
     let sourcePool = DEFAULT_PROMPTS;
-    let currentDeck: CustomDeck | undefined;
 
     if (activeDeckId !== 'default') {
-      currentDeck = customDecks.find(d => d.id === activeDeckId);
+      const currentDeck = customDecks.find(d => d.id === activeDeckId) || THEMED_PREBUILT_DECKS.find(d => d.id === activeDeckId);
       if (currentDeck && currentDeck.prompts.length > 0) {
         sourcePool = currentDeck.prompts;
       }
     }
 
-    // Filter by intensity and type.
+    // Filter by intensity and type
     const filtered = sourcePool.filter(p => {
       const matchType = p.type === type;
       const matchIntensity = p.intensity === (intensity || Intensity.SOFT);
@@ -193,6 +233,13 @@ export const useGameLogic = () => {
       const next = pool[Math.floor(Math.random() * pool.length)];
       setPrompt(next);
       setHistory(prev => [next, ...prev]);
+    }
+
+    // Tactile haptic feedback on card draw
+    if (intensity === Intensity.VULGAR) {
+      hapticService.heavy();
+    } else {
+      hapticService.medium();
     }
   }, [activeDeckId, customDecks, intensity, prompt]);
 
@@ -211,15 +258,42 @@ export const useGameLogic = () => {
       return [...prev, sanitizedDeck];
     });
     setEditingDeck(null);
+    hapticService.success();
   }, []);
 
   const deleteDeck = useCallback((id: string) => {
     if (activeDeckId === id) setActiveDeckId('default');
     setCustomDecks(prev => prev.filter(d => d.id !== id));
+    hapticService.light();
   }, [activeDeckId]);
 
   const toggleFavoriteDeck = useCallback((id: string) => {
     setCustomDecks(prev => prev.map(d => d.id === id ? { ...d, isFavorite: !d.isFavorite } : d));
+    hapticService.light();
+  }, []);
+
+  // Pre-built themed decks cloning & import
+  const cloneThemedDeck = useCallback((deckId: string) => {
+    const themed = THEMED_PREBUILT_DECKS.find(d => d.id === deckId);
+    if (!themed) return;
+    const cloned: CustomDeck = {
+      ...themed,
+      id: generateId(),
+      name: `${themed.name} (Copy)`,
+      isCustom: true,
+      isFavorite: false,
+      prompts: themed.prompts.map(p => ({ ...p, id: generateId() }))
+    };
+    setCustomDecks(prev => [...prev, cloned]);
+    setActiveDeckId(cloned.id);
+    hapticService.success();
+    return cloned;
+  }, []);
+
+  const importCustomDeck = useCallback((deck: CustomDeck) => {
+    setCustomDecks(prev => [...prev, deck]);
+    setActiveDeckId(deck.id);
+    hapticService.success();
   }, []);
 
   const addNewPromptToEditingDeck = useCallback(() => {
@@ -232,6 +306,7 @@ export const useGameLogic = () => {
       penalty: ''
     };
     setEditingDeck({ ...editingDeck, prompts: [...editingDeck.prompts, newPrompt] });
+    hapticService.light();
   }, [editingDeck]);
 
   const updatePromptInEditingDeck = useCallback((id: string, field: 'text' | 'penalty' | 'type' | 'intensity', value: string | PromptType | Intensity) => {
@@ -259,10 +334,12 @@ export const useGameLogic = () => {
       ...editingDeck,
       prompts: editingDeck.prompts.filter(p => p.id !== id)
     });
+    hapticService.light();
   }, [editingDeck]);
 
   const handleSetTheme = useCallback((newTheme: Theme, isExplicit: boolean = true) => {
     setTheme(newTheme);
+    hapticService.medium();
     if (isExplicit) {
       if (newTheme !== Theme.NONE) {
         setHasExplicitlySelectedTheme(true);
@@ -273,20 +350,38 @@ export const useGameLogic = () => {
   }, []);
 
   return {
-    activeTab, setActiveTab,
-    gameMode, setGameMode,
-    intensity, setIntensity,
+    activeTab, setActiveTab: (tab: string) => {
+      setActiveTab(tab);
+      hapticService.light();
+    },
+    gameMode, setGameMode: (mode: GameMode | null) => {
+      setGameMode(mode);
+      if (mode) hapticService.light();
+    },
+    intensity, setIntensity: (i: Intensity | null) => {
+      setIntensity(i);
+      if (i) hapticService.light();
+    },
     prompt, setPrompt,
     history, setHistory,
-    useEasyFont, setUseEasyFont,
+    useEasyFont, setUseEasyFont, toggleEasyFont,
+    hapticsEnabled, setHapticsEnabled, toggleHapticsEnabled,
     theme, setTheme: handleSetTheme,
     hasExplicitlySelectedTheme,
-    view, setView,
+    view, setView: (v: GameView) => {
+      setView(v);
+      hapticService.light();
+    },
     customDecks, setCustomDecks,
-    activeDeckId, setActiveDeckId,
+    activeDeckId, setActiveDeckId: (id: string) => {
+      setActiveDeckId(id);
+      hapticService.light();
+    },
     editingDeck, setEditingDeck,
     handleDraw, saveDeck, deleteDeck,
     toggleFavoriteDeck,
+    cloneThemedDeck, importCustomDeck,
+    themedPrebuiltDecks: THEMED_PREBUILT_DECKS,
     addNewPromptToEditingDeck,
     updatePromptInEditingDeck,
     removePromptFromEditingDeck,

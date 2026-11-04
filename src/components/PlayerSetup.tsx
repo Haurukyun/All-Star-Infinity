@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameLogic } from '../hooks/useGameLogic';
+import { hapticService } from '../services/haptics';
 
 interface PlayerSetupProps {
   logic: ReturnType<typeof useGameLogic>;
@@ -26,16 +27,19 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ logic }) => {
   };
 
   const handleStartGame = () => {
+    hapticService.success();
     setPlayersEnabled(true);
     setView('game');
   };
 
   const handleQuickPlay = () => {
+    hapticService.light();
     setPlayersEnabled(false);
     setView('game');
   };
 
   const handleAddPresets = () => {
+    hapticService.light();
     if (players.length === 0) {
       addPlayer('Player 1');
       addPlayer('Player 2');
@@ -149,7 +153,10 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ logic }) => {
               Skip (Solo Play)
             </button>
             <button
-              onClick={() => setView('menu')}
+              onClick={() => {
+                hapticService.light();
+                setView('menu');
+              }}
               className="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold uppercase tracking-wider text-white/70 hover:text-white transition-colors"
             >
               Back to Menu

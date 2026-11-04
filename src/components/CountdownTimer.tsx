@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TimerDuration } from '../types';
+import { hapticService } from '../services/haptics';
 
 interface CountdownTimerProps {
   enabled: boolean;
@@ -48,15 +49,11 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          // Trigger light vibration if available
-          try {
-            if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-              navigator.vibrate([200, 100, 300]);
-            }
-          } catch {
-            // Ignore vibration errors
-          }
+          hapticService.error();
           return 0;
+        }
+        if (prev <= 4) {
+          hapticService.warning();
         }
         return prev - 1;
       });
@@ -75,7 +72,10 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
     return (
       <div className="relative inline-block select-none">
         <button
-          onClick={onToggleEnabled}
+          onClick={() => {
+            hapticService.light();
+            onToggleEnabled();
+          }}
           title="Turn on Countdown Timer"
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider
                      bg-black/60 hover:bg-black/80 text-white/70 hover:text-white border border-white/20 
@@ -102,7 +102,10 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           repeat: isLowTime ? Infinity : isExpired ? 3 : 0,
           duration: isLowTime ? 0.6 : 0.3,
         }}
-        onClick={() => setShowConfig((prev) => !prev)}
+        onClick={() => {
+          hapticService.light();
+          setShowConfig((prev) => !prev);
+        }}
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider cursor-pointer
                     border-2 backdrop-blur-md shadow-lg transition-colors active:scale-95
                     ${
@@ -143,6 +146,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  hapticService.light();
                   setShowConfig(false);
                 }}
                 className="text-white/50 hover:text-white font-mono text-sm"
@@ -156,6 +160,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  hapticService.light();
                   setIsRunning((prev) => !prev);
                 }}
                 className="py-1 px-2 rounded bg-white/10 hover:bg-white/20 font-bold text-[10px] uppercase text-center"
@@ -165,6 +170,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  hapticService.light();
                   setTimeLeft(duration);
                   setIsRunning(true);
                 }}
@@ -183,6 +189,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
                     key={d}
                     onClick={(e) => {
                       e.stopPropagation();
+                      hapticService.light();
                       onChangeDuration(d);
                       setTimeLeft(d);
                       setIsRunning(true);
@@ -204,6 +211,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
+                  hapticService.light();
                   setShowConfig(false);
                   onToggleEnabled();
                 }}
