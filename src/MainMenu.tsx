@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Theme, GameMode } from './types';
 import { useGameLogic } from './hooks/useGameLogic';
 import { getThemeDefinition } from './themes';
-import { getFontForTheme } from './themes/allThemesList';
+import { allThemesList, getFontForTheme } from './themes/allThemesList';
 import { hapticService } from './services/haptics';
 import { soundService } from './services/soundFx';
 
@@ -59,18 +59,41 @@ const MainMenu: React.FC<{ logic: ReturnType<typeof useGameLogic> }> = ({ logic 
             SELECT YOUR <span className="text-[#D80000]">REALM</span>
           </h1>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-6 max-h-[60vh] overflow-y-auto px-4 py-4 custom-scrollbar">
-            {Object.values(Theme).filter(t => t !== Theme.NONE).map((t) => {
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 sm:gap-5 max-h-[65vh] overflow-y-auto px-4 py-4 custom-scrollbar">
+            {allThemesList.map((t) => {
               return (
                 <motion.button
-                  key={t}
-                  whileHover={{ scale: 1.05, rotate: -2, backgroundColor: '#D80000', color: '#fff' }}
+                  key={t.id}
+                  whileHover={{ scale: 1.05, rotate: -2, y: -4 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => setTheme(t)}
-                  className="bg-white text-black p-4 sm:p-6 font-bold border-4 border-black shadow-[4px_4px_0_#D80000] uppercase tracking-widest transition-all text-sm sm:text-base leading-tight min-h-[80px]"
-                  style={{ transform: 'skewX(-10deg)', fontFamily: getFontForTheme(t) }}
+                  onClick={() => {
+                    hapticService.medium();
+                    soundService.click();
+                    setTheme(t.id);
+                  }}
+                  className="group relative bg-[#141414] hover:bg-black text-white p-4 rounded-2xl border-2 flex flex-col items-center justify-between gap-3 transition-all text-center shadow-lg active:scale-95"
+                  style={{
+                    borderColor: t.color,
+                    boxShadow: '0 8px 24px ' + t.color + '22, 0 4px 0 ' + t.color,
+                  }}
                 >
-                  {t}
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border shadow-inner transition-transform group-hover:scale-110"
+                    style={{
+                      backgroundColor: t.color + '22',
+                      borderColor: t.color + '55',
+                    }}
+                  >
+                    {t.icon || '✨'}
+                  </div>
+                  <div>
+                    <div
+                      className="font-black text-xs sm:text-sm uppercase tracking-wide leading-tight group-hover:text-white transition-colors"
+                      style={{ fontFamily: t.font }}
+                    >
+                      {t.label}
+                    </div>
+                  </div>
                 </motion.button>
               );
             })}

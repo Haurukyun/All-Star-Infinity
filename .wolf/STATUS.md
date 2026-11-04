@@ -23,6 +23,9 @@ budget_tokens: 1000
   - Procedural sound cues: card flip resonant swoosh, click blip, clock tick, countdown warning beeps, harsh party fail buzzer, and ascending victory chime.
   - Linked to card draws, countdown timers, Hot Seat rapid-fire responses, finger pointing countdown, and chickened-out penalties.
   - User toggle switch in Settings tab (`phantom_sound_enabled`), persisted globally.
+- **Realm Selection Preview Cards:**
+  - Redesigned initial "SELECT YOUR REALM" screen in `MainMenu.tsx` using `allThemesList`.
+  - Themed cards with authentic accent colors, glowing drop shadows, thematic emoji icons, and authentic font families.
 - **Native Haptic Feedback:**
   - Installed `@capacitor/haptics` with full native Android integration.
   - Built `src/services/haptics.ts` supporting `light`, `medium`, `heavy`, `warning`, `error`, and `success` tactile vibrations.
