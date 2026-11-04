@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CustomDeck, GameMode, Intensity } from '../types';
@@ -15,7 +14,9 @@ interface DeckSearchModalProps {
         accent: string;
         bg: string;
         textColor: string;
-        cardBg: string;
+        cardBg?: string;
+        borderColor?: string;
+        fontFamily?: string;
     };
 }
 
@@ -54,7 +55,11 @@ export const DeckSearchModal: React.FC<DeckSearchModalProps> = ({
                         animate={{ scale: 1, y: 0 }}
                         exit={{ scale: 0.9, y: 20 }}
                         onClick={e => e.stopPropagation()}
-                        style={{ backgroundColor: styles.cardBg, borderColor: styles.accent }}
+                        style={{
+                            backgroundColor: styles.cardBg || styles.bg,
+                            borderColor: styles.borderColor || styles.accent,
+                            fontFamily: styles.fontFamily
+                        }}
                     >
                         <div className="p-6 border-b flex justify-between items-center" style={{ borderColor: `${styles.accent}22` }}>
                             <div>
@@ -86,7 +91,7 @@ export const DeckSearchModal: React.FC<DeckSearchModalProps> = ({
                                 className={`p-4 rounded-2xl border-4 cursor-pointer flex justify-between items-center transition-all`}
                                 style={{
                                     backgroundColor: activeDeckId === 'default' ? `${styles.accent}11` : styles.bg,
-                                    borderColor: activeDeckId === 'default' ? styles.accent : `${styles.accent}11`,
+                                    borderColor: activeDeckId === 'default' ? (styles.borderColor || styles.accent) : `${styles.accent}11`,
                                     color: styles.textColor
                                 }}
                             >
@@ -104,7 +109,7 @@ export const DeckSearchModal: React.FC<DeckSearchModalProps> = ({
                                     className={`p-4 rounded-2xl border-4 cursor-pointer transition-all`}
                                     style={{
                                         backgroundColor: activeDeckId === deck.id ? `${styles.accent}11` : styles.bg,
-                                        borderColor: activeDeckId === deck.id ? styles.accent : `${styles.accent}11`,
+                                        borderColor: activeDeckId === deck.id ? (styles.borderColor || styles.accent) : `${styles.accent}11`,
                                         color: styles.textColor
                                     }}
                                 >

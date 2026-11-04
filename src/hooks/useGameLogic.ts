@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Intensity, PromptType, GamePrompt, CustomDeck, Theme, GameMode } from '../types';
 import { getRandomPrompt, DEFAULT_PROMPTS } from '../services/localPrompts';
@@ -127,7 +126,7 @@ export const useGameLogic = () => {
     setEditingDeck({ ...editingDeck, prompts: [...editingDeck.prompts, newPrompt] });
   };
 
-  const updatePromptInEditingDeck = (id: string, field: 'text' | 'penalty' | 'type', value: string | PromptType) => {
+  const updatePromptInEditingDeck = (id: string, field: 'text' | 'penalty' | 'type' | 'intensity', value: string | PromptType | Intensity) => {
     if (!editingDeck) return;
     setEditingDeck({
       ...editingDeck,

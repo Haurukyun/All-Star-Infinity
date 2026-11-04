@@ -275,7 +275,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             <div className="flex justify-between items-end mb-6">
                                 <h2 className="theme-text-header text-4xl font-bold italic">DECKS</h2>
                                 <button
-                                    onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true })}
+                                    onClick={() => setEditingDeck({ id: generateId(), name: '', description: '', prompts: [], isCustom: true, intensity: intensity || Intensity.SOFT, gameMode: gameMode || GameMode.TRUTH_OR_DARE })}
                                     className="theme-button px-4 py-1 text-sm italic"
                                 >
                                     + NEW

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { Component, ReactNode } from 'react';
 
 interface Props {
-    children: React.ReactNode;
+    children: ReactNode;
 }
 
 interface State {
@@ -9,17 +9,17 @@ interface State {
     error: Error | null;
 }
 
-export class ErrorBoundary extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-        this.state = { hasError: false, error: null };
-    }
+export class ErrorBoundary extends Component<Props, State> {
+    public override state: State = {
+        hasError: false,
+        error: null
+    };
 
-    static getDerivedStateFromError(error: Error) {
+    static getDerivedStateFromError(error: Error): State {
         return { hasError: true, error };
     }
 
-    render() {
+    override render() {
         if (this.state.hasError) {
             return (
                 <div style={{ padding: 20, background: 'red', color: 'white', zIndex: 99999, position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>

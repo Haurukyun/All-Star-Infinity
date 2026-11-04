@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "bugs": [
+    {
+      "id": "bug-001",
+      "error_message": "error TS2339 / TS4112 in ErrorBoundary.tsx with React 19 types",
+      "file": "src/ErrorBoundary.tsx",
+      "root_cause": "Missing @types/react and @types/react-dom in devDependencies left React untyped, and constructor-based state in class component failed TS override checks in React 19.",
+      "fix": "Installed @types/react@^19 and @types/react-dom@^19, refactored ErrorBoundary to declare `public override state: State` directly and explicit static getDerivedStateFromError signature.",
+      "tags": ["react19", "typescript", "errorboundary"],
+      "occurrences": 1,
+      "first_seen": "2026-11-04",
+      "resolved": "2026-11-04"
+    },
+    {
+      "id": "bug-002",
+      "error_message": "error TS2741: Property 'cardBg' is missing in type passed to DeckSearchModal",
+      "file": "src/components/DeckSearchModal.tsx",
+      "root_cause": "10 themes passed styles to DeckSearchModal omitting cardBg (only providing accent, bg, textColor, borderColor), but styles.cardBg was strictly required.",
+      "fix": "Made cardBg optional in DeckSearchModalProps (cardBg?: string) with fallback to styles.bg.",
+      "tags": ["themes", "typescript", "decksearchmodal"],
+      "occurrences": 1,
+      "first_seen": "2026-11-04",
+      "resolved": "2026-11-04"
+    },
+    {
+      "id": "bug-003",
+      "error_message": "error TS2345 in UnifiedGame.tsx: missing intensity and gameMode in SetStateAction<CustomDeck>",
+      "file": "src/components/UnifiedGame.tsx",
+      "root_cause": "setEditingDeck was called with a newly created deck missing required intensity and gameMode fields.",
+      "fix": "Supplied current active intensity and gameMode (with fallbacks) when initializing new deck.",
+      "tags": ["decks", "typescript", "customdeck"],
+      "occurrences": 1,
+      "first_seen": "2026-11-04",
+      "resolved": "2026-11-04"
+    },
+    {
+      "id": "bug-004",
+      "error_message": "error TS2322 in PersonaTheme.tsx: Type 'string' is not assignable to type 'AnimationGeneratorType'",
+      "file": "src/themes/PersonaTheme.tsx",
+      "root_cause": "P5_VARIANTS transition had type: 'spring' inferred as string rather than string literal type.",
+      "fix": "Added `as const` to spring type and easeInOut transition in P5_VARIANTS.",
+      "tags": ["framer-motion", "typescript", "PersonaTheme"],
+      "occurrences": 1,
+      "first_seen": "2026-11-04",
+      "resolved": "2026-11-04"
+    }
+  ]
+}

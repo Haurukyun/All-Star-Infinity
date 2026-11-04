@@ -14,7 +14,7 @@ const P5_VARIANTS = {
         skewX: 0,
         scale: 1,
         transition: {
-            type: 'spring',
+            type: 'spring' as const,
             damping: 20,
             stiffness: 300,
             mass: 0.5
@@ -25,7 +25,7 @@ const P5_VARIANTS = {
         x: 30,
         skewX: 5,
         scale: 0.98,
-        transition: { duration: 0.2, ease: 'easeInOut' }
+        transition: { duration: 0.2, ease: 'easeInOut' as const }
     }
 };
 
@@ -217,7 +217,7 @@ export const PersonaPlayScreen: React.FC<{ logic: any }> = ({ logic }) => {
                                 key={stage.id}
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: i * 0.05, type: 'spring', stiffness: 300, damping: 20 }}
+                                transition={{ delay: i * 0.05, type: 'spring' as const, stiffness: 300, damping: 20 }}
                                 whileHover={{ x: 3, scale: 1.01 }}
                                 onClick={() => setIntensity(stage.id)}
                                 className={`group relative flex items-center justify-between p-3 sm:p-4 overflow-hidden transform ${i % 2 === 0 ? '-skew-x-6' : 'skew-x-6'} p5-border ${stage.id === Intensity.SOFT ? 'bg-white text-black' : stage.id === Intensity.HOT ? 'bg-[#D80000] text-white' : 'bg-black text-white'}`}
