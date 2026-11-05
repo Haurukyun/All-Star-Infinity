@@ -5,12 +5,18 @@ budget_tokens: 1000
 # STATUS — All★Star Infinity
 
 > Single source of truth for resuming work. Read this FIRST when starting a session.
-> Last updated: 2026-11-05 (Tier 2: Gameplay Depth & Multiplayer Party Mechanics complete)
+> Last updated: 2026-11-05 (Tier 3: Full per-theme visual adaptation – PlayerSetup, PlayerTurnBanner, PartyAwardsModal, CountdownTimer, UnifiedGame top bar)
 
 ---
 
 ## ✅ Done
 
+- **Tier 3: Per-Theme Visual Adaptation (all 19 themes):**
+  - `PlayerSetup.tsx`: Fully rewritten with `getThemeSetupStyles(theme: Theme)` switching all 19 themes. Outer wrapper `bg`, panel borders/shadows/fonts, inputs, buttons, roster items all inherit the active theme. No more generic white/dark rounded pill on Omori, Undertale, etc.
+  - `PlayerTurnBanner.tsx`: Complete per-theme `getThemeStyles()` already in place from previous session.
+  - `PartyAwardsModal.tsx`: Complete per-theme `getThemeModalStyles()` already in place.
+  - `CountdownTimer.tsx`: Per-theme pill styling for all 19 themes; progress dot hidden on sketch/8-bit themes.
+  - `UnifiedGame.tsx`: `getThemedModeButton()`, `getThemedAwardsButton()` per all 19 themes; removed duplicate active-player chip from top bar; `theme` prop passed to all sub-components.
 - **Tier 2: Gameplay Depth & Multiplayer Party Mechanics:**
   - **Would You Rather Live Room Vote Tally (`UnifiedGame.tsx`):**
     - Multi-player voting chips with live vote split (Option A vs Option B).
@@ -49,11 +55,12 @@ budget_tokens: 1000
 
 ## 🚀 Next phase
 
-**Goal:** Tier 3: Theme-Specific Aesthetic & Layout Polish.
+**Goal:** Tier 4: Theme-Specific Visual Frames for New Game Modes.
 
 ### Priority order
-1. 🟡 **Theme-Specific Visual Frames for New Game Modes:** Custom container styling for Would You Rather, Most Likely To, and Hot Seat across specific themes.
-2. 🟢 **Theme Tab Bar Micro-Animations & Release Packaging:** Adaptive app icons and release keystore signing.
+1. 🟡 **Custom container/card styling for Would You Rather, Most Likely To & Hot Seat** across all 19 themes (vote tally chips, countdown buttons, scoring cards).
+2. 🟡 **Hot Seat speedrun top-clock** (`⏰ {hotSeatTimeLeft}s` block) needs per-theme font/color (currently generic mono red).
+3. 🟢 **Theme Tab Bar Micro-Animations & Release Packaging:** Adaptive app icons and release keystore signing.
 
 ---
 

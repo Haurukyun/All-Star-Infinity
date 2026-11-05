@@ -449,15 +449,17 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
         <span>{currentIcon}</span>
         <span className="tracking-normal font-black">{displayText}</span>
 
-        {/* Small progress meter dot */}
-        <div className="w-2.5 h-2.5 border border-white/40 overflow-hidden bg-black/40 inline-block align-middle ml-0.5">
-          <div
-            className={`h-full transition-all duration-300 ${
-              isExpired ? 'bg-red-400' : isLowTime ? 'bg-amber-400' : 'bg-emerald-400'
-            }`}
-            style={{ width: progressPercent + '%' }}
-          />
-        </div>
+        {/* Small progress meter dot (hidden in monochrome sketch / 8-bit themes like Omori & Undertale) */}
+        {theme !== Theme.OMORI && theme !== Theme.UNDERTALE && (
+          <div className="w-2.5 h-2.5 border border-current/40 overflow-hidden bg-black/20 inline-block align-middle ml-0.5">
+            <div
+              className={`h-full transition-all duration-300 ${
+                isExpired ? 'bg-red-500' : isLowTime ? 'bg-amber-400' : 'bg-current'
+              }`}
+              style={{ width: progressPercent + '%' }}
+            />
+          </div>
+        )}
       </motion.div>
 
       {/* Quick Config Popover */}

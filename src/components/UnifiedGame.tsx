@@ -1025,6 +1025,86 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         }
     };
 
+    const getThemedAwardsButton = () => {
+        switch (theme) {
+            case Theme.UNDERTALE:
+                return {
+                    className: "border-2 border-white bg-black text-white font-['Press_Start_2P'] text-[10px] px-2.5 py-1.5 shadow-[2px_2px_0_#FFF] rounded-none active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "🏆 AWARDS"
+                };
+            case Theme.OMORI:
+                return {
+                    className: "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-2.5 py-1 rounded-none shadow-[2px_2px_0_#000] active:scale-95 transition-all flex items-center gap-1 cursor-pointer font-bold",
+                    text: "(awards 🏆)"
+                };
+            case Theme.SONIC:
+                return {
+                    className: "-skew-x-12 border-3 border-black bg-yellow-400 text-black font-['Bangers'] text-sm px-3 py-0.5 rounded-xl shadow-[3px_3px_0_#000] active:scale-95 transition-all flex items-center gap-1 cursor-pointer tracking-wide",
+                    text: "🏆 AWARDS"
+                };
+            case Theme.PERSONA:
+                return {
+                    className: "-skew-x-12 border-2 border-white bg-[#D80000] text-white font-['Edo'] text-xs px-3 py-0.5 rounded-none shadow-[2px_2px_0_#000] active:scale-95 transition-all flex items-center gap-1 cursor-pointer italic font-bold",
+                    text: "HONORS ★"
+                };
+            case Theme.MINECRAFT:
+                return {
+                    className: "border-2 border-t-[#AAA] border-l-[#AAA] border-r-[#373737] border-b-[#373737] bg-[#707070] text-yellow-300 font-['Minecraft'] text-xs px-2.5 py-1 rounded-none active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "🏆 Podium"
+                };
+            case Theme.ANIMAL_CROSSING:
+                return {
+                    className: "border-2 border-[#7EBF8F] bg-[#F7F4E9] text-[#4A7A56] font-['Sniglet'] text-xs px-3 py-0.5 rounded-2xl shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "🏆 Trophy"
+                };
+            case Theme.SANRIO:
+                return {
+                    className: "border-2 border-[#FF8DA1] bg-[#FFE4EC] text-[#D84B6B] font-['Cherry_Bomb_One'] text-xs px-3 py-0.5 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "👑 Awards"
+                };
+            case Theme.CYBERPUNK:
+                return {
+                    className: "border border-yellow-400 bg-black text-yellow-400 font-['Orbitron'] text-[11px] px-2.5 py-0.5 rounded-none shadow-[0_0_8px_rgba(250,204,21,0.3)] active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "// AWARDS"
+                };
+            case Theme.FNAF:
+                return {
+                    className: "border border-green-500/80 bg-black text-green-400 font-['VT323'] text-base px-2.5 py-0.5 rounded-none shadow-[0_0_8px_rgba(34,197,94,0.3)] active:scale-95 transition-all flex items-center gap-1 cursor-pointer tracking-wider",
+                    text: "[AWARDS_LOG]"
+                };
+            case Theme.FALLOUT:
+                return {
+                    className: "border border-[#14FF00] bg-black text-[#14FF00] font-['Share_Tech_Mono'] text-xs px-2.5 py-0.5 rounded-none shadow-[0_0_8px_rgba(20,255,0,0.3)] active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "[AWARDS]"
+                };
+            case Theme.DANGANRONPA:
+                return {
+                    className: "border-2 border-[#FF007F] bg-[#050510] text-[#FF007F] font-mono text-xs px-2.5 py-0.5 rounded-none shadow-[0_0_8px_rgba(255,0,127,0.3)] active:scale-95 transition-all flex items-center gap-1 cursor-pointer font-bold",
+                    text: "TRIAL RANK"
+                };
+            case Theme.KIRBY:
+                return {
+                    className: "border-2 border-[#FF85B3] bg-[#FFE4EF] text-[#D81B60] font-['Fredoka_One'] text-xs px-3 py-0.5 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "⭐ Trophy"
+                };
+            case Theme.POKEMON:
+                return {
+                    className: "border-2 border-[#3B4CCA] bg-zinc-900 text-[#FFDE00] font-['Press_Start_2P'] text-[9px] px-2.5 py-1 rounded-none shadow-[2px_2px_0_#3B4CCA] active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
+                    text: "🏆 HALL OF FAME"
+                };
+            case Theme.SKYRIM:
+                return {
+                    className: "border border-[#D4AF37] bg-black text-[#D4AF37] font-['Cinzel'] text-xs px-2.5 py-0.5 rounded-none shadow-[0_0_8px_rgba(212,175,55,0.3)] active:scale-95 transition-all flex items-center gap-1 cursor-pointer tracking-widest uppercase font-bold",
+                    text: "HONORS"
+                };
+            default:
+                return {
+                    className: "border border-white/30 bg-black/70 text-amber-300 text-xs px-2.5 py-1 rounded-full active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-md",
+                    text: "🏆 Awards"
+                };
+        }
+    };
+
     return (
         <AnimatePresence mode="wait">
             {activeTab === 'play' && (
@@ -1059,18 +1139,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                             setIsAwardsModalOpen(true);
                                         }}
                                         title="View Party Awards Podium"
-                                        className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95"
+                                        className={getThemedAwardsButton().className}
                                     >
-                                        <span>🏆</span>
-                                        <span className="hidden sm:inline">AWARDS</span>
+                                        <span>{getThemedAwardsButton().text}</span>
                                     </button>
-                                )}
-
-                                {playersEnabled && activePlayer && (
-                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-black/60 border border-white/20 text-white text-xs font-bold">
-                                        <span>{activePlayer.avatar || '🎮'}</span>
-                                        <span className="text-red-400 font-black">{activePlayer.name}'s Turn</span>
-                                    </div>
                                 )}
 
                                 {/* Themed Corner Timer: Only show if not in 60s Hot Seat mode */}
@@ -1088,19 +1160,6 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             </div>
                         </div>
 
-                        {/* Deck Reshuffled Notification Banner */}
-                        {deckReshuffledAlert && (
-                            <motion.div
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                className="p-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs text-center rounded-xl shadow-lg border border-emerald-400 flex items-center justify-center gap-2"
-                            >
-                                <span>🔄</span>
-                                <span>{deckReshuffledAlert}</span>
-                            </motion.div>
-                        )}
-
                         {/* Pass & Play Roster Turn Banner (when active) */}
                         {playersEnabled && players.length > 0 && (
                             <PlayerTurnBanner
@@ -1112,6 +1171,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 onIncrementChicken={incrementChicken}
                                 onAddPlayer={addPlayer}
                                 onRemovePlayer={removePlayer}
+                                theme={theme}
                             />
                         )}
                     </div>
@@ -1721,6 +1781,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 onReturnToTitle={() => setView('menu')}
                 players={players}
                 totalCardsCompleted={history.length}
+                theme={theme}
             />
         </AnimatePresence>
     );
