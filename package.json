@@ -10,6 +10,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.1.0",
     "@capacitor/haptics": "^8.0.2",
     "@types/qrcode": "^1.5.6",

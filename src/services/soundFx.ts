@@ -12,6 +12,18 @@ export const setSoundGlobalEnabled = (enabled: boolean) => {
 
 export const getSoundGlobalEnabled = () => isSoundGlobalEnabled;
 
+export const suspendAudio = () => {
+  if (audioCtx && audioCtx.state === 'running') {
+    audioCtx.suspend().catch(() => {});
+  }
+};
+
+export const resumeAudio = () => {
+  if (audioCtx && audioCtx.state === 'suspended' && isSoundGlobalEnabled) {
+    audioCtx.resume().catch(() => {});
+  }
+};
+
 // AudioContext singleton with lazy initialization on user gesture
 let audioCtx: AudioContext | null = null;
 
@@ -285,3 +297,4 @@ export const soundService = {
     }
   }
 };
+

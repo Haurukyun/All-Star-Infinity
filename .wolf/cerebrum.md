@@ -11,8 +11,10 @@ budget_tokens: 2000
 ## User Preferences
 
 - **ZERO AI CONTENT / ASSETS RULE (CRITICAL):** NEVER generate AI assets, AI art, or suggest AI prompts. The app must NOT rely on AI at any point for content, assets, or gameplay. Everything must be 100% handcrafted, authored, and offline-first.
-- **Theme Aesthetic Preservation (CRITICAL):** Every single theme has its own aesthetic and rules that must not be broken or altered. Any new features must integrate into each theme's unique vibe, palette, and layout respectfully.
+- **Theme Aesthetic Preservation (CRITICAL):** Every single theme has its own aesthetic and rules that must not be broken or altered. Any new features, controls, timers, or minigame choosers must be styled specifically per-theme, respecting the theme's fonts, shapes, borders, and atmosphere. Never float generic modern pills or widgets over stylized themes.
+- **Theme Visual Integrity & Pre-Consultation (CRITICAL):** Themes HAVE to look good no matter what. If unsure about adding or removing something from a theme, ask the user beforehand and explain how that change would look (except when designing a new theme or overhauling a theme at user request).
 - **Party Rule Preset Toggle (Sips vs Physical Dares):** User explicitly dislikes this suggestion. Do NOT implement or re-suggest.
+- **Internal Prefix:** Use `allstarinfinity_` as the universal internal prefix (replaced legacy `phantom_`).
 - **Communication:** Explain decisions clearly with context.
 - **Ambition over caution:** Prioritize polish, cool animations, and thematic fidelity.
 - **Agent directing:** Be proactive — verify real state with compiler/build tools rather than relying on stale text logs.
@@ -38,6 +40,8 @@ budget_tokens: 2000
 - **[2026-11-04]** Do NOT upgrade Gradle wrapper to 9.6+ while on Android Gradle Plugin 8.x. Keep `gradle-8.14.3-all.zip`.
 - **[2026-11-04]** Do NOT commit `android/local.properties` (kept in `.gitignore`).
 - **[2026-11-04]** Never make vague or one-liner commits. Always provide a clear title and bulleted description of changes and timestamps.
+- **[2026-11-05]** NEVER float generic modern pills/widgets (like generic rounded countdown timer or default modal) over stylized themes. All controls must match each theme's bespoke font, borders, colors, and layout.
+- **[2026-11-05]** NEVER leave users trapped in a minigame without a way to switch modes. Always provide a theme-styled minigame chooser on the Play screen.
 
 ## Decision Log
 

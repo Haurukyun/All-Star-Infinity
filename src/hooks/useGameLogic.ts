@@ -7,30 +7,50 @@ import { soundService, setSoundGlobalEnabled } from '../services/soundFx';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
 
+// Seamless storage migration from legacy 'phantom_' prefix to 'allstarinfinity_'
+const getStorageItem = (newKey: string, legacyKey: string): string | null => {
+  const newVal = localStorage.getItem(newKey);
+  if (newVal !== null) return newVal;
+  const legacyVal = localStorage.getItem(legacyKey);
+  if (legacyVal !== null) {
+    try { localStorage.setItem(newKey, legacyVal); } catch (e) { console.error(e); }
+    return legacyVal;
+  }
+  return null;
+};
+
 export const useGameLogic = () => {
   const [activeTab, setActiveTab] = useState('play');
   const [gameMode, setGameMode] = useState<GameMode | null>(null);
   const [intensity, setIntensity] = useState<Intensity | null>(null);
   const [prompt, setPrompt] = useState<GamePrompt | null>(null);
-  const [history, setHistory] = useState<GamePrompt[]>([]);
+
+  // Globally persisted Game History (last 50 drawn prompts)
+  const [history, setHistory] = useState<GamePrompt[]>(() => {
+    const saved = getStorageItem('allstarinfinity_history', 'phantom_history');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [];
+  });
 
   // Globally persisted Easy Font mode
   const [useEasyFont, setUseEasyFont] = useState<boolean>(() => {
-    return localStorage.getItem('phantom_easy_font') === 'true';
+    return getStorageItem('allstarinfinity_easy_font', 'phantom_easy_font') === 'true';
   });
 
   // Globally persisted Native Haptic feedback
   const [hapticsEnabled, setHapticsEnabled] = useState<boolean>(() => {
-    return localStorage.getItem('phantom_haptics_enabled') !== 'false'; // default true
+    return getStorageItem('allstarinfinity_haptics_enabled', 'phantom_haptics_enabled') !== 'false'; // default true
   });
 
   // Globally persisted Procedural Sound FX
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
-    return localStorage.getItem('phantom_sound_enabled') !== 'false'; // default true
+    return getStorageItem('allstarinfinity_sound_enabled', 'phantom_sound_enabled') !== 'false'; // default true
   });
 
   const [theme, setTheme] = useState<Theme>(() => {
-    const savedTheme = localStorage.getItem('phantom_theme');
+    const savedTheme = getStorageItem('allstarinfinity_theme', 'phantom_theme');
     if (savedTheme && Object.values(Theme).includes(savedTheme as Theme) && savedTheme !== Theme.NONE) {
       return savedTheme as Theme;
     }
@@ -38,12 +58,12 @@ export const useGameLogic = () => {
   });
   const [view, setView] = useState<GameView>('menu');
   const [hasExplicitlySelectedTheme, setHasExplicitlySelectedTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('phantom_theme');
+    const savedTheme = getStorageItem('allstarinfinity_theme', 'phantom_theme');
     return !!(savedTheme && Object.values(Theme).includes(savedTheme as Theme) && savedTheme !== Theme.NONE);
   });
 
   const [customDecks, setCustomDecks] = useState<CustomDeck[]>(() => {
-    const saved = localStorage.getItem('phantom_custom_decks');
+    const saved = getStorageItem('allstarinfinity_custom_decks', 'phantom_custom_decks');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
@@ -54,7 +74,7 @@ export const useGameLogic = () => {
 
   // Pass & Play Player Roster State
   const [players, setPlayers] = useState<Player[]>(() => {
-    const saved = localStorage.getItem('phantom_players');
+    const saved = getStorageItem('allstarinfinity_players', 'phantom_players');
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
@@ -62,65 +82,70 @@ export const useGameLogic = () => {
   });
   const [activePlayerIndex, setActivePlayerIndex] = useState<number>(0);
   const [playersEnabled, setPlayersEnabled] = useState<boolean>(() => {
-    return localStorage.getItem('phantom_players_enabled') === 'true';
+    return getStorageItem('allstarinfinity_players_enabled', 'phantom_players_enabled') === 'true';
   });
 
   // Countdown Timer State (Default OFF)
   const [timerEnabled, setTimerEnabled] = useState<boolean>(() => {
-    return localStorage.getItem('phantom_timer_enabled') === 'true';
+    return getStorageItem('allstarinfinity_timer_enabled', 'phantom_timer_enabled') === 'true';
   });
   const [timerDuration, setTimerDuration] = useState<TimerDuration>(() => {
-    const saved = localStorage.getItem('phantom_timer_duration');
+    const saved = getStorageItem('allstarinfinity_timer_duration', 'phantom_timer_duration');
     if (saved && (saved === '15' || saved === '30' || saved === '60')) {
       return Number(saved) as TimerDuration;
     }
     return 30;
   });
 
+  // Save History to localStorage (last 50 items)
+  useEffect(() => {
+    localStorage.setItem('allstarinfinity_history', JSON.stringify(history.slice(0, 50)));
+  }, [history]);
+
   // Save Decks to localStorage
   useEffect(() => {
-    localStorage.setItem('phantom_custom_decks', JSON.stringify(customDecks));
+    localStorage.setItem('allstarinfinity_custom_decks', JSON.stringify(customDecks));
   }, [customDecks]);
 
   // Save Theme to localStorage
   useEffect(() => {
-    localStorage.setItem('phantom_theme', theme);
+    localStorage.setItem('allstarinfinity_theme', theme);
   }, [theme]);
 
   // Save Easy Font to localStorage
   useEffect(() => {
-    localStorage.setItem('phantom_easy_font', String(useEasyFont));
+    localStorage.setItem('allstarinfinity_easy_font', String(useEasyFont));
   }, [useEasyFont]);
 
   // Save Haptics setting to localStorage and update global service
   useEffect(() => {
-    localStorage.setItem('phantom_haptics_enabled', String(hapticsEnabled));
+    localStorage.setItem('allstarinfinity_haptics_enabled', String(hapticsEnabled));
     setHapticsGlobalEnabled(hapticsEnabled);
   }, [hapticsEnabled]);
 
   // Save Sound FX setting to localStorage and update global service
   useEffect(() => {
-    localStorage.setItem('phantom_sound_enabled', String(soundEnabled));
+    localStorage.setItem('allstarinfinity_sound_enabled', String(soundEnabled));
     setSoundGlobalEnabled(soundEnabled);
   }, [soundEnabled]);
 
   // Save Players to localStorage
   useEffect(() => {
-    localStorage.setItem('phantom_players', JSON.stringify(players));
+    localStorage.setItem('allstarinfinity_players', JSON.stringify(players));
   }, [players]);
 
   // Save Players Enabled setting to localStorage
   useEffect(() => {
-    localStorage.setItem('phantom_players_enabled', String(playersEnabled));
+    localStorage.setItem('allstarinfinity_players_enabled', String(playersEnabled));
   }, [playersEnabled]);
 
   // Save Timer Settings to localStorage
   useEffect(() => {
-    localStorage.setItem('phantom_timer_enabled', String(timerEnabled));
+    localStorage.setItem('allstarinfinity_timer_enabled', String(timerEnabled));
   }, [timerEnabled]);
 
   useEffect(() => {
-    localStorage.setItem('phantom_timer_duration', String(timerDuration));
+    localStorage.setItem('allstarinfinity_timer_duration', String(timerDuration));
   }, [timerDuration]);
 
   // Reset active deck if it no longer matches the current context
@@ -202,6 +227,12 @@ export const useGameLogic = () => {
 
   const resetRosterScores = useCallback(() => {
     setPlayers(prev => prev.map(p => ({ ...p, chickenCount: 0, score: 0 })));
+    hapticService.light();
+  }, []);
+
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+    try { localStorage.removeItem('allstarinfinity_history'); } catch (e) { console.error(e); }
     hapticService.light();
   }, []);
 
@@ -396,7 +427,7 @@ export const useGameLogic = () => {
       if (i) hapticService.light();
     },
     prompt, setPrompt,
-    history, setHistory,
+    history, setHistory, clearHistory,
     useEasyFont, setUseEasyFont, toggleEasyFont,
     hapticsEnabled, setHapticsEnabled, toggleHapticsEnabled,
     soundEnabled, setSoundEnabled, toggleSoundEnabled,

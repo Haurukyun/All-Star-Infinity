@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameLogic } from '../hooks/useGameLogic';
-import { Intensity, GameMode, TimerDuration, CustomDeck } from '../types';
+import { Intensity, GameMode, TimerDuration, CustomDeck, Theme } from '../types';
 import { getThemeDefinition } from '../themes';
 import { CountdownTimer } from './CountdownTimer';
+import { ThemedMinigameChooser } from './ThemedMinigameChooser';
 import { PlayerTurnBanner } from './PlayerTurnBanner';
 import { DeckShareModal } from './DeckShareModal';
 import { hapticService } from '../services/haptics';
@@ -22,7 +23,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         handleDraw,
         customDecks,
         activeDeckId, setActiveDeckId,
-        history,
+        history, clearHistory,
         theme,
         editingDeck, setEditingDeck,
         saveDeck, deleteDeck,
@@ -59,6 +60,9 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [shareModalMode, setShareModalMode] = useState<'export' | 'import'>('export');
     const [deckToShare, setDeckToShare] = useState<CustomDeck | null>(null);
+
+    // Themed Minigame Chooser Modal state
+    const [isMinigameChooserOpen, setIsMinigameChooserOpen] = useState(false);
 
     // Most Likely To Countdown state
     const [pointCountdown, setPointCountdown] = useState<number | string | null>(null);
@@ -694,6 +698,123 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         return <DefaultPromptDisplay />;
     };
 
+    const getModeDisplayLabel = () => {
+        switch (gameMode) {
+            case GameMode.TRUTH_OR_DARE: return 'TRUTH OR DARE';
+            case GameMode.NEVER_HAVE_I_EVER: return 'NEVER HAVE I EVER';
+            case GameMode.MOST_LIKELY_TO: return 'MOST LIKELY TO';
+            case GameMode.WOULD_YOU_RATHER: return 'WOULD YOU RATHER';
+            case GameMode.HOT_SEAT: return 'THE HOT SEAT';
+            default: return 'SELECT MODE';
+        }
+    };
+
+    const getThemedModeButton = () => {
+        const modeLabel = getModeDisplayLabel();
+        switch (theme) {
+            case Theme.UNDERTALE:
+                return {
+                    className: "border-2 border-white bg-black text-white font-['Press_Start_2P'] text-[10px] px-3 py-1.5 shadow-[2px_2px_0_#FFF] rounded-none active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `* ${modeLabel} ⟳`
+                };
+            case Theme.FNAF:
+                return {
+                    className: "border border-green-500/80 bg-black text-green-400 font-['VT323'] text-base px-3 py-0.5 rounded-none shadow-[0_0_8px_rgba(34,197,94,0.3)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer tracking-wider",
+                    text: `[CAM_PROTOCOL: ${modeLabel}] ⟳`
+                };
+            case Theme.SONIC:
+                return {
+                    className: "-skew-x-12 border-3 border-black bg-white text-black font-['Bangers'] text-base px-3.5 py-1 rounded-xl shadow-[3px_3px_0_#000] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer tracking-wide",
+                    text: `ACT: ${modeLabel} ⟳`
+                };
+            case Theme.PERSONA:
+                return {
+                    className: "-skew-x-12 border-2 border-white bg-black text-white font-['Edo'] text-xs px-3.5 py-1 rounded-none shadow-[3px_3px_0_#D80000] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer italic font-bold",
+                    text: `TACTIC: ${modeLabel} ⟳`
+                };
+            case Theme.MINECRAFT:
+                return {
+                    className: "border-2 border-t-[#AAA] border-l-[#AAA] border-r-[#373737] border-b-[#373737] bg-[#707070] text-white font-['Minecraft'] text-xs px-3 py-1.5 rounded-none active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `Quest: ${modeLabel} ⟳`
+                };
+            case Theme.ANIMAL_CROSSING:
+                return {
+                    className: "border-2 border-[#7EBF8F] bg-[#F7F4E9] text-[#4A7A56] font-['Sniglet'] text-xs px-3.5 py-1 rounded-2xl shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `🍃 ${modeLabel} ⟳`
+                };
+            case Theme.CYBERPUNK:
+                return {
+                    className: "border border-yellow-400 bg-black text-yellow-400 font-['Orbitron'] text-[11px] px-3 py-1 rounded-none shadow-[0_0_8px_rgba(250,204,21,0.3)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `// MOD: ${modeLabel} ⟳`
+                };
+            case Theme.DANGANRONPA:
+                return {
+                    className: "border-2 border-[#FF007F] bg-[#050510] text-[#FF007F] font-mono text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(255,0,127,0.4)] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer tracking-wider",
+                    text: `BULLET: ${modeLabel} ⟳`
+                };
+            case Theme.OMORI:
+                return {
+                    className: "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#000] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `(act: ${modeLabel}) ⟳`
+                };
+            case Theme.KIRBY:
+                return {
+                    className: "border-2 border-[#FF85B3] bg-[#FFE4EF] text-[#D81B60] font-['Fredoka_One'] text-xs px-3.5 py-1 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `⭐ ${modeLabel} ⟳`
+                };
+            case Theme.POKEMON:
+                return {
+                    className: "border-2 border-[#3B4CCA] bg-zinc-900 text-[#FFDE00] font-['Press_Start_2P'] text-[10px] px-3 py-1.5 rounded-none shadow-[2px_2px_0_#3B4CCA] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `BATTLE: ${modeLabel} ⟳`
+                };
+            case Theme.SKYRIM:
+                return {
+                    className: "border border-[#D4AF37] bg-black text-[#D4AF37] font-['Cinzel'] text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(212,175,55,0.3)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer tracking-widest uppercase font-bold",
+                    text: `DESTINY: ${modeLabel} ⟳`
+                };
+            case Theme.SANRIO:
+                return {
+                    className: "border-2 border-[#FF8DA1] bg-[#FFE4EC] text-[#D84B6B] font-['Cherry_Bomb_One'] text-xs px-3.5 py-1 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `🎀 ${modeLabel} ⟳`
+                };
+            case Theme.FALLOUT:
+                return {
+                    className: "border border-[#14FF00] bg-black text-[#14FF00] font-['Share_Tech_Mono'] text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(20,255,0,0.3)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `[PIP: ${modeLabel}] ⟳`
+                };
+            case Theme.HAZBIN:
+                return {
+                    className: "border border-[#FFD700] bg-[#1a050f] text-[#FFD700] font-['Lora'] text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(229,43,80,0.4)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer tracking-wider font-bold",
+                    text: `PACT: ${modeLabel} ⟳`
+                };
+            case Theme.VOCALOID:
+                return {
+                    className: "border border-[#39C5BB] bg-black text-[#39C5BB] font-['Orbitron'] text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(57,197,187,0.4)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer font-bold",
+                    text: `TRACK: ${modeLabel} ⟳`
+                };
+            case Theme.IRUMA:
+                return {
+                    className: "border-2 border-[#ffd700] bg-[#2e1534] text-[#ffd700] font-['Sniglet'] text-xs px-3.5 py-1 rounded-xl shadow-[0_0_8px_rgba(255,215,0,0.3)] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `BABYLS: ${modeLabel} ⟳`
+                };
+            case Theme.ARCANE:
+                return {
+                    className: "border border-[#C8AA6E] bg-black text-[#00E5FF] font-['Cinzel'] text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(0,229,255,0.3)] active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer tracking-widest font-bold",
+                    text: `HEXTECH: ${modeLabel} ⟳`
+                };
+            case Theme.BILLY_HATCHER:
+                return {
+                    className: "border-2 border-[#1873CA] bg-[#FDFAF4] text-[#1873CA] font-['Fredoka_One'] text-xs px-3.5 py-1 rounded-2xl shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    text: `EGG: ${modeLabel} ⟳`
+                };
+            default:
+                return {
+                    className: "border border-white/30 bg-black/70 text-white text-xs px-3 py-1 rounded-full active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-md",
+                    text: `🎮 ${modeLabel} ⟳`
+                };
+        }
+    };
+
     return (
         <AnimatePresence mode="wait">
             {activeTab === 'play' && (
@@ -704,27 +825,43 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     exit={{ opacity: 0, x: 20 }}
                     className="h-full flex flex-col"
                 >
-                    {/* Universal Top Bar for Play screen: Quick Player Pill & Countdown Timer */}
+                    {/* Universal Top Bar for Play screen: Themed Minigame Chooser & Themed Countdown Timer */}
                     <div className="flex flex-col gap-2 mb-2 shrink-0">
-                        <div className="flex justify-between items-center gap-2">
-                            {playersEnabled && activePlayer ? (
-                                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/60 border border-white/20 text-white text-xs font-bold">
-                                    <span>🎮</span>
-                                    <span className="text-red-400 font-black">{activePlayer.name}'s Turn</span>
-                                </div>
-                            ) : <div />}
+                        <div className="flex flex-wrap justify-between items-center gap-2">
+                            {/* Themed Mode Switcher Button */}
+                            <button
+                                onClick={() => {
+                                    hapticService.light();
+                                    soundService.click();
+                                    setIsMinigameChooserOpen(true);
+                                }}
+                                title="Switch Minigame Mode"
+                                className={getThemedModeButton().className}
+                            >
+                                <span>{getThemedModeButton().text}</span>
+                            </button>
 
-                            {/* Corner Timer: Only show if not in 60s Hot Seat mode (which has its own big clock) */}
-                            {gameMode !== GameMode.HOT_SEAT && (
-                                <CountdownTimer
-                                    enabled={timerEnabled}
-                                    duration={timerDuration}
-                                    onToggleEnabled={toggleTimerEnabled}
-                                    onChangeDuration={setTimerDuration}
-                                    promptId={prompt?.id}
-                                    isPromptActive={!!prompt}
-                                />
-                            )}
+                            <div className="flex items-center gap-2">
+                                {playersEnabled && activePlayer && (
+                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-black/60 border border-white/20 text-white text-xs font-bold">
+                                        <span>🎮</span>
+                                        <span className="text-red-400 font-black">{activePlayer.name}'s Turn</span>
+                                    </div>
+                                )}
+
+                                {/* Themed Corner Timer: Only show if not in 60s Hot Seat mode */}
+                                {gameMode !== GameMode.HOT_SEAT && (
+                                    <CountdownTimer
+                                        enabled={timerEnabled}
+                                        duration={timerDuration}
+                                        onToggleEnabled={toggleTimerEnabled}
+                                        onChangeDuration={setTimerDuration}
+                                        promptId={prompt?.id}
+                                        isPromptActive={!!prompt}
+                                        theme={theme}
+                                    />
+                                )}
+                            </div>
                         </div>
 
                         {/* Pass & Play Roster Turn Banner (when active) */}
@@ -1077,7 +1214,22 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         <themeDef.HistoryScreen logic={logic} />
                     ) : (
                         <>
-                            <h2 className="theme-text-header text-4xl font-bold italic">ARCHIVES</h2>
+                            <div className="flex items-center justify-between">
+                                <h2 className="theme-text-header text-4xl font-bold italic">ARCHIVES</h2>
+                                {history.length > 0 && (
+                                    <button
+                                        onClick={() => {
+                                            if (window.confirm('Clear all history? This cannot be undone.')) {
+                                                clearHistory();
+                                                hapticService.medium();
+                                            }
+                                        }}
+                                        className="text-[10px] uppercase font-bold opacity-50 hover:opacity-90 transition-opacity border border-current/30 px-2 py-1 rounded"
+                                    >
+                                        🗑️ Clear
+                                    </button>
+                                )}
+                            </div>
                             <div className="flex flex-col gap-3">
                                 {history.length === 0 ? (
                                     <div className="py-20 text-center opacity-20 italic">No history yet.</div>
@@ -1310,6 +1462,19 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 mode={shareModalMode}
                 deckToExport={deckToShare}
                 onImportSuccess={importCustomDeck}
+            />
+
+            {/* Themed Minigame Chooser Modal */}
+            <ThemedMinigameChooser
+                isOpen={isMinigameChooserOpen}
+                onClose={() => setIsMinigameChooserOpen(false)}
+                currentMode={gameMode}
+                onSelectMode={(mode) => {
+                    setGameMode(mode);
+                    setIntensity(null);
+                    setPrompt(null);
+                }}
+                theme={theme}
             />
         </AnimatePresence>
     );
