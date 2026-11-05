@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Intensity, PromptType, GamePrompt, CustomDeck, Theme, GameMode, Player, TimerDuration, GameView } from '../types';
 import { getRandomPrompt, DEFAULT_PROMPTS } from '../services/localPrompts';
 import { THEMED_PREBUILT_DECKS } from '../services/themedDecks';
@@ -6,6 +6,9 @@ import { hapticService, setHapticsGlobalEnabled } from '../services/haptics';
 import { soundService, setSoundGlobalEnabled } from '../services/soundFx';
 
 const generateId = () => Math.random().toString(36).substring(2, 11);
+
+export const DEFAULT_AVATARS = ['🦊', '🐉', '⚡', '💎', '💀', '👑', '🐱', '🚀', '🎭', '🎮', '🔥', '🌸'];
+export const DEFAULT_COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#e11d48'];
 
 // Seamless storage migration from legacy 'phantom_' prefix to 'allstarinfinity_'
 const getStorageItem = (newKey: string, legacyKey: string): string | null => {
@@ -173,24 +176,52 @@ export const useGameLogic = () => {
     ? players[(activePlayerIndex + 1) % players.length]
     : null;
 
+  // Chaos mode (randomized turn order)
+  const [chaosMode, setChaosMode] = useState<boolean>(() => {
+    return getStorageItem('allstarinfinity_chaos_mode', 'phantom_chaos_mode') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('allstarinfinity_chaos_mode', String(chaosMode));
+  }, [chaosMode]);
+
+  const chaosBagRef = useRef<number[]>([]);
+
+  // Double stakes mechanic
+  const [isDoubleStakes, setIsDoubleStakes] = useState<boolean>(false);
+
+  // Deck loop / exhaustion banner
+  const [deckReshuffledAlert, setDeckReshuffledAlert] = useState<string | null>(null);
+  const drawnPromptIdsRef = useRef<Set<string>>(new Set());
+
+  // Session stats for awards podium
+  const [sessionCompletedCount, setSessionCompletedCount] = useState<number>(0);
+
   // Pass & Play Actions
-  const addPlayer = useCallback((name: string) => {
+  const addPlayer = useCallback((name: string, customAvatar?: string, customColor?: string) => {
     const trimmed = name.trim();
     if (!trimmed) return;
     const newPlayer: Player = {
       id: generateId(),
       name: trimmed,
       chickenCount: 0,
-      score: 0
+      score: 0,
+      avatar: customAvatar || DEFAULT_AVATARS[players.length % DEFAULT_AVATARS.length],
+      color: customColor || DEFAULT_COLORS[players.length % DEFAULT_COLORS.length]
     };
     setPlayers(prev => [...prev, newPlayer]);
     hapticService.light();
-  }, []);
+  }, [players.length]);
 
   const removePlayer = useCallback((id: string) => {
     setPlayers(prev => prev.filter(p => p.id !== id));
     setActivePlayerIndex(prev => Math.max(0, prev - 1));
+    chaosBagRef.current = [];
     hapticService.light();
+  }, []);
+
+  const updatePlayer = useCallback((id: string, updates: Partial<Player>) => {
+    setPlayers(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
   }, []);
 
   const updatePlayerName = useCallback((id: string, name: string) => {
@@ -199,9 +230,25 @@ export const useGameLogic = () => {
 
   const nextPlayer = useCallback(() => {
     if (players.length === 0) return;
-    setActivePlayerIndex(prev => (prev + 1) % players.length);
+    if (chaosMode && players.length > 1) {
+      if (chaosBagRef.current.length === 0) {
+        const pool = players.map((_, i) => i);
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        if (pool[0] === activePlayerIndex && pool.length > 1) {
+          [pool[0], pool[1]] = [pool[1], pool[0]];
+        }
+        chaosBagRef.current = pool;
+      }
+      const nextIdx = chaosBagRef.current.shift() ?? 0;
+      setActivePlayerIndex(nextIdx);
+    } else {
+      setActivePlayerIndex(prev => (prev + 1) % players.length);
+    }
     hapticService.light();
-  }, [players.length]);
+  }, [players.length, chaosMode, activePlayerIndex]);
 
   const prevPlayer = useCallback(() => {
     if (players.length === 0) return;
@@ -209,13 +256,15 @@ export const useGameLogic = () => {
     hapticService.light();
   }, [players.length]);
 
-  const incrementChicken = useCallback((playerId?: string) => {
+  const incrementChicken = useCallback((playerId?: string, amount?: number) => {
     const targetId = playerId || activePlayer?.id;
     if (!targetId) return;
-    setPlayers(prev => prev.map(p => p.id === targetId ? { ...p, chickenCount: p.chickenCount + 1 } : p));
+    const countToAdd = amount !== undefined ? amount : (isDoubleStakes ? 2 : 1);
+    setPlayers(prev => prev.map(p => p.id === targetId ? { ...p, chickenCount: p.chickenCount + countToAdd } : p));
+    setIsDoubleStakes(false);
     hapticService.heavy();
     soundService.buzzer();
-  }, [activePlayer?.id]);
+  }, [activePlayer?.id, isDoubleStakes]);
 
   const incrementScore = useCallback((playerId?: string) => {
     const targetId = playerId || activePlayer?.id;
@@ -227,8 +276,34 @@ export const useGameLogic = () => {
 
   const resetRosterScores = useCallback(() => {
     setPlayers(prev => prev.map(p => ({ ...p, chickenCount: 0, score: 0 })));
+    chaosBagRef.current = [];
     hapticService.light();
   }, []);
+
+  const toggleChaosMode = useCallback(() => {
+    setChaosMode(prev => !prev);
+    chaosBagRef.current = [];
+    hapticService.light();
+  }, []);
+
+  const recordPromptCompleted = useCallback(() => {
+    setSessionCompletedCount(prev => prev + 1);
+    setIsDoubleStakes(false);
+  }, []);
+
+  const getAwardsPodium = useCallback(() => {
+    if (players.length === 0) return null;
+    const biggestChicken = [...players].sort((a, b) => b.chickenCount - a.chickenCount)[0];
+    const hotSeatMaster = [...players].sort((a, b) => b.score - a.score)[0];
+    const ironWill = [...players].sort((a, b) => a.chickenCount - b.chickenCount)[0];
+
+    return {
+      biggestChicken: biggestChicken && biggestChicken.chickenCount > 0 ? biggestChicken : null,
+      hotSeatMaster: hotSeatMaster && hotSeatMaster.score > 0 ? hotSeatMaster : null,
+      ironWill: players.length > 1 ? ironWill : null,
+      totalPrompts: sessionCompletedCount,
+    };
+  }, [players, sessionCompletedCount]);
 
   const clearHistory = useCallback(() => {
     setHistory([]);
@@ -273,16 +348,27 @@ export const useGameLogic = () => {
       return matchType && matchIntensity;
     });
 
+    let next: any;
+
     if (filtered.length === 0) {
-      const next = getRandomPrompt(type, intensity || Intensity.SOFT);
-      setPrompt(next);
-      setHistory(prev => [next, ...prev]);
+      next = getRandomPrompt(type, intensity || Intensity.SOFT);
     } else {
+      // Check if all cards in this category have been seen
+      if (drawnPromptIdsRef.current.size >= filtered.length) {
+        drawnPromptIdsRef.current.clear();
+        setDeckReshuffledAlert(`🎉 All ${filtered.length} cards in this deck played! Shuffling deck...`);
+        soundService.chime();
+        hapticService.success();
+        setTimeout(() => setDeckReshuffledAlert(null), 3500);
+      }
+
       const pool = (filtered.length > 1 && prompt) ? filtered.filter(p => p.id !== prompt.id) : filtered;
-      const next = pool[Math.floor(Math.random() * pool.length)];
-      setPrompt(next);
-      setHistory(prev => [next, ...prev]);
+      next = pool[Math.floor(Math.random() * pool.length)];
+      if (next?.id) drawnPromptIdsRef.current.add(next.id);
     }
+
+    setPrompt(next);
+    setHistory(prev => [next, ...prev]);
 
     // Tactile haptic feedback and card flip sound on draw
     if (intensity === Intensity.VULGAR) {
@@ -292,6 +378,12 @@ export const useGameLogic = () => {
     }
     soundService.cardFlip();
   }, [activeDeckId, customDecks, intensity, prompt]);
+
+  const triggerDoubleStakes = useCallback((type: PromptType) => {
+    setIsDoubleStakes(true);
+    hapticService.heavy();
+    handleDraw(type);
+  }, [handleDraw]);
 
   const saveDeck = useCallback((deck: CustomDeck) => {
     const sanitizedPrompts = deck.prompts.map(p => {
@@ -456,9 +548,12 @@ export const useGameLogic = () => {
     activePlayerIndex, setActivePlayerIndex,
     playersEnabled, setPlayersEnabled,
     activePlayer, targetPlayer,
-    addPlayer, removePlayer, updatePlayerName,
+    addPlayer, removePlayer, updatePlayer, updatePlayerName,
     nextPlayer, prevPlayer,
     incrementChicken, incrementScore, resetRosterScores,
+    chaosMode, toggleChaosMode,
+    isDoubleStakes, setIsDoubleStakes, triggerDoubleStakes,
+    deckReshuffledAlert, recordPromptCompleted, getAwardsPodium,
     // Countdown Timer
     timerEnabled, setTimerEnabled,
     timerDuration, setTimerDuration,

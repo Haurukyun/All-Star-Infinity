@@ -295,6 +295,44 @@ export const soundService = {
     } catch {
       // AudioContext unavailable
     }
+  },
+
+  /**
+   * Triumphant fanfare for awards podium and victories
+   */
+  fanfare: () => {
+    if (!isSoundGlobalEnabled) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+      const now = ctx.currentTime;
+      const notes = [
+        { f: 523.25, t: 0, d: 0.12 },
+        { f: 659.25, t: 0.1, d: 0.12 },
+        { f: 783.99, t: 0.2, d: 0.12 },
+        { f: 1046.5, t: 0.3, d: 0.45 },
+      ];
+      notes.forEach((n) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const start = now + n.t;
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(n.f, start);
+
+        gain.gain.setValueAtTime(0.12, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + n.d);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(start);
+        osc.stop(start + n.d);
+      });
+    } catch {
+      // AudioContext unavailable
+    }
   }
 };
 

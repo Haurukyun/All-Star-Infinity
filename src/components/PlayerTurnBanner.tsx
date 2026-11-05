@@ -59,8 +59,11 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           </button>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-white font-black text-sm shadow-md">
-              {activePlayer.name.charAt(0).toUpperCase()}
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white font-black text-sm shadow-md"
+              style={{ backgroundColor: activePlayer.color || '#ef4444' }}
+            >
+              {activePlayer.avatar || activePlayer.name.charAt(0).toUpperCase()}
             </div>
             <div>
               <div className="flex items-center gap-1.5">
@@ -171,8 +174,11 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
                     >
                       <div className="flex items-center gap-3">
                         <span className="font-mono text-xs opacity-50">#{index + 1}</span>
-                        <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center font-black text-sm">
-                          {p.name.charAt(0).toUpperCase()}
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm shadow"
+                          style={{ backgroundColor: p.color || '#3b82f6' }}
+                        >
+                          {p.avatar || p.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <div className="font-bold text-sm flex items-center gap-2">

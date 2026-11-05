@@ -44,9 +44,12 @@ export interface Player {
   name: string;
   chickenCount: number;
   score: number;
+  avatar?: string;
+  color?: string;
 }
 
 export type TimerDuration = 15 | 30 | 60;
+export type HotSeatDuration = 30 | 60 | 90;
 
 export type GameView = 'menu' | 'player-setup' | 'game';
 

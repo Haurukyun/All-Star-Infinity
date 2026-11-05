@@ -5,56 +5,55 @@ budget_tokens: 1000
 # STATUS — All★Star Infinity
 
 > Single source of truth for resuming work. Read this FIRST when starting a session.
-> Last updated: 2026-11-05 (Themed Minigame Chooser, Per-Theme Timers, Hardware Back Button, Platform Insets, & allstarinfinity_ migration complete)
+> Last updated: 2026-11-05 (Tier 2: Gameplay Depth & Multiplayer Party Mechanics complete)
 
 ---
 
 ## ✅ Done
 
-- **Per-Theme Minigame Chooser (`ThemedMinigameChooser.tsx`):**
-  - Allows in-game switching between all 5 minigames (Truth or Dare, Never Have I Ever, Most Likely To, Would You Rather, Hot Seat).
-  - Custom UI implementations for all 19 themes (Undertale 8-bit, FNAF terminal, Sonic skewed Bangers, Persona 5 tactical red/black, Minecraft stone/wood, Animal Crossing pastel, Cyberpunk neon, Danganronpa trial, Omori sketchbook, Kirby Dreamland, Pokemon GBA battle, Skyrim Elder Scrolls, Sanrio kawaii, Fallout Pip-Boy, Hazbin Art Deco, Vocaloid synth, Iruma Babyls, Arcane Hextech, Billy Hatcher morning egg).
-  - Integrated into `UnifiedGame.tsx` top bar with authentic themed switch buttons.
-- **Per-Theme Visual Countdown Timer (`CountdownTimer.tsx`):**
-  - Bespoke visual styles across all 19 themes (fonts, borders, colors, icons, and status labels) matching each realm's identity.
-  - Replaced generic dark pills with authentic theme-specific indicators and popovers.
-  - Synthesizer sound integration (ticks, countdown beeps, buzzer) and haptics.
-- **Android Hardware Back Button Handler (`@capacitor/app`):**
-  - Multi-tier prioritized hardware back button stack in `src/App.tsx`:
-    1. Active card prompt → returns to intensity selector.
-    2. Selected intensity → clears intensity.
-    3. Player setup view → returns to main menu.
-    4. Non-play game tab → switches back to 'play' tab.
-    5. Play tab with no prompt → returns to main menu.
-    6. Main menu → double-tap back within 2 seconds exits app.
-- **Notch, Cutout & Safe Area Insets:**
-  - CSS variables `--sat`, `--sar`, `--sab`, `--sal` defined in `index.html` with `env(safe-area-inset-*)` fallbacks.
-  - `viewport-fit=cover` active in viewport meta tag.
-- **Screen Orientation Lock (Portrait-First Party Flow):**
-  - Set `android:screenOrientation="portrait"` on MainActivity in `AndroidManifest.xml`.
-- **Background Audio & Interval Suspension (`appStateChange`):**
-  - Connected `App.addListener('appStateChange')` in `App.tsx` to `suspendAudio()` / `resumeAudio()` in `soundFx.ts`.
-- **Persistent Game History Storage (`allstarinfinity_history`):**
-  - Last 50 drawn prompts persisted to `localStorage` across app restarts.
-  - Added "🗑️ Clear" action button with confirmation in the Archives/History tab.
-- **Universal Storage Prefix Migration (`phantom_` $\rightarrow$ `allstarinfinity_`):**
-  - Renamed all 19 `phantom_*` keys in `src/hooks/useGameLogic.ts` to `allstarinfinity_*` with graceful legacy migration via `getStorageItem`.
-  - App internal title updated to `All★Star Infinity`.
-- **Build & Native Android:**
+- **Tier 2: Gameplay Depth & Multiplayer Party Mechanics:**
+  - **Would You Rather Live Room Vote Tally (`UnifiedGame.tsx`):**
+    - Multi-player voting chips with live vote split (Option A vs Option B).
+    - Automatic minority option identification & "Assign Minority Forfeit" one-click action.
+  - **Most Likely To Room Pointing Leaderboard (`UnifiedGame.tsx`):**
+    - Post-countdown player target chips to record who received the most fingers pointed at them.
+    - Animated "Enforce Forfeit" button with buzzer sound & heavy haptic feedback.
+  - **The Hot Seat Configurable Timer (`UnifiedGame.tsx`):**
+    - User choice of 3 round durations: ⚡ 30s Blitz, 🔥 60s Standard, or 🧨 90s Marathon.
+  - **Player Avatars & Color Badges (`PlayerSetup.tsx`, `PlayerTurnBanner.tsx`, `types.ts`):**
+    - Added retro avatars (🦊, 🐉, ⚡, 💎, 💀, 👑, 🐱, 🚀, 🎭, 🎮, 🔥, 🌸) and color options to `Player`.
+    - Avatar/color picker in `PlayerSetup.tsx`, rendered on turn banners, roster chips, and voting tallies.
+  - **Strategic Re-Roll / Double Stakes (`useGameLogic.ts`, `UnifiedGame.tsx`):**
+    - "Double or Nothing Re-Roll" option with pulsing 2x penalty badge and +2 chicken forfeit risk.
+  - **Chaos Mode / Randomized Fair Turn Order (`useGameLogic.ts`, `PlayerSetup.tsx`):**
+    - "🎲 Chaos Turn Order" toggle with fair shuffle bag algorithm (unpredictable order without repeating).
+  - **End-of-Game Party Awards Ceremony (`PartyAwardsModal.tsx`):**
+    - Full podium celebration modal awarding 🛡️ The Iron Will, 🐔 The Biggest Chicken, and 🔥 The Hot Seat Master.
+    - Procedural fanfare audio cue (`soundService.fanfare()`) and success haptics.
+  - **Deck Loop Reshuffle Alert Banner (`UnifiedGame.tsx`, `useGameLogic.ts`):**
+    - In-game notification banner notifying players when all cards in a deck category have been seen and reshuffled.
+- **Tier 1: Mobile UX & Android Integration:**
+  - Per-theme minigame chooser (`ThemedMinigameChooser.tsx`) for all 19 themes.
+  - Per-theme countdown timers (`CountdownTimer.tsx`) for all 19 themes.
+  - Android hardware back button handler (`@capacitor/app`).
+  - Notch/cutout safe area insets & portrait lock.
+  - Audio background suspension & persistent history storage.
+  - Universal prefix migration: `allstarinfinity_*`.
+- **Build & Verification:**
   - `npx tsc --noEmit` $\rightarrow$ 0 errors.
-  - `npm run build` $\rightarrow$ clean production build (2.9s).
-  - `npx cap sync android` $\rightarrow$ synced assets & plugins (`@capacitor/app` 8.1.2, `@capacitor/haptics` 8.0.2).
-  - `./gradlew assembleDebug` $\rightarrow$ `BUILD SUCCESSFUL in 6s` (`app-debug.apk`).
+  - `npm run build` $\rightarrow$ clean production build (3.0s).
+  - `npx cap sync android` $\rightarrow$ synced cleanly.
+  - `./gradlew assembleDebug` $\rightarrow$ `BUILD SUCCESSFUL in 4s` (`app-debug.apk`).
 
 ---
 
 ## 🚀 Next phase
 
-**Goal:** Theme Visual Polish, Release Packaging & Design QC.
+**Goal:** Tier 3: Theme-Specific Aesthetic & Layout Polish.
 
 ### Priority order
-1. 🟡 **Visual Design Review:** Test/inspect in-game screens across all 19 themes with the new minigame chooser and timers.
-2. 🟢 **App Branding & Release Packaging:** Release keystore signing configuration, adaptive icons, and launch splash screen.
+1. 🟡 **Theme-Specific Visual Frames for New Game Modes:** Custom container styling for Would You Rather, Most Likely To, and Hot Seat across specific themes.
+2. 🟢 **Theme Tab Bar Micro-Animations & Release Packaging:** Adaptive app icons and release keystore signing.
 
 ---
 
@@ -62,6 +61,5 @@ budget_tokens: 1000
 
 - **Stack:** React 19, TypeScript 5.8, Vite 6, Framer Motion 12, Capacitor 8 (Android)
 - **Zero AI Guarantee:** 100% handcrafted assets, prompts, and code. No AI runtime dependencies.
-- **Platform:** Hardware back button, safe area insets, portrait lock, background audio lifecycle via `@capacitor/app`.
-- **Storage Prefix:** `allstarinfinity_*` universal internal prefix with automatic backward-compatibility migration.
-- **Android Target:** Gradle 8.14.3, AGP 8.13.0, JDK 22 configured in `android/gradle.properties`. Output APK at `android/app/build/outputs/apk/debug/app-debug.apk`.
+- **Multiplayer Party Engine:** Live room voting, chaos turn shuffle, double stakes, player avatars/colors, and party awards ceremony.
+- **Android Target:** Gradle 8.14.3, AGP 8.13.0, JDK 22. Output APK at `android/app/build/outputs/apk/debug/app-debug.apk`.
