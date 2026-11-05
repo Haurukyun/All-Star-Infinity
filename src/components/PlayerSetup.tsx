@@ -339,7 +339,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ logic }) => {
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="inline-block p-3 rounded-2xl bg-black/10 dark:bg-white/10 border border-current/20 shadow-md mb-1">
-            <span className="text-3xl">👥</span>
+            <span className="text-2xl font-bold">{theme === Theme.UNDERTALE ? "❤" : theme === Theme.OMORI ? "○" : theme === Theme.PERSONA ? "★" : theme === Theme.FNAF ? "●" : theme === Theme.FALLOUT ? "►" : theme === Theme.CYBERPUNK ? "◈" : "★"}</span>
           </div>
           <h1 className={`text-2xl sm:text-3xl font-black ${themeStyle.headerText}`}>
             PASS & PLAY ROSTER
@@ -450,7 +450,7 @@ export const PlayerSetup: React.FC<PlayerSetupProps> = ({ logic }) => {
                   onClick={handleAddPresets}
                   className={`px-4 py-2 ${themeStyle.secondaryBtn} text-xs font-bold uppercase tracking-wider transition-colors`}
                 >
-                  ⚡ Add 3 Sample Players
+                  + Add 3 Sample Players
                 </button>
               </motion.div>
             ) : (

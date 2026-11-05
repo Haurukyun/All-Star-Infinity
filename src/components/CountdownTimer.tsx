@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TimerDuration, Theme } from '../types';
+import { TimerDuration, Theme, Intensity } from '../types';
 import { hapticService } from '../services/haptics';
 import { soundService } from '../services/soundFx';
 
@@ -12,6 +12,7 @@ interface CountdownTimerProps {
   promptId?: string;
   isPromptActive: boolean;
   theme?: Theme;
+  intensity?: Intensity | null;
 }
 
 export const CountdownTimer: React.FC<CountdownTimerProps> = ({
@@ -22,6 +23,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
   promptId,
   isPromptActive,
   theme = Theme.SONIC,
+  intensity,
 }) => {
   const [timeLeft, setTimeLeft] = useState<number>(duration);
   const [isRunning, setIsRunning] = useState<boolean>(true);
@@ -100,9 +102,9 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           activeBtn: "border border-green-500/80 bg-black text-green-400 font-['VT323'] text-lg px-3 py-0.5 rounded-none shadow-[0_0_10px_rgba(34,197,94,0.3)] tracking-wider",
           lowBtn: "border border-amber-400 bg-black text-amber-300 font-['VT323'] text-lg px-3 py-0.5 rounded-none shadow-[0_0_10px_rgba(251,191,36,0.4)] tracking-wider",
           expiredBtn: "border border-red-500 bg-black text-red-500 font-['VT323'] text-lg px-3 py-0.5 rounded-none shadow-[0_0_15px_rgba(239,68,68,0.5)] tracking-wider",
-          activeIcon: "🔴",
-          offIcon: "⚫",
-          expiredIcon: "⚠️",
+          activeIcon: "●",
+          offIcon: "○",
+          expiredIcon: "!",
           offLabel: "[REC_TMR: OFF]",
           activePrefix: "[REC 00:",
           activeSuffix: "]",
@@ -161,9 +163,9 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           activeBtn: "border border-yellow-400 bg-black text-yellow-400 font-['Orbitron'] text-[11px] px-3 py-1 rounded-none shadow-[0_0_8px_rgba(250,204,21,0.3)]",
           lowBtn: "border border-amber-400 bg-amber-950 text-amber-300 font-['Orbitron'] text-[11px] px-3 py-1 rounded-none shadow-[0_0_10px_rgba(251,191,36,0.4)]",
           expiredBtn: "border border-cyan-400 bg-red-950 text-cyan-300 font-['Orbitron'] text-[11px] px-3 py-1 rounded-none shadow-[0_0_12px_rgba(34,211,238,0.5)]",
-          activeIcon: "⚡",
-          offIcon: "⚡",
-          expiredIcon: "⚠️",
+          activeIcon: ">",
+          offIcon: "x",
+          expiredIcon: "!",
           offLabel: "[TMR: OFF]",
           activePrefix: "[T-",
           activeSuffix: "]",
@@ -207,9 +209,9 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           activeBtn: "border border-[#14FF00] bg-black text-[#14FF00] font-['Share_Tech_Mono'] text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(20,255,0,0.3)]",
           lowBtn: "border border-[#FFAA00] bg-black text-[#FFAA00] font-['Share_Tech_Mono'] text-xs px-3 py-1 rounded-none shadow-[0_0_10px_rgba(255,170,0,0.4)]",
           expiredBtn: "border border-[#FF3B00] bg-black text-[#FF3B00] font-['Share_Tech_Mono'] text-xs px-3 py-1 rounded-none shadow-[0_0_12px_rgba(255,59,0,0.5)]",
-          activeIcon: "☢️",
-          offIcon: "☢️",
-          expiredIcon: "⚠️",
+          activeIcon: "►",
+          offIcon: "○",
+          expiredIcon: "!",
           offLabel: "[SYS.TMR: OFF]",
           activePrefix: "[SEC: ",
           activeSuffix: "]",
@@ -231,22 +233,45 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({
           expiredLabel: "GUILTY!",
           popoverBg: "bg-[#050510] border-2 border-[#FF007F] text-white font-mono rounded-none text-xs shadow-2xl",
         };
-      case Theme.OMORI:
+      case Theme.OMORI: {
+        const isVulgar = intensity === Intensity.VULGAR;
+        const isHot = intensity === Intensity.HOT;
         return {
           font: "'Gloria Hallelujah', cursive",
-          offBtn: "border-2 border-black/40 bg-white/70 text-black/50 font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-sm",
-          activeBtn: "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#000] font-bold",
-          lowBtn: "border-2 border-red-500 bg-red-50 text-red-600 font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#EF4444] font-bold",
-          expiredBtn: "border-2 border-black bg-black text-white font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#FFF] font-bold",
-          activeIcon: "💡",
-          offIcon: "💡",
-          expiredIcon: "🔪",
+          offBtn: isVulgar
+            ? "border-2 border-[#ff0000]/50 bg-black text-[#ff0000]/60 font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-sm"
+            : isHot
+            ? "border-2 border-white/50 bg-[#9B6EFF] text-white/70 font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-sm"
+            : "border-2 border-black/40 bg-white/70 text-black/50 font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-sm",
+          activeBtn: isVulgar
+            ? "border-2 border-[#ff0000] bg-black text-[#ff0000] font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#ff0000] font-bold"
+            : isHot
+            ? "border-2 border-white bg-[#7B55CC] text-white font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#fff] font-bold"
+            : "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#000] font-bold",
+          lowBtn: isVulgar
+            ? "border-2 border-[#ff0000] bg-red-950 text-[#ff0000] font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#ff0000] font-bold animate-pulse"
+            : isHot
+            ? "border-2 border-white bg-[#5B35AC] text-white font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#fff] font-bold animate-pulse"
+            : "border-2 border-red-500 bg-red-50 text-red-600 font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#EF4444] font-bold",
+          expiredBtn: isVulgar
+            ? "border-2 border-[#ff0000] bg-[#ff0000] text-black font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#ff0000] font-bold"
+            : isHot
+            ? "border-2 border-white bg-white text-[#7B55CC] font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#7B55CC] font-bold"
+            : "border-2 border-black bg-black text-white font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#FFF] font-bold",
+          activeIcon: isVulgar ? "!" : isHot ? "★" : "!",
+          offIcon: "○",
+          expiredIcon: "×",
           offLabel: "(timer off)",
           activePrefix: "(",
           activeSuffix: ")",
           expiredLabel: "something happened",
-          popoverBg: "bg-white border-2 border-black text-black font-['Gloria_Hallelujah'] rounded-none text-xs shadow-lg",
+          popoverBg: isVulgar
+            ? "bg-black border-2 border-[#ff0000] text-[#ff0000] font-['Gloria_Hallelujah'] rounded-none text-xs shadow-lg"
+            : isHot
+            ? "bg-[#9B6EFF] border-2 border-white text-white font-['Gloria_Hallelujah'] rounded-none text-xs shadow-lg"
+            : "bg-white border-2 border-black text-black font-['Gloria_Hallelujah'] rounded-none text-xs shadow-lg",
         };
+      }
       case Theme.KIRBY:
         return {
           font: "'Fredoka One', cursive",

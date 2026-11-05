@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Player, Theme } from '../types';
+import { Player, Theme, Intensity } from '../types';
 import { hapticService } from '../services/haptics';
 
 interface PlayerTurnBannerProps {
@@ -13,6 +13,7 @@ interface PlayerTurnBannerProps {
   onAddPlayer: (name: string) => void;
   onRemovePlayer: (id: string) => void;
   theme?: Theme;
+  intensity?: Intensity | null;
 }
 
 export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
@@ -25,6 +26,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
   onAddPlayer,
   onRemovePlayer,
   theme = Theme.SONIC,
+  intensity,
 }) => {
   const [showRosterModal, setShowRosterModal] = useState(false);
   const [newPlayerName, setNewPlayerName] = useState('');
@@ -60,20 +62,56 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-red-600 text-white border-red-500",
           rosterBtn: "border border-white bg-black text-white hover:bg-white hover:text-black rounded-none text-[9px] px-2 py-1 cursor-pointer transition-colors",
           modal: "bg-black border-4 border-white text-white font-['Press_Start_2P'] rounded-none shadow-2xl p-6",
+          themeIcons: { iconGamepad: "❤", iconTarget: "*", iconChicken: "×", chickenText: "Fled", iconRoster: "♦", iconStar: "★" },
         };
-      case Theme.OMORI:
+      case Theme.OMORI: {
+        const isVulgar = intensity === Intensity.VULGAR;
+        const isHot = intensity === Intensity.HOT;
         return {
           font: "'Gloria Hallelujah', cursive",
-          container: "bg-white text-black border-2 border-black rounded-none shadow-[3px_3px_0_#000] p-3 font-['Gloria_Hallelujah']",
-          btnNav: "border-2 border-black bg-white text-black hover:bg-black hover:text-white rounded-none shadow-[1px_1px_0_#000] text-xs w-7 h-7 flex items-center justify-center cursor-pointer transition-colors font-bold",
-          labelSub: "text-black/60 text-[10px]",
-          nameMain: "text-black font-bold text-base",
-          targetPill: "border border-black bg-white text-black rounded-none shadow-[1px_1px_0_#000] text-xs px-2.5 py-0.5 font-bold",
-          chickenBtn: "border-2 border-black bg-white text-black hover:bg-black hover:text-white rounded-none shadow-[2px_2px_0_#000] text-xs font-bold px-3 py-1 transition-all active:scale-95 cursor-pointer",
-          chickenBtnActive: "bg-black text-white border-black",
-          rosterBtn: "border-2 border-black bg-white text-black hover:bg-black hover:text-white rounded-none shadow-[1px_1px_0_#000] text-xs px-2.5 py-1 cursor-pointer font-bold",
-          modal: "bg-white border-4 border-black text-black font-['Gloria_Hallelujah'] rounded-none shadow-[6px_6px_0_#000] p-6",
+          container: isVulgar
+            ? "bg-black text-[#ff0000] border-2 border-[#ff0000] rounded-none shadow-[3px_3px_0_#ff0000] p-3 font-['Gloria_Hallelujah']"
+            : isHot
+            ? "bg-[#9B6EFF] text-white border-2 border-white rounded-none shadow-[3px_3px_0_#7B55CC] p-3 font-['Gloria_Hallelujah']"
+            : "bg-white text-black border-2 border-black rounded-none shadow-[3px_3px_0_#000] p-3 font-['Gloria_Hallelujah']",
+          btnNav: isVulgar
+            ? "border-2 border-[#ff0000] bg-black text-[#ff0000] hover:bg-[#ff0000] hover:text-black rounded-none shadow-[1px_1px_0_#ff0000] text-xs w-7 h-7 flex items-center justify-center cursor-pointer transition-colors font-bold"
+            : isHot
+            ? "border-2 border-white bg-[#7B55CC] text-white hover:bg-white hover:text-[#7B55CC] rounded-none shadow-[1px_1px_0_#fff] text-xs w-7 h-7 flex items-center justify-center cursor-pointer transition-colors font-bold"
+            : "border-2 border-black bg-white text-black hover:bg-black hover:text-white rounded-none shadow-[1px_1px_0_#000] text-xs w-7 h-7 flex items-center justify-center cursor-pointer transition-colors font-bold",
+          labelSub: isVulgar ? "text-[#ff0000]/60 text-[10px]" : isHot ? "text-white/70 text-[10px]" : "text-black/60 text-[10px]",
+          nameMain: isVulgar ? "text-[#ff0000] font-bold text-base" : "text-black font-bold text-base",
+          targetPill: isVulgar
+            ? "border border-[#ff0000] bg-black text-[#ff0000] rounded-none shadow-[1px_1px_0_#ff0000] text-xs px-2.5 py-0.5 font-bold"
+            : isHot
+            ? "border border-white bg-[#7B55CC] text-white rounded-none shadow-[1px_1px_0_#fff] text-xs px-2.5 py-0.5 font-bold"
+            : "border border-black bg-white text-black rounded-none shadow-[1px_1px_0_#000] text-xs px-2.5 py-0.5 font-bold",
+          chickenBtn: isVulgar
+            ? "border-2 border-[#ff0000] bg-black text-[#ff0000] hover:bg-[#ff0000] hover:text-black rounded-none shadow-[2px_2px_0_#ff0000] text-xs font-bold px-3 py-1 transition-all active:scale-95 cursor-pointer"
+            : isHot
+            ? "border-2 border-white bg-[#7B55CC] text-white hover:bg-white hover:text-[#7B55CC] rounded-none shadow-[2px_2px_0_#fff] text-xs font-bold px-3 py-1 transition-all active:scale-95 cursor-pointer"
+            : "border-2 border-black bg-white text-black hover:bg-black hover:text-white rounded-none shadow-[2px_2px_0_#000] text-xs font-bold px-3 py-1 transition-all active:scale-95 cursor-pointer",
+          chickenBtnActive: isVulgar ? "bg-[#ff0000] text-black border-[#ff0000]" : "bg-black text-white border-black",
+          rosterBtn: isVulgar
+            ? "border-2 border-[#ff0000] bg-black text-[#ff0000] hover:bg-[#ff0000] hover:text-black rounded-none shadow-[1px_1px_0_#ff0000] text-xs px-2.5 py-1 cursor-pointer font-bold"
+            : isHot
+            ? "border-2 border-white bg-[#7B55CC] text-white hover:bg-white hover:text-[#7B55CC] rounded-none shadow-[1px_1px_0_#fff] text-xs px-2.5 py-1 cursor-pointer font-bold"
+            : "border-2 border-black bg-white text-black hover:bg-black hover:text-white rounded-none shadow-[1px_1px_0_#000] text-xs px-2.5 py-1 cursor-pointer font-bold",
+          modal: isVulgar
+            ? "bg-black border-4 border-[#ff0000] text-[#ff0000] font-['Gloria_Hallelujah'] rounded-none shadow-[6px_6px_0_#ff0000] p-6"
+            : isHot
+            ? "bg-[#9B6EFF] border-4 border-white text-white font-['Gloria_Hallelujah'] rounded-none shadow-[6px_6px_0_#7B55CC] p-6"
+            : "bg-white border-4 border-black text-black font-['Gloria_Hallelujah'] rounded-none shadow-[6px_6px_0_#000] p-6",
+          themeIcons: {
+            iconGamepad: isVulgar ? "!" : "○",
+            iconTarget: "→",
+            iconChicken: isVulgar ? "×" : "!",
+            chickenText: "Forfeit",
+            iconRoster: "▪",
+            iconStar: "★"
+          },
         };
+      }
       case Theme.SONIC:
         return {
           font: "'Bangers', cursive",
@@ -86,6 +124,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-black text-yellow-400",
           rosterBtn: "border-2 border-black bg-white text-black hover:bg-black hover:text-white rounded-lg shadow-[2px_2px_0_#000] text-xs font-bold px-2.5 py-1 cursor-pointer",
           modal: "bg-yellow-400 border-4 border-black text-black font-['Bangers'] rounded-xl shadow-[8px_8px_0_#000] -skew-x-2 p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "▶", iconChicken: "×", chickenText: "Drop", iconRoster: "⚡", iconStar: "★" },
         };
       case Theme.PERSONA:
         return {
@@ -99,6 +138,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-white text-black",
           rosterBtn: "border border-white bg-black text-white hover:bg-[#D80000] rounded-none text-xs px-2.5 py-1 cursor-pointer",
           modal: "bg-[#0A0A0A] border-4 border-white text-white font-['Edo'] rounded-none shadow-[8px_8px_0_#D80000] -skew-x-2 p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "→", iconChicken: "×", chickenText: "Yield", iconRoster: "♠", iconStar: "★" },
         };
       case Theme.MINECRAFT:
         return {
@@ -112,6 +152,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#A00] border-t-[#F88] border-l-[#F88]",
           rosterBtn: "border-2 border-t-[#AAA] border-l-[#AAA] border-r-[#222] border-b-[#222] bg-[#555] text-white rounded-none text-[10px] px-2 py-1 cursor-pointer",
           modal: "bg-[#4B4B4B] border-4 border-t-[#AAA] border-l-[#AAA] border-r-[#222] border-b-[#222] text-white font-['Minecraft'] rounded-none p-6",
+          themeIcons: { iconGamepad: "◆", iconTarget: "→", iconChicken: "×", chickenText: "Yield", iconRoster: "▪", iconStar: "★" },
         };
       case Theme.ANIMAL_CROSSING:
         return {
@@ -125,6 +166,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#E8927C] text-white",
           rosterBtn: "border border-[#7EBF8F] bg-white text-[#4A7A56] rounded-xl text-xs font-bold px-2.5 py-1 cursor-pointer",
           modal: "bg-[#FBF8EF] border-4 border-[#7EBF8F] text-[#4A7A56] font-['Sniglet'] rounded-3xl shadow-xl p-6",
+          themeIcons: { iconGamepad: "🍃", iconTarget: "→", iconChicken: "×", chickenText: "Pass", iconRoster: "▪", iconStar: "★" },
         };
       case Theme.SANRIO:
         return {
@@ -138,6 +180,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#FF1493] text-white",
           rosterBtn: "border border-[#FF8DA1] bg-white text-[#D84B6B] rounded-full text-xs font-bold px-2.5 py-1 cursor-pointer",
           modal: "bg-[#FFF5F8] border-4 border-[#FF8DA1] text-[#D84B6B] font-['Cherry_Bomb_One'] rounded-3xl shadow-2xl p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "♡", iconChicken: "×", chickenText: "Pass", iconRoster: "▪", iconStar: "★" },
         };
       case Theme.CYBERPUNK:
         return {
@@ -151,6 +194,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-red-600 text-white",
           rosterBtn: "border border-yellow-400 bg-black text-yellow-400 rounded-none text-xs px-2 py-1 cursor-pointer",
           modal: "bg-black border-2 border-yellow-400 text-yellow-400 font-['Orbitron'] rounded-none shadow-[0_0_25px_rgba(250,204,21,0.25)] p-6",
+          themeIcons: { iconGamepad: ">", iconTarget: ">>", iconChicken: "//X", chickenText: "Surrender", iconRoster: "::", iconStar: "◈" },
         };
       case Theme.FNAF:
         return {
@@ -164,6 +208,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-amber-600 text-black",
           rosterBtn: "border border-green-500 bg-black text-green-400 rounded-none text-sm px-2.5 py-0.5 cursor-pointer",
           modal: "bg-black border-2 border-green-500/80 text-green-400 font-['VT323'] rounded-none shadow-[0_0_20px_rgba(34,197,94,0.3)] p-6",
+          themeIcons: { iconGamepad: "●", iconTarget: "▶", iconChicken: "!", chickenText: "Aborted", iconRoster: "■", iconStar: "★" },
         };
       case Theme.FALLOUT:
         return {
@@ -177,6 +222,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#FFAA00] text-black",
           rosterBtn: "border border-[#14FF00] bg-black text-[#14FF00] rounded-none text-xs px-2 py-1 cursor-pointer",
           modal: "bg-black border-2 border-[#14FF00] text-[#14FF00] font-['Share_Tech_Mono'] rounded-none shadow-[0_0_20px_rgba(20,255,0,0.3)] p-6",
+          themeIcons: { iconGamepad: "►", iconTarget: "→", iconChicken: "×", chickenText: "Forfeit", iconRoster: "◉", iconStar: "★" },
         };
       case Theme.DANGANRONPA:
         return {
@@ -190,6 +236,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#FF007F] text-black",
           rosterBtn: "border border-[#FF007F] bg-black text-[#FF007F] rounded-none text-xs font-bold px-2 py-1 cursor-pointer",
           modal: "bg-[#050510] border-4 border-[#FF007F] text-white font-mono rounded-none shadow-[0_0_30px_rgba(255,0,127,0.3)] p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "→", iconChicken: "×", chickenText: "Despair", iconRoster: "◉", iconStar: "★" },
         };
       case Theme.KIRBY:
         return {
@@ -203,6 +250,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#E91E63] text-white",
           rosterBtn: "border border-[#FF85B3] bg-white text-[#D81B60] rounded-xl text-xs font-bold px-2.5 py-1 cursor-pointer",
           modal: "bg-[#FFF0F5] border-4 border-[#FF85B3] text-[#D81B60] font-['Fredoka_One'] rounded-3xl shadow-2xl p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "♡", iconChicken: "×", chickenText: "Pass", iconRoster: "▪", iconStar: "★" },
         };
       case Theme.POKEMON:
         return {
@@ -216,6 +264,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#CC0000] text-white",
           rosterBtn: "border border-[#3B4CCA] bg-zinc-800 text-white rounded-none text-[8px] px-2 py-1 cursor-pointer",
           modal: "bg-zinc-900 border-4 border-[#3B4CCA] text-white font-['Press_Start_2P'] rounded-none shadow-[6px_6px_0_#CC0000] p-6",
+          themeIcons: { iconGamepad: "●", iconTarget: "→", iconChicken: "×", chickenText: "Run", iconRoster: "▪", iconStar: "★" },
         };
       case Theme.SKYRIM:
         return {
@@ -229,6 +278,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-red-800 text-white",
           rosterBtn: "border border-[#D4AF37] bg-black text-[#D4AF37] rounded-none text-xs px-2 py-1 cursor-pointer",
           modal: "bg-[#0A0A0A] border-2 border-[#D4AF37] text-stone-200 font-['Cinzel'] rounded-none shadow-[0_0_30px_rgba(212,175,55,0.2)] p-6",
+          themeIcons: { iconGamepad: "†", iconTarget: "→", iconChicken: "‡", chickenText: "Fled", iconRoster: "⚔", iconStar: "★" },
         };
       case Theme.HAZBIN:
         return {
@@ -242,6 +292,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#FFD700] text-black",
           rosterBtn: "border border-[#FFD700] bg-black text-[#FFD700] rounded-none text-xs px-2 py-1 cursor-pointer",
           modal: "bg-[#1a050f] border-2 border-[#FFD700] text-[#ffcccb] font-['Lora'] rounded-none shadow-[0_0_30px_rgba(229,43,80,0.3)] p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "→", iconChicken: "!", chickenText: "Default", iconRoster: "🍸", iconStar: "★" },
         };
       case Theme.VOCALOID:
         return {
@@ -255,6 +306,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#FF1493] text-white",
           rosterBtn: "border border-[#39C5BB] bg-black text-[#39C5BB] rounded-none text-xs font-bold px-2 py-1 cursor-pointer",
           modal: "bg-black border-2 border-[#39C5BB] text-[#39C5BB] font-['Orbitron'] rounded-none shadow-[0_0_25px_rgba(57,197,187,0.3)] p-6",
+          themeIcons: { iconGamepad: "♫", iconTarget: ">>", iconChicken: "//X", chickenText: "Miss", iconRoster: "◉", iconStar: "◈" },
         };
       case Theme.IRUMA:
         return {
@@ -268,6 +320,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#ffd700] text-black",
           rosterBtn: "border border-[#ffd700] bg-purple-950 text-[#ffd700] rounded-lg text-xs font-bold px-2.5 py-1 cursor-pointer",
           modal: "bg-[#2e1534] border-4 border-[#ffd700] text-white font-['Sniglet'] rounded-3xl shadow-[0_0_25px_rgba(255,215,0,0.25)] p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "→", iconChicken: "!", chickenText: "Forfeit", iconRoster: "👑", iconStar: "★" },
         };
       case Theme.ARCANE:
         return {
@@ -281,6 +334,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#00E5FF] text-black",
           rosterBtn: "border border-[#C8AA6E] bg-black text-[#00E5FF] rounded-none text-xs px-2 py-1 cursor-pointer",
           modal: "bg-[#0b0c10] border-2 border-[#C8AA6E] text-stone-200 font-['Cinzel'] rounded-none shadow-[0_0_30px_rgba(0,229,255,0.25)] p-6",
+          themeIcons: { iconGamepad: "◆", iconTarget: "→", iconChicken: "×", chickenText: "Overload", iconRoster: "⚙", iconStar: "◈" },
         };
       case Theme.BILLY_HATCHER:
         return {
@@ -294,6 +348,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-[#E53935] text-white",
           rosterBtn: "border border-[#1873CA] bg-white text-[#1873CA] rounded-xl text-xs font-bold px-2.5 py-1 cursor-pointer",
           modal: "bg-[#FDFAF4] border-4 border-[#1873CA] text-[#222] font-['Fredoka_One'] rounded-3xl shadow-2xl p-6",
+          themeIcons: { iconGamepad: "★", iconTarget: "→", iconChicken: "×", chickenText: "Chirp", iconRoster: "▪", iconStar: "★" },
         };
       default:
         return {
@@ -307,6 +362,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           chickenBtnActive: "bg-amber-500 text-black shadow-lg shadow-amber-500/50",
           rosterBtn: "bg-white/10 hover:bg-white/20 border border-white/20 text-white px-2.5 py-1.5 rounded-lg font-bold text-xs uppercase transition-colors cursor-pointer",
           modal: "bg-zinc-950 border-2 border-white/20 rounded-2xl p-5 text-white shadow-2xl",
+          themeIcons: { iconGamepad: "★", iconTarget: "→", iconChicken: "×", chickenText: "Forfeit", iconRoster: "▪", iconStar: "★" },
         };
     }
   };
@@ -340,7 +396,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
             <div>
               <div className="flex items-center gap-1.5">
                 <span className={style.labelSub}>CURRENT TURN</span>
-                <span className="text-xs">🎮</span>
+                <span className="text-xs">{style.themeIcons.iconGamepad}</span>
               </div>
               <div className={style.nameMain}>
                 {activePlayer.name}
@@ -365,7 +421,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
           <div className={`hidden sm:flex items-center gap-1.5 ${style.targetPill}`}>
             <span className="opacity-60 uppercase text-[9px] font-semibold">Target:</span>
             <span className="font-bold">
-              {targetPlayer.avatar || '🎯'} {targetPlayer.name}
+              {targetPlayer.avatar || style.themeIcons.iconTarget} {targetPlayer.name}
             </span>
           </div>
         )}
@@ -379,8 +435,8 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
             title="Active player chickened out of the prompt!"
             className={`${justChickened ? style.chickenBtnActive : style.chickenBtn} flex items-center gap-1.5 transition-all`}
           >
-            <span>🐔</span>
-            <span>Chickened ({activePlayer.chickenCount})</span>
+            <span>{style.themeIcons.iconChicken}</span>
+            <span>{style.themeIcons.chickenText || 'Forfeit'} ({activePlayer.chickenCount})</span>
           </motion.button>
 
           <button
@@ -391,7 +447,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
             title="View Player Roster & Standings"
             className={`${style.rosterBtn} flex items-center gap-1 transition-all`}
           >
-            <span>👥</span>
+            <span>{style.themeIcons.iconRoster}</span>
             <span>({players.length})</span>
           </button>
         </div>
@@ -402,7 +458,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
         <div className="sm:hidden mt-1 text-center">
           <span className="text-[10px] opacity-60 uppercase">Target: </span>
           <span className="text-xs font-bold">
-            {targetPlayer.avatar || '🎯'} {targetPlayer.name}
+            {targetPlayer.avatar || style.themeIcons.iconTarget} {targetPlayer.name}
           </span>
         </div>
       )}
@@ -421,7 +477,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
               {/* Modal Header */}
               <div className="flex justify-between items-center pb-2 border-b border-current/20">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">👥</span>
+                  <span className="text-xl">{style.themeIcons.iconRoster}</span>
                   <h3 className="text-lg font-black uppercase tracking-wider">Party Roster</h3>
                 </div>
                 <button
@@ -463,8 +519,8 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
                             )}
                           </div>
                           <div className="text-[11px] opacity-60 flex items-center gap-3">
-                            <span>🐔 {p.chickenCount} Chickens</span>
-                            {p.score > 0 && <span>⭐ {p.score} pts</span>}
+                            <span>{style.themeIcons.iconChicken} {p.chickenCount} {style.themeIcons.chickenText || 'forfeits'}</span>
+                            {p.score > 0 && <span>{style.themeIcons.iconStar} {p.score} pts</span>}
                           </div>
                         </div>
                       </div>
@@ -478,7 +534,7 @@ export const PlayerTurnBanner: React.FC<PlayerTurnBannerProps> = ({
                           title="Add chicken penalty"
                           className="px-2 py-1 rounded border border-current/30 text-xs font-bold hover:bg-current/10 cursor-pointer"
                         >
-                          +🐔
+                          +{style.themeIcons.iconChicken}
                         </button>
                         {players.length > 1 && (
                           <button

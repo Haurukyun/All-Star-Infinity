@@ -112,6 +112,36 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
 
   const style = getThemeModalStyles();
 
+  const getThemeIcons = () => {
+    switch (theme) {
+      case Theme.UNDERTALE:
+        return { trophy: "★", shield: "❤", forfeit: "×", flame: "⚡", forfeitText: "fled" };
+      case Theme.OMORI:
+        return { trophy: "○", shield: "■", forfeit: "×", flame: "!", forfeitText: "forfeits" };
+      case Theme.FNAF:
+        return { trophy: "●", shield: "◆", forfeit: "!", flame: "▲", forfeitText: "aborts" };
+      case Theme.FALLOUT:
+        return { trophy: "►", shield: "◈", forfeit: "☠", flame: "▲", forfeitText: "forfeits" };
+      case Theme.CYBERPUNK:
+        return { trophy: "◈", shield: "▣", forfeit: "//X", flame: "⚡", forfeitText: "surrenders" };
+      case Theme.SKYRIM:
+        return { trophy: "†", shield: "‡", forfeit: "☠", flame: "⚔", forfeitText: "fled" };
+      case Theme.PERSONA:
+        return { trophy: "★", shield: "♠", forfeit: "☠", flame: "★", forfeitText: "yields" };
+      case Theme.MINECRAFT:
+        return { trophy: "◆", shield: "■", forfeit: "×", flame: "▲", forfeitText: "yields" };
+      case Theme.POKEMON:
+        return { trophy: "●", shield: "■", forfeit: "×", flame: "▲", forfeitText: "runs" };
+      case Theme.DANGANRONPA:
+        return { trophy: "★", shield: "◉", forfeit: "💀", flame: "★", forfeitText: "despairs" };
+      default:
+        return { trophy: "★", shield: "🛡", forfeit: "🐔", flame: "🔥", forfeitText: "forfeits" };
+    }
+  };
+
+  const icons = getThemeIcons();
+
+
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md select-none">
@@ -124,7 +154,7 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
         >
           {/* Header */}
           <div className="space-y-1">
-            <div className="text-4xl animate-bounce">🏆</div>
+            <div className="text-4xl font-bold">{icons.trophy}</div>
             <h2 className={style.title}>PARTY AWARDS</h2>
             <p className={style.sub}>
               Session Wrap-up · {totalCardsCompleted} Cards Conquered
@@ -137,7 +167,7 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
             {ironWill && (
               <div className={`${style.card} flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
-                  <div className="text-2xl">🛡️</div>
+                  <div className="text-2xl font-bold">{icons.shield}</div>
                   <div>
                     <div className="text-[10px] font-black uppercase opacity-60">THE IRON WILL</div>
                     <div className="font-black text-sm">{ironWill.name}</div>
@@ -153,14 +183,14 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
             {biggestChicken && biggestChicken.chickenCount > 0 && (
               <div className={`${style.card} flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
-                  <div className="text-2xl">🐔</div>
+                  <div className="text-2xl font-bold">{icons.forfeit}</div>
                   <div>
                     <div className="text-[10px] font-black uppercase opacity-60">THE BIGGEST CHICKEN</div>
                     <div className="font-black text-sm">{biggestChicken.name}</div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-bold opacity-80">{biggestChicken.chickenCount} chickened</span>
+                  <span className="text-xs font-bold opacity-80">{biggestChicken.chickenCount} {icons.forfeitText}</span>
                 </div>
               </div>
             )}
@@ -169,7 +199,7 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
             {hotSeatMaster && hotSeatMaster.score > 0 && (
               <div className={`${style.card} flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
-                  <div className="text-2xl">🔥</div>
+                  <div className="text-2xl font-bold">{icons.flame}</div>
                   <div>
                     <div className="text-[10px] font-black uppercase opacity-60">HOT SEAT SPEEDRUNNER</div>
                     <div className="font-black text-sm">{hotSeatMaster.name}</div>

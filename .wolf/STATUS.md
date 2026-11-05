@@ -11,12 +11,22 @@ budget_tokens: 1000
 
 ## ✅ Done
 
-- **Tier 3: Per-Theme Visual Adaptation (all 19 themes):**
-  - `PlayerSetup.tsx`: Fully rewritten with `getThemeSetupStyles(theme: Theme)` switching all 19 themes. Outer wrapper `bg`, panel borders/shadows/fonts, inputs, buttons, roster items all inherit the active theme. No more generic white/dark rounded pill on Omori, Undertale, etc.
-  - `PlayerTurnBanner.tsx`: Complete per-theme `getThemeStyles()` already in place from previous session.
-  - `PartyAwardsModal.tsx`: Complete per-theme `getThemeModalStyles()` already in place.
-  - `CountdownTimer.tsx`: Per-theme pill styling for all 19 themes; progress dot hidden on sketch/8-bit themes.
-  - `UnifiedGame.tsx`: `getThemedModeButton()`, `getThemedAwardsButton()` per all 19 themes; removed duplicate active-player chip from top bar; `theme` prop passed to all sub-components.
+- **Tier 3: Per-Theme Visual Adaptation & Strict Aesthetic Integrity (all 19 themes):**
+  - **Omori Black Space (Vulgar) Contrast & Box Theming (`OmoriTheme.tsx`, `PlayerTurnBanner.tsx`, `CountdownTimer.tsx`, `UnifiedGame.tsx`):**
+    - Fixed CSS cascade bug where `.omori-card` forced `color: #000 !important`, causing text to disappear completely on black background. All prompt text, penalties, tags, and borders now dynamically render `#ff0000` on Black Space and `#ffffff` on Headspace.
+    - `OmoriLayout` header, main, and nav dynamically transform to black/red on Vulgar and purple/white on Hot.
+    - Top bar (`getThemedModeButton`, `getThemedAwardsButton`), timer (`CountdownTimer`), and turn banner (`PlayerTurnBanner`) now strictly adapt to Omori Black Space (black background with red sketchy border `#ff0000`) instead of floating as a white paper box.
+  - **Universal Emoji Purge & Theme-Native Glyphs (`PlayerTurnBanner.tsx`, `PartyAwardsModal.tsx`, `UnifiedGame.tsx`, `CountdownTimer.tsx`, `PlayerSetup.tsx`):**
+    - Eradicated all out-of-place cartoon emojis (🎮, 🎯, 🐔, 👥, 🏆, 🛡️, 🔥, ⚡) across retro, indie, and terminal themes.
+    - Replaced with theme-native typographic glyphs (`themeIcons`):
+      - Undertale: 8-bit text symbols (`❤`, `*`, `×`, `♦`, `★`) and `Fled` forfeits.
+      - Omori: Minimalist hand-drawn symbols (`○`, `→`, `!`, `▪`, `★`) and `Forfeit`.
+      - FNAF: Security CRT terminal ASCII (`●`, `▶`, `!`, `■`) and `Aborted`.
+      - Fallout: Pip-Boy radioactive terminal glyphs (`►`, `→`, `☠`, `◉`).
+      - Cyberpunk: High-tech terminal prompts (`>`, `>>`, `//X`, `::`, `◈`).
+      - Persona: Shujin tactical glyphs (`★`, `→`, `☠`, `♠`).
+      - Minecraft: Pixel glyphs (`◆`, `→`, `×`, `▪`) and `Yield`.
+      - Skyrim: Elder stone symbols (`†`, `→`, `‡`, `⚔`).
 - **Tier 2: Gameplay Depth & Multiplayer Party Mechanics:**
   - **Would You Rather Live Room Vote Tally (`UnifiedGame.tsx`):**
     - Multi-player voting chips with live vote split (Option A vs Option B).

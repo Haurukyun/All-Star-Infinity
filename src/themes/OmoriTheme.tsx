@@ -93,6 +93,42 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                     background-color: #B088FF !important;
                     color: #fff !important;
                 }
+                .headspace-bg .omori-panel, .headspace-bg .omori-card {
+                    border-color: #fff !important;
+                    box-shadow: 4px 4px 0px #7B55CC !important;
+                    background: #9B6EFF !important;
+                    color: #fff !important;
+                }
+                .headspace-bg .omori-card p,
+                .headspace-bg .omori-card span,
+                .headspace-bg .omori-card h1,
+                .headspace-bg .omori-card h2,
+                .headspace-bg .omori-card div {
+                    color: #fff !important;
+                }
+                .headspace-bg .omori-card .border-black,
+                .headspace-bg .border-black {
+                    border-color: #fff !important;
+                }
+                .headspace-bg .omori-button {
+                    border-color: #fff !important;
+                    color: #fff !important;
+                    background: #7B55CC !important;
+                    box-shadow: 2px 2px 0px #fff !important;
+                }
+                .headspace-bg .omori-button.active {
+                    background: #fff !important;
+                    color: #7B55CC !important;
+                }
+                .headspace-bg .omori-button:hover {
+                    background: #fff !important;
+                    color: #7B55CC !important;
+                    box-shadow: 4px 4px 0px #fff !important;
+                }
+                .headspace-bg .omori-nav-btn {
+                    color: #fff !important;
+                }
+
                 .blackspace-bg {
                     background-color: #000 !important;
                     color: #ff0000 !important;
@@ -102,19 +138,43 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                     border-color: #ff0000 !important;
                     box-shadow: 4px 4px 0px #ff0000 !important;
                     background: #000 !important;
+                    color: #ff0000 !important;
+                }
+                .blackspace-bg .omori-card p,
+                .blackspace-bg .omori-card span,
+                .blackspace-bg .omori-card h1,
+                .blackspace-bg .omori-card h2,
+                .blackspace-bg .omori-card div {
+                    color: #ff0000 !important;
+                }
+                .blackspace-bg .omori-card .border-black,
+                .blackspace-bg .border-black {
+                    border-color: #ff0000 !important;
+                }
+                .blackspace-bg .omori-header {
+                    color: #ff0000 !important;
                 }
                 .blackspace-bg .omori-button {
                     border-color: #ff0000 !important;
                     color: #ff0000 !important;
                     background: #000 !important;
+                    box-shadow: 2px 2px 0px #ff0000 !important;
+                }
+                .blackspace-bg .omori-button.active {
+                    background: #ff0000 !important;
+                    color: #000 !important;
                 }
                 .blackspace-bg .omori-button:hover {
                     background: #ff0000 !important;
                     color: #000 !important;
+                    box-shadow: 4px 4px 0px #ff0000 !important;
+                }
+                .blackspace-bg .omori-nav-btn {
+                    color: #ff0000 !important;
                 }
             `}</style>
 
-            <header className="p-6 flex justify-center items-center shrink-0">
+            <header className={`p-6 flex justify-center items-center shrink-0 transition-colors duration-500 ${intensity === Intensity.HOT ? 'bg-[#B088FF] text-white' : intensity === Intensity.VULGAR ? 'bg-black text-[#ff0000]' : ''}`}>
                 <h1 className="omori-header">OMORI</h1>
             </header>
 
@@ -125,7 +185,7 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                 </div>
             </main>
 
-            <nav className="fixed bottom-0 left-0 w-full bg-white border-t-4 border-black h-20 z-50">
+            <nav className={`fixed bottom-0 left-0 w-full h-20 z-50 border-t-4 transition-colors duration-500 ${intensity === Intensity.HOT ? 'bg-[#B088FF] border-white text-white' : intensity === Intensity.VULGAR ? 'bg-black border-[#ff0000] text-[#ff0000]' : 'bg-white border-black text-black'}`}>
                 <div className="flex justify-around items-center h-full px-2">
                     {tabs.map((tab) => (
                         <button

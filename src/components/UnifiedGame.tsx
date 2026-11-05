@@ -752,12 +752,12 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 {/* Speedrun Top Clock */}
                 <div className="flex justify-between items-center p-3 rounded-xl bg-black/10 dark:bg-white/10 border border-black/10">
                     <div className="flex items-center gap-2">
-                        <span className="text-xl">⏰</span>
+                        <span className="text-xs font-black tracking-widest opacity-60">TIMER</span>
                         <span className="font-mono text-2xl font-black text-red-500">{hotSeatTimeLeft}s</span>
                     </div>
                     <div className="flex items-center gap-3 text-xs font-bold">
-                        <span className="text-emerald-500">⭐ {hotSeatAnswered}</span>
-                        <span className="text-amber-500">🐔 {hotSeatPassed}</span>
+                        <span className="text-emerald-500">ANSWERED: {hotSeatAnswered}</span>
+                        <span className="text-amber-500">FORFEITS: {hotSeatPassed}</span>
                     </div>
                 </div>
 
@@ -780,7 +780,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         onClick={handleHotSeatPass}
                         className="theme-button theme-button-alt p-5 text-xl font-black uppercase tracking-wider bg-amber-600/80 hover:bg-amber-600 text-white shadow-md active:scale-95"
                     >
-                        🐔 PASS (+1)
+                        FORFEIT (+1)
                     </button>
                 </div>
             </motion.div>
@@ -807,12 +807,12 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 <div className="flex justify-between items-center pb-3 mb-3 border-b border-black/10">
                     <div className="flex items-center gap-1.5">
                         <span className="text-xs font-black uppercase tracking-wider text-[var(--theme-accent,#d90429)]">
-                            🎮 {activePlayer.avatar || ''} {activePlayer.name}'s Turn
+                            {activePlayer.name}'s Turn
                         </span>
                     </div>
                     {targetPlayer && (
                         <span className="text-[11px] font-bold opacity-75">
-                            🎯 Target: {targetPlayer.avatar || ''} {targetPlayer.name}
+                            Target: {targetPlayer.avatar || ''} {targetPlayer.name}
                         </span>
                     )}
                 </div>
@@ -888,7 +888,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         onClick={() => incrementChicken(activePlayer.id)}
                         className="text-xs font-bold opacity-70 hover:opacity-100 transition-opacity uppercase tracking-wider text-amber-500"
                     >
-                        🐔 Chickened Out (+{isDoubleStakes ? 2 : 1} Chicken)
+                        Forfeited (+{isDoubleStakes ? 2 : 1} Forfeit)
                     </button>
                 </div>
             )}
@@ -962,11 +962,18 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     className: "border-2 border-[#FF007F] bg-[#050510] text-[#FF007F] font-mono text-xs px-3 py-1 rounded-none shadow-[0_0_8px_rgba(255,0,127,0.4)] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer tracking-wider",
                     text: `BULLET: ${modeLabel} ⟳`
                 };
-            case Theme.OMORI:
+            case Theme.OMORI: {
+                const isVulgar = intensity === Intensity.VULGAR;
+                const isHot = intensity === Intensity.HOT;
                 return {
-                    className: "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#000] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
+                    className: isVulgar
+                        ? "border-2 border-[#ff0000] bg-black text-[#ff0000] font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#ff0000] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                        : isHot
+                        ? "border-2 border-white bg-[#7B55CC] text-white font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#fff] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                        : "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-3 py-1 rounded-none shadow-[2px_2px_0_#000] font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
                     text: `(act: ${modeLabel}) ⟳`
                 };
+            }
             case Theme.KIRBY:
                 return {
                     className: "border-2 border-[#FF85B3] bg-[#FFE4EF] text-[#D81B60] font-['Fredoka_One'] text-xs px-3.5 py-1 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
@@ -1020,7 +1027,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             default:
                 return {
                     className: "border border-white/30 bg-black/70 text-white text-xs px-3 py-1 rounded-full active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer shadow-md",
-                    text: `🎮 ${modeLabel} ⟳`
+                    text: `[${modeLabel}] ⟳`
                 };
         }
     };
@@ -1030,17 +1037,24 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             case Theme.UNDERTALE:
                 return {
                     className: "border-2 border-white bg-black text-white font-['Press_Start_2P'] text-[10px] px-2.5 py-1.5 shadow-[2px_2px_0_#FFF] rounded-none active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
-                    text: "🏆 AWARDS"
+                    text: "* AWARDS"
                 };
-            case Theme.OMORI:
+            case Theme.OMORI: {
+                const isVulgar = intensity === Intensity.VULGAR;
+                const isHot = intensity === Intensity.HOT;
                 return {
-                    className: "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-2.5 py-1 rounded-none shadow-[2px_2px_0_#000] active:scale-95 transition-all flex items-center gap-1 cursor-pointer font-bold",
-                    text: "(awards 🏆)"
+                    className: isVulgar
+                        ? "border-2 border-[#ff0000] bg-black text-[#ff0000] font-['Gloria_Hallelujah'] text-xs px-2.5 py-1 rounded-none shadow-[2px_2px_0_#ff0000] active:scale-95 transition-all flex items-center gap-1 cursor-pointer font-bold"
+                        : isHot
+                        ? "border-2 border-white bg-[#7B55CC] text-white font-['Gloria_Hallelujah'] text-xs px-2.5 py-1 rounded-none shadow-[2px_2px_0_#fff] active:scale-95 transition-all flex items-center gap-1 cursor-pointer font-bold"
+                        : "border-2 border-black bg-white text-black font-['Gloria_Hallelujah'] text-xs px-2.5 py-1 rounded-none shadow-[2px_2px_0_#000] active:scale-95 transition-all flex items-center gap-1 cursor-pointer font-bold",
+                    text: "(awards)"
                 };
+            }
             case Theme.SONIC:
                 return {
                     className: "-skew-x-12 border-3 border-black bg-yellow-400 text-black font-['Bangers'] text-sm px-3 py-0.5 rounded-xl shadow-[3px_3px_0_#000] active:scale-95 transition-all flex items-center gap-1 cursor-pointer tracking-wide",
-                    text: "🏆 AWARDS"
+                    text: "ACT AWARDS"
                 };
             case Theme.PERSONA:
                 return {
@@ -1050,12 +1064,12 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             case Theme.MINECRAFT:
                 return {
                     className: "border-2 border-t-[#AAA] border-l-[#AAA] border-r-[#373737] border-b-[#373737] bg-[#707070] text-yellow-300 font-['Minecraft'] text-xs px-2.5 py-1 rounded-none active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
-                    text: "🏆 Podium"
+                    text: "Honors"
                 };
             case Theme.ANIMAL_CROSSING:
                 return {
                     className: "border-2 border-[#7EBF8F] bg-[#F7F4E9] text-[#4A7A56] font-['Sniglet'] text-xs px-3 py-0.5 rounded-2xl shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
-                    text: "🏆 Trophy"
+                    text: "TRIAL AWARDS"
                 };
             case Theme.SANRIO:
                 return {
@@ -1090,7 +1104,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             case Theme.POKEMON:
                 return {
                     className: "border-2 border-[#3B4CCA] bg-zinc-900 text-[#FFDE00] font-['Press_Start_2P'] text-[9px] px-2.5 py-1 rounded-none shadow-[2px_2px_0_#3B4CCA] active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
-                    text: "🏆 HALL OF FAME"
+                    text: "HALL OF FAME"
                 };
             case Theme.SKYRIM:
                 return {
@@ -1100,7 +1114,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             default:
                 return {
                     className: "border border-white/30 bg-black/70 text-amber-300 text-xs px-2.5 py-1 rounded-full active:scale-95 transition-all flex items-center gap-1 cursor-pointer shadow-md",
-                    text: "🏆 Awards"
+                    text: "AWARDS"
                 };
         }
     };
@@ -1155,6 +1169,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                         promptId={prompt?.id}
                                         isPromptActive={!!prompt}
                                         theme={theme}
+                                        intensity={intensity}
                                     />
                                 )}
                             </div>
@@ -1172,6 +1187,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 onAddPlayer={addPlayer}
                                 onRemovePlayer={removePlayer}
                                 theme={theme}
+                                intensity={intensity}
                             />
                         )}
                     </div>
