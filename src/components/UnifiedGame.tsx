@@ -163,6 +163,15 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
         setActiveTab('play');
     };
 
+    const handleCycleIntensity = () => {
+        hapticService.medium();
+        soundService.click();
+        const cycle = [Intensity.SOFT, Intensity.HOT, Intensity.VULGAR];
+        const currentIndex = cycle.indexOf(intensity || Intensity.SOFT);
+        const nextIntensity = cycle[(currentIndex + 1) % cycle.length];
+        setIntensity(nextIntensity);
+    };
+
     const triggerPointCountdown = () => {
         hapticService.light();
         soundService.countdownStep(0.9);
@@ -317,7 +326,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
                 {/* Quick Player Target / Voter (Pass & Play) */}
                 {playersEnabled && players.length > 0 && (
-                    <div className="space-y-2.5 pt-2 border-t border-black/10">
+                    <div className="space-y-2.5 pt-2 border-t border-current/20">
                         <p className="text-[10px] uppercase font-bold opacity-70">
                             ▶ Tap who got the most fingers pointed at them:
                         </p>
@@ -328,10 +337,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                     <button
                                         key={p.id}
                                         onClick={() => handleSelectWinner(p.id)}
-                                        className={`px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-2 border ${
+                                        className={`theme-player-chip px-3 py-2 rounded-xl text-xs font-bold transition-all active:scale-95 flex items-center gap-2 border ${
                                             isWinner
                                                 ? 'bg-red-600 text-white border-red-400 shadow-md scale-105'
-                                                : 'bg-black/10 hover:bg-black/20 dark:bg-white/10 border-white/10'
+                                                : 'border-current/40 hover:border-current bg-current/5'
                                         }`}
                                     >
                                         <ThemeLoreBadge theme={theme} index={idx} intensity={intensity} />
@@ -346,7 +355,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         {winnerPlayer && (
                             <button
                                 onClick={handleEnforcePenalty}
-                                className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-sm uppercase tracking-wider shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
+                                className="w-full mt-2 py-3 px-4 rounded-xl border-2 border-current/60 bg-current/10 hover:bg-current/25 text-current font-black text-sm uppercase tracking-wider shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
                             >
                                 <span>!</span>
                                 <span>Enforce Forfeit on {winnerPlayer.name} (+1 Forfeit)</span>
@@ -355,12 +364,12 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     </div>
                 )}
 
-                <div className="theme-penalty-box p-4 border-t-2 border-dashed border-black/20">
+                <div className="theme-penalty-box p-4 border-t-2 border-dashed border-current/30">
                     <p className="theme-text-header text-xs text-[var(--theme-accent)] mb-1">PENALTY FOR MOST VOTES</p>
                     <p className="text-sm italic opacity-80">{prompt?.penalty}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-2 gap-4 mt-6 pb-12">
                     <button
                         onClick={() => {
                             recordPromptCompleted();
@@ -368,7 +377,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             setIntensity(null);
                             setPrompt(null);
                         }}
-                        className="theme-button p-4 text-xl"
+                        className="theme-button py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all"
                     >
                         DONE
                     </button>
@@ -378,7 +387,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             if (playersEnabled) nextPlayer();
                             handleDraw('MostLikelyTo');
                         }}
-                        className="theme-button theme-button-alt p-4 text-xl"
+                        className="theme-button theme-button-alt py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all"
                     >
                         NEXT
                     </button>
@@ -454,10 +463,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     <motion.div
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleSelectOption('A')}
-                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        className={`theme-card-option p-4 rounded-xl border-2 cursor-pointer transition-all ${
                             selectedWyrOption === 'A'
                                 ? 'bg-red-600 text-white border-red-400 shadow-lg scale-[1.01]'
-                                : 'bg-black/5 dark:bg-white/5 border-black/20 dark:border-white/20 hover:border-red-500'
+                                : 'border-current/40 hover:border-current bg-current/5'
                         }`}
                     >
                         <div className="flex justify-between items-center mb-1.5">
@@ -480,10 +489,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     <motion.div
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleSelectOption('B')}
-                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        className={`theme-card-option p-4 rounded-xl border-2 cursor-pointer transition-all ${
                             selectedWyrOption === 'B'
                                 ? 'bg-red-600 text-white border-red-400 shadow-lg scale-[1.01]'
-                                : 'bg-black/5 dark:bg-white/5 border-black/20 dark:border-white/20 hover:border-red-500'
+                                : 'border-current/40 hover:border-current bg-current/5'
                         }`}
                     >
                         <div className="flex justify-between items-center mb-1.5">
@@ -503,7 +512,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
                 {/* Live Room Voting Tally Chips (when players are enabled) */}
                 {playersEnabled && players.length > 0 && (
-                    <div className="p-3 rounded-xl bg-black/10 dark:bg-white/5 border border-black/10 space-y-2">
+                    <div className="theme-room-box p-3 rounded-xl border-2 border-current/40 bg-current/5 space-y-2">
                         <div className="flex justify-between items-center">
                             <span className="text-[10px] font-black uppercase tracking-wider opacity-70">
                                 [ Live Room Votes ({totalRoomVotes}/{players.length}) ]
@@ -521,7 +530,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 return (
                                     <div
                                         key={p.id}
-                                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/10 dark:bg-white/10 text-xs font-bold border border-white/10"
+                                        className="theme-player-chip flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-current/40 text-xs font-bold"
                                     >
                                         <ThemeLoreBadge theme={theme} index={idx} intensity={intensity} />
                                         <span>{p.name}:</span>
@@ -529,7 +538,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                             <button
                                                 onClick={() => handlePlayerVote(p.id, 'A')}
                                                 className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-colors ${
-                                                    currentVote === 'A' ? 'bg-red-600 text-white' : 'bg-white/10 hover:bg-white/20 opacity-60'
+                                                    currentVote === 'A' ? 'bg-red-600 text-white' : 'bg-current/15 hover:bg-current/30'
                                                 }`}
                                             >
                                                 A
@@ -537,7 +546,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                             <button
                                                 onClick={() => handlePlayerVote(p.id, 'B')}
                                                 className={`px-1.5 py-0.5 rounded text-[10px] font-black transition-colors ${
-                                                    currentVote === 'B' ? 'bg-red-600 text-white' : 'bg-white/10 hover:bg-white/20 opacity-60'
+                                                    currentVote === 'B' ? 'bg-red-600 text-white' : 'bg-current/15 hover:bg-current/30'
                                                 }`}
                                             >
                                                 B
@@ -551,7 +560,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         {minorityPlayers.length > 0 && (
                             <button
                                 onClick={handleAssignMinorityForfeits}
-                                className="w-full mt-2 py-2 px-3 rounded-lg bg-amber-600/80 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow transition-all active:scale-95"
+                                className="w-full mt-2 py-2.5 px-3 rounded-lg border-2 border-current/60 bg-current/10 hover:bg-current/25 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow transition-all active:scale-95"
                             >
                                 <span>!</span>
                                 <span>Assign Minority Forfeit (+1 Forfeit to {minorityPlayers.map(p => p.name).join(', ')})</span>
@@ -560,12 +569,12 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     </div>
                 )}
 
-                <div className="theme-penalty-box p-4 border-t-2 border-dashed border-black/20">
+                <div className="theme-penalty-box p-4 border-t-2 border-dashed border-current/30">
                     <p className="theme-text-header text-xs text-[var(--theme-accent)] mb-1">MINORITY FORFEIT</p>
                     <p className="text-sm italic opacity-80">{prompt?.penalty || 'Minority voters take 1 sip.'}</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-2 gap-4 mt-6 pb-12">
                     <button
                         onClick={() => {
                             recordPromptCompleted();
@@ -573,7 +582,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             setIntensity(null);
                             setPrompt(null);
                         }}
-                        className="theme-button p-4 text-xl"
+                        className="theme-button py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all"
                     >
                         DONE
                     </button>
@@ -583,7 +592,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             if (playersEnabled) nextPlayer();
                             handleDraw('WouldYouRather');
                         }}
-                        className="theme-button theme-button-alt p-4 text-xl"
+                        className="theme-button theme-button-alt py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all"
                     >
                         NEXT
                     </button>
@@ -646,7 +655,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     </div>
                     <h3 className="theme-text-header text-3xl font-black italic">HOT SEAT COMPLETE!</h3>
 
-                    <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-black/10 dark:bg-white/5 border border-black/10">
+                    <div className="theme-room-box grid grid-cols-2 gap-4 p-4 rounded-xl border-2 border-current/40 bg-current/5">
                         <div>
                             <div className="text-3xl font-black text-emerald-500">{hotSeatAnswered}</div>
                             <div className="text-xs uppercase font-bold opacity-60">Answered</div>
@@ -701,7 +710,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     </p>
 
                     {/* Speedrun Duration Selector */}
-                    <div className="space-y-2 pt-2 border-t border-black/10">
+                    <div className="space-y-2 pt-2 border-t border-current/20">
                         <span className="text-[10px] uppercase font-bold opacity-60">Select Round Duration:</span>
                         <div className="flex justify-center gap-2">
                             {([30, 60, 90] as HotSeatDuration[]).map((d) => (
@@ -716,7 +725,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                     className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase transition-all ${
                                         hotSeatDuration === d
                                             ? 'bg-red-600 text-white shadow-md scale-105'
-                                            : 'bg-black/10 dark:bg-white/10 opacity-60 hover:opacity-100'
+                                            : 'border border-current/30 bg-current/10 opacity-70 hover:opacity-100'
                                     }`}
                                 >
                                     {d === 30 ? '⚡ 30s Blitz' : d === 60 ? '▲ 60s Standard' : '! 90s Marathon'}
@@ -813,13 +822,13 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             <p className="theme-text-prompt text-2xl sm:text-3xl leading-tight mb-8">
                 "{prompt?.text}"
             </p>
-            <div className="theme-penalty-box p-4 border-t-2 border-dashed border-black/20">
+            <div className="theme-penalty-box p-4 border-t-2 border-dashed border-current/30">
                 <p className="theme-text-header text-xs text-[var(--theme-accent)] mb-1">
                     {isDoubleStakes ? '⚡ DOUBLE PENALTY (2X STAKES)' : 'PENALTY'}
                 </p>
                 <p className="text-sm italic opacity-80">{prompt?.penalty}</p>
             </div>
-            <div className="grid grid-cols-2 gap-4 mt-8">
+            <div className="grid grid-cols-2 gap-4 mt-8 pb-12">
                 {gameMode === GameMode.NEVER_HAVE_I_EVER ? (
                     <>
                         <button
@@ -829,7 +838,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 setIntensity(null);
                                 setPrompt(null);
                             }}
-                            className="theme-button p-4 text-xl"
+                            className="theme-button py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all"
                         >
                             DONE
                         </button>
@@ -839,7 +848,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 if (playersEnabled) nextPlayer();
                                 handleDraw('NeverHaveIEver');
                             }}
-                            className="theme-button theme-button-alt p-4 text-xl"
+                            className="theme-button theme-button-alt py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all"
                         >
                             NEXT
                         </button>
@@ -852,17 +861,17 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 if (playersEnabled) nextPlayer();
                                 setPrompt(null);
                             }}
-                            className="theme-button p-4 text-xl"
+                            className="theme-button py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all"
                         >
                             DONE
                         </button>
-                        <button onClick={() => handleDraw(prompt!.type)} className="theme-button theme-button-alt p-4 text-xl">
+                        <button onClick={() => handleDraw(prompt!.type)} className="theme-button theme-button-alt py-4 px-6 text-xl font-black min-h-[56px] shadow-md cursor-pointer active:scale-95 transition-all">
                             REROLL
                         </button>
                         {!isDoubleStakes && (
                             <button
                                 onClick={() => triggerDoubleStakes(prompt!.type)}
-                                className="col-span-2 py-3 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border-2 border-amber-400 text-amber-300 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow"
+                                className="col-span-2 py-3 px-4 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border-2 border-amber-400 text-amber-300 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 active:scale-95 transition-all shadow cursor-pointer"
                             >
                                 <span>⚡</span>
                                 <span>Double or Nothing Re-Roll (2x Stakes!)</span>
@@ -1124,6 +1133,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         intensity={intensity}
                         gameMode={gameMode}
                         onOpenModeChooser={() => setIsMinigameChooserOpen(true)}
+                        onCycleIntensity={handleCycleIntensity}
                         onOpenAwards={() => setIsAwardsModalOpen(true)}
                         timerEnabled={timerEnabled}
                         timerDuration={timerDuration}

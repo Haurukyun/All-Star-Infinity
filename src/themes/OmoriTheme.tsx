@@ -89,11 +89,73 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                     font-weight: bold;
                     transform: scale(1.1);
                 }
+                /* Universal Theme Classes in Omori */
+                .omori-theme .theme-panel {
+                    background: #fff;
+                    border: 3px solid #000;
+                    box-shadow: 4px 4px 0px #000;
+                    color: #000;
+                    font-family: 'Gloria Hallelujah', cursive;
+                    animation: sketchy 2s ease-in-out infinite;
+                }
+                .omori-theme .theme-button {
+                    background: #fff;
+                    border: 2px solid #000;
+                    color: #000;
+                    padding: 10px 20px;
+                    cursor: pointer;
+                    transition: all 0.1s;
+                    box-shadow: 2px 2px 0px #000;
+                    font-family: 'Gloria Hallelujah', cursive;
+                    font-weight: bold;
+                }
+                .omori-theme .theme-button:hover {
+                    background: #000;
+                    color: #fff;
+                    transform: translate(-1px, -1px);
+                    box-shadow: 4px 4px 0px #000;
+                }
+                .omori-theme .theme-button-alt {
+                    background: #000;
+                    color: #fff;
+                    border: 2px solid #000;
+                    box-shadow: 2px 2px 0px #000;
+                }
+                .omori-theme .theme-button-alt:hover {
+                    background: #fff;
+                    color: #000;
+                }
+                .omori-theme .theme-card-option {
+                    background: #fff;
+                    border: 2px solid #000;
+                    color: #000;
+                    box-shadow: 3px 3px 0px #000;
+                }
+                .omori-theme .theme-room-box {
+                    background: #fff;
+                    border: 2px solid #000;
+                    color: #000;
+                }
+                .omori-theme .theme-player-chip {
+                    background: #fff;
+                    border: 1px solid #000;
+                    color: #000;
+                }
+                .omori-theme .theme-badge {
+                    background: #000;
+                    color: #fff;
+                    border: 2px solid #000;
+                    font-family: 'Gloria Hallelujah', cursive;
+                }
+                .omori-theme .theme-penalty-box {
+                    border-top: 2px dashed #000;
+                }
+
                 .headspace-bg {
                     background-color: #B088FF !important;
                     color: #fff !important;
                 }
-                .headspace-bg .omori-panel, .headspace-bg .omori-card {
+                .headspace-bg .omori-panel, .headspace-bg .omori-card, .headspace-bg .theme-panel {
                     border-color: #fff !important;
                     box-shadow: 4px 4px 0px #7B55CC !important;
                     background: #9B6EFF !important;
@@ -103,27 +165,50 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                 .headspace-bg .omori-card span,
                 .headspace-bg .omori-card h1,
                 .headspace-bg .omori-card h2,
-                .headspace-bg .omori-card div {
+                .headspace-bg .omori-card div,
+                .headspace-bg .theme-panel p,
+                .headspace-bg .theme-panel span,
+                .headspace-bg .theme-panel div {
                     color: #fff !important;
                 }
                 .headspace-bg .omori-card .border-black,
                 .headspace-bg .border-black {
                     border-color: #fff !important;
                 }
-                .headspace-bg .omori-button {
+                .headspace-bg .omori-button, .headspace-bg .theme-button {
                     border-color: #fff !important;
                     color: #fff !important;
                     background: #7B55CC !important;
                     box-shadow: 2px 2px 0px #fff !important;
                 }
-                .headspace-bg .omori-button.active {
+                .headspace-bg .omori-button.active, .headspace-bg .theme-button-alt {
                     background: #fff !important;
                     color: #7B55CC !important;
+                    border-color: #fff !important;
                 }
-                .headspace-bg .omori-button:hover {
+                .headspace-bg .omori-button:hover, .headspace-bg .theme-button:hover {
                     background: #fff !important;
                     color: #7B55CC !important;
                     box-shadow: 4px 4px 0px #fff !important;
+                }
+                .headspace-bg .theme-card-option {
+                    background: #7B55CC !important;
+                    border: 2px solid #fff !important;
+                    color: #fff !important;
+                    box-shadow: 3px 3px 0px #fff !important;
+                }
+                .headspace-bg .theme-room-box {
+                    background: #9B6EFF !important;
+                    border: 2px solid #fff !important;
+                    color: #fff !important;
+                }
+                .headspace-bg .theme-player-chip {
+                    background: #7B55CC !important;
+                    border: 1px solid #fff !important;
+                    color: #fff !important;
+                }
+                .headspace-bg .theme-penalty-box {
+                    border-top: 2px dashed #fff !important;
                 }
                 .headspace-bg .omori-nav-btn {
                     color: #fff !important;
@@ -134,7 +219,7 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                     color: #ff0000 !important;
                     border-color: #ff0000 !important;
                 }
-                .blackspace-bg .omori-panel, .blackspace-bg .omori-card {
+                .blackspace-bg .omori-panel, .blackspace-bg .omori-card, .blackspace-bg .theme-panel {
                     border-color: #ff0000 !important;
                     box-shadow: 4px 4px 0px #ff0000 !important;
                     background: #000 !important;
@@ -144,7 +229,10 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                 .blackspace-bg .omori-card span,
                 .blackspace-bg .omori-card h1,
                 .blackspace-bg .omori-card h2,
-                .blackspace-bg .omori-card div {
+                .blackspace-bg .omori-card div,
+                .blackspace-bg .theme-panel p,
+                .blackspace-bg .theme-panel span,
+                .blackspace-bg .theme-panel div {
                     color: #ff0000 !important;
                 }
                 .blackspace-bg .omori-card .border-black,
@@ -154,20 +242,40 @@ export const OmoriLayout: React.FC<{ children: React.ReactNode; activeTab: strin
                 .blackspace-bg .omori-header {
                     color: #ff0000 !important;
                 }
-                .blackspace-bg .omori-button {
+                .blackspace-bg .omori-button, .blackspace-bg .theme-button {
                     border-color: #ff0000 !important;
                     color: #ff0000 !important;
                     background: #000 !important;
                     box-shadow: 2px 2px 0px #ff0000 !important;
                 }
-                .blackspace-bg .omori-button.active {
+                .blackspace-bg .omori-button.active, .blackspace-bg .theme-button-alt {
                     background: #ff0000 !important;
                     color: #000 !important;
+                    border-color: #ff0000 !important;
                 }
-                .blackspace-bg .omori-button:hover {
+                .blackspace-bg .omori-button:hover, .blackspace-bg .theme-button:hover {
                     background: #ff0000 !important;
                     color: #000 !important;
                     box-shadow: 4px 4px 0px #ff0000 !important;
+                }
+                .blackspace-bg .theme-card-option {
+                    background: #000 !important;
+                    border: 2px solid #ff0000 !important;
+                    color: #ff0000 !important;
+                    box-shadow: 3px 3px 0px #ff0000 !important;
+                }
+                .blackspace-bg .theme-room-box {
+                    background: #000 !important;
+                    border: 2px solid #ff0000 !important;
+                    color: #ff0000 !important;
+                }
+                .blackspace-bg .theme-player-chip {
+                    background: #000 !important;
+                    border: 1px solid #ff0000 !important;
+                    color: #ff0000 !important;
+                }
+                .blackspace-bg .theme-penalty-box {
+                    border-top: 2px dashed #ff0000 !important;
                 }
                 .blackspace-bg .omori-nav-btn {
                     color: #ff0000 !important;

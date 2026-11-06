@@ -10,6 +10,7 @@ interface ThemedGameHeaderProps {
   intensity: Intensity | null;
   gameMode: GameMode | null;
   onOpenModeChooser: () => void;
+  onCycleIntensity?: () => void;
   onOpenAwards: () => void;
   timerEnabled: boolean;
   timerDuration: TimerDuration;
@@ -33,6 +34,7 @@ export const ThemedGameHeader: React.FC<ThemedGameHeaderProps> = ({
   intensity,
   gameMode,
   onOpenModeChooser,
+  onCycleIntensity,
   onOpenAwards,
   timerEnabled,
   timerDuration,
@@ -62,6 +64,91 @@ export const ThemedGameHeader: React.FC<ThemedGameHeaderProps> = ({
       case GameMode.WOULD_YOU_RATHER: return 'WOULD YOU RATHER';
       case GameMode.HOT_SEAT: return 'HOT SEAT';
       default: return 'MINIGAME';
+    }
+  };
+
+  const getIntensityLabel = () => {
+    switch (theme) {
+      case Theme.OMORI:
+        if (intensity === Intensity.VULGAR) return 'BLACK SPACE';
+        if (intensity === Intensity.HOT) return 'HEADSPACE';
+        return 'WHITE SPACE';
+      case Theme.UNDERTALE:
+        if (intensity === Intensity.VULGAR) return '* GENOCIDE';
+        if (intensity === Intensity.HOT) return '* NEUTRAL';
+        return '* PACIFIST';
+      case Theme.POKEMON:
+        if (intensity === Intensity.VULGAR) return 'LVL: GHOST';
+        if (intensity === Intensity.HOT) return 'LVL: FIRE';
+        return 'LVL: NORMAL';
+      case Theme.HAZBIN:
+        if (intensity === Intensity.VULGAR) return 'OVERLORD';
+        if (intensity === Intensity.HOT) return 'SINNER';
+        return 'REHAB';
+      case Theme.PERSONA:
+        if (intensity === Intensity.VULGAR) return 'ALL-OUT';
+        if (intensity === Intensity.HOT) return 'INFILTRATE';
+        return 'STEALTH';
+      case Theme.MINECRAFT:
+        if (intensity === Intensity.VULGAR) return 'THE END';
+        if (intensity === Intensity.HOT) return 'NETHER';
+        return 'OVERWORLD';
+      case Theme.CYBERPUNK:
+        if (intensity === Intensity.VULGAR) return 'OVERDRIVE';
+        if (intensity === Intensity.HOT) return 'CYBERPSYCHO';
+        return 'GLITCH';
+      case Theme.FNAF:
+        if (intensity === Intensity.VULGAR) return 'NIGHT 5';
+        if (intensity === Intensity.HOT) return 'NIGHT 3';
+        return 'NIGHT 1';
+      case Theme.FALLOUT:
+        if (intensity === Intensity.VULGAR) return 'RAD-STORM';
+        if (intensity === Intensity.HOT) return 'WASTELAND';
+        return 'VAULT';
+      case Theme.SKYRIM:
+        if (intensity === Intensity.VULGAR) return 'DRAGONBORN';
+        if (intensity === Intensity.HOT) return 'APPRENTICE';
+        return 'NOVICE';
+      case Theme.DANGANRONPA:
+        if (intensity === Intensity.VULGAR) return 'DESPAIR';
+        if (intensity === Intensity.HOT) return 'CULPRIT';
+        return 'HOPE';
+      case Theme.KIRBY:
+        if (intensity === Intensity.VULGAR) return 'NIGHTMARE';
+        if (intensity === Intensity.HOT) return 'EXTRA';
+        return 'BREEZE';
+      case Theme.SONIC:
+        if (intensity === Intensity.VULGAR) return 'CHAOS';
+        if (intensity === Intensity.HOT) return 'SUPER';
+        return 'ACT SPEED';
+      case Theme.SANRIO:
+        if (intensity === Intensity.VULGAR) return 'SPICY';
+        if (intensity === Intensity.HOT) return 'SWEET';
+        return 'PASTEL';
+      case Theme.ANIMAL_CROSSING:
+        if (intensity === Intensity.VULGAR) return 'NIGHT OWL';
+        if (intensity === Intensity.HOT) return 'SUNNY';
+        return 'BREEZY';
+      case Theme.VOCALOID:
+        if (intensity === Intensity.VULGAR) return 'PEAK dB';
+        if (intensity === Intensity.HOT) return 'OVERDRIVE';
+        return 'ACOUSTIC';
+      case Theme.IRUMA:
+        if (intensity === Intensity.VULGAR) return 'EVIL CYCLE';
+        if (intensity === Intensity.HOT) return 'DEMONIC';
+        return 'HUMAN';
+      case Theme.ARCANE:
+        if (intensity === Intensity.VULGAR) return 'SHIMMER';
+        if (intensity === Intensity.HOT) return 'ZAUN';
+        return 'PILTOVER';
+      case Theme.BILLY_HATCHER:
+        if (intensity === Intensity.VULGAR) return 'SUPER';
+        if (intensity === Intensity.HOT) return 'GOLDEN';
+        return 'MORNING';
+      default:
+        if (intensity === Intensity.VULGAR) return 'VULGAR';
+        if (intensity === Intensity.HOT) return 'HOT';
+        return 'SOFT';
     }
   };
 
@@ -485,18 +572,33 @@ export const ThemedGameHeader: React.FC<ThemedGameHeaderProps> = ({
 
   return (
     <div className={style.frame} style={{ fontFamily: style.font }}>
-      {/* Unified Top Utility Row: Mode Switcher + Awards + Timer */}
+      {/* Unified Top Utility Row: Mode Switcher + Intensity Switcher + Awards + Timer */}
       <div className={style.topRow}>
-        <button
-          onClick={() => {
-            hapticService.light();
-            onOpenModeChooser();
-          }}
-          title="Switch Minigame Mode"
-          className={style.modeBtn}
-        >
-          <span>{getModeLabel()} ⟳</span>
-        </button>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => {
+              hapticService.light();
+              onOpenModeChooser();
+            }}
+            title="Switch Minigame Mode"
+            className={style.modeBtn}
+          >
+            <span>{getModeLabel()} ⟳</span>
+          </button>
+
+          {onCycleIntensity && (
+            <button
+              onClick={() => {
+                hapticService.medium();
+                onCycleIntensity();
+              }}
+              title="Change Intensity Level"
+              className={style.modeBtn}
+            >
+              <span>{getIntensityLabel()} ⟳</span>
+            </button>
+          )}
+        </div>
 
         <div className="flex items-center gap-1.5">
           {playersEnabled && players.length > 0 && (

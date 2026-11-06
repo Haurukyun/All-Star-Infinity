@@ -5,12 +5,26 @@ budget_tokens: 1000
 # STATUS — All★Star Infinity
 
 > Single source of truth for resuming work. Read this FIRST when starting a session.
-> Last updated: 2026-11-06 (Theme Lore Badges, Unified ThemedGameHeader HUD for all 19 themes, PlayerSetup immersion overhaul, Zero-Emoji audit across gameplay & awards)
+> Last updated: 2026-11-06 (Intensity switcher button per theme, Omori Black/White/Head Space full CSS hook & grey border purge, bottom action button visibility fix)
 
 ---
 
 ## ✅ Done
 
+- **Per-Theme Intensity Switcher & Deep Contrast Overhaul:**
+  - **In-Game "Change Intensity" Button (`ThemedGameHeader.tsx`, `UnifiedGame.tsx`):**
+    - Added an intensity switcher button directly on the game HUD next to the minigame switcher.
+    - Shows authentic in-universe tier names across all 19 realms (Omori: `WHITE SPACE` / `HEADSPACE` / `BLACK SPACE`; Undertale: `* PACIFIST` / `* NEUTRAL` / `* GENOCIDE`; Pokémon: `LVL: NORMAL` / `LVL: FIRE` / `LVL: GHOST`; Hazbin: `REHAB` / `SINNER` / `OVERLORD`; Persona: `STEALTH` / `INFILTRATE` / `ALL-OUT`, etc.).
+    - Instant one-click cycling with medium haptic tactile feedback.
+  - **Eliminated Grey Borders Across Themes (`OmoriTheme.tsx`, `UnifiedGame.tsx`):**
+    - Replaced all hardcoded `border-black/20 dark:border-white/20` and `bg-black/5 dark:bg-white/5` with theme-adaptive classes (`theme-card-option`, `theme-room-box`, `theme-player-chip`).
+    - Added explicit CSS rules in `OmoriTheme` mapping `.theme-panel`, `.theme-button`, `.theme-button-alt`, `.theme-card-option`, `.theme-room-box`, and `.theme-player-chip`:
+      - **Black Space (Vulgar)**: Pitch black background (`#000000`) with solid `#ff0000` borders and shadows.
+      - **White Space (Soft)**: Pure white background with solid `#000000` sketch borders and shadows.
+      - **Headspace (Hot)**: Vivid purple background with solid `#ffffff` white borders.
+  - **High-Contrast, Visible Action Buttons (`UnifiedGame.tsx`):**
+    - Styled `DONE` and `NEXT` with solid backgrounds, 2px borders, drop shadows, and `min-h-[56px]`.
+    - Added `pb-12` clearance so bottom buttons are never cut off or obscured by the fixed bottom navigation bar.
 - **Theme-Native Lore Badges & Complete Immersion Overhaul (all 19 themes):**
   - **Universal Lore Badge System (`ThemeLoreBadge.tsx`):**
     - Built a dedicated, reusable lore-badge engine for all 19 universes. Replaces generic emojis and modern flat circular web avatar circles with authentic in-universe symbols:
