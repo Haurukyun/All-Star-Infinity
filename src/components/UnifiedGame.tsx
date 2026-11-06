@@ -4,6 +4,8 @@ import { useGameLogic } from '../hooks/useGameLogic';
 import { Intensity, GameMode, TimerDuration, CustomDeck, Theme, HotSeatDuration } from '../types';
 import { getThemeDefinition } from '../themes';
 import { CountdownTimer } from './CountdownTimer';
+import { ThemedGameHeader } from './ThemedGameHeader';
+import { ThemeLoreBadge } from './ThemeLoreBadge';
 import { ThemedMinigameChooser } from './ThemedMinigameChooser';
 import { PlayerTurnBanner } from './PlayerTurnBanner';
 import { DeckShareModal } from './DeckShareModal';
@@ -176,7 +178,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 setTimeout(() => {
                     hapticService.heavy();
                     soundService.buzzer();
-                    setPointCountdown('POINT! 👉');
+                    setPointCountdown('POINT! ▶');
                 }, 750);
             }, 750);
         }, 750);
@@ -284,7 +286,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 className="theme-panel p-6 sm:p-8 mt-4 space-y-5"
             >
                 <div className="flex justify-between items-center">
-                    <span className="theme-badge px-3 py-1 font-bold italic">🗳️ MOST LIKELY TO</span>
+                    <span className="theme-badge px-3 py-1 font-bold italic">[ MOST LIKELY TO ]</span>
                     <span className="theme-text-header text-[10px] opacity-40 italic">ENTRY_{history.length}</span>
                 </div>
 
@@ -299,7 +301,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                             onClick={triggerPointCountdown}
                             className="theme-button p-4 text-base font-black w-full uppercase tracking-wider"
                         >
-                            👉 3, 2, 1... TAP TO POINT!
+                            ▶ 3, 2, 1... TAP TO POINT!
                         </button>
                     ) : (
                         <motion.div
@@ -317,10 +319,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 {playersEnabled && players.length > 0 && (
                     <div className="space-y-2.5 pt-2 border-t border-black/10">
                         <p className="text-[10px] uppercase font-bold opacity-70">
-                            👉 Tap who got the most fingers pointed at them:
+                            ▶ Tap who got the most fingers pointed at them:
                         </p>
                         <div className="flex flex-wrap gap-2">
-                            {players.map((p) => {
+                            {players.map((p, idx) => {
                                 const isWinner = mostLikelyToWinnerId === p.id;
                                 return (
                                     <button
@@ -332,10 +334,10 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                                 : 'bg-black/10 hover:bg-black/20 dark:bg-white/10 border-white/10'
                                         }`}
                                     >
-                                        <span>{p.avatar || '👤'}</span>
+                                        <ThemeLoreBadge theme={theme} index={idx} intensity={intensity} />
                                         <span>{p.name}</span>
-                                        <span className="opacity-50 text-[10px]">🐔 {p.chickenCount}</span>
-                                        {isWinner && <span className="text-xs">🎯</span>}
+                                        <span className="opacity-60 text-[10px]">({p.chickenCount})</span>
+                                        {isWinner && <span className="text-xs font-bold text-yellow-300">★</span>}
                                     </button>
                                 );
                             })}
@@ -346,8 +348,8 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 onClick={handleEnforcePenalty}
                                 className="w-full mt-2 py-3 px-4 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-black text-sm uppercase tracking-wider shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"
                             >
-                                <span>💥</span>
-                                <span>Enforce Forfeit on {winnerPlayer.name} (+1 Chicken)</span>
+                                <span>!</span>
+                                <span>Enforce Forfeit on {winnerPlayer.name} (+1 Forfeit)</span>
                             </button>
                         )}
                     </div>
@@ -442,7 +444,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 className="theme-panel p-6 sm:p-8 mt-4 space-y-5"
             >
                 <div className="flex justify-between items-center">
-                    <span className="theme-badge px-3 py-1 font-bold italic">⚖️ WOULD YOU RATHER</span>
+                    <span className="theme-badge px-3 py-1 font-bold italic">[ WOULD YOU RATHER ]</span>
                     <span className="theme-text-header text-[10px] opacity-40 italic">ENTRY_{history.length}</span>
                 </div>
 
@@ -504,24 +506,24 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     <div className="p-3 rounded-xl bg-black/10 dark:bg-white/5 border border-black/10 space-y-2">
                         <div className="flex justify-between items-center">
                             <span className="text-[10px] font-black uppercase tracking-wider opacity-70">
-                                🗳️ Live Room Votes ({totalRoomVotes}/{players.length})
+                                [ Live Room Votes ({totalRoomVotes}/{players.length}) ]
                             </span>
                             {minorityOption && (
                                 <span className="text-[10px] font-bold text-amber-500 uppercase">
-                                    {minorityOption === 'TIE' ? '⚖️ Tie Vote' : `⚡ Minority: Option ${minorityOption}`}
+                                    {minorityOption === 'TIE' ? '= Tie Vote' : `! Minority: Option ${minorityOption}`}
                                 </span>
                             )}
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                            {players.map((p) => {
+                            {players.map((p, idx) => {
                                 const currentVote = roomWyrVotes[p.id];
                                 return (
                                     <div
                                         key={p.id}
                                         className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/10 dark:bg-white/10 text-xs font-bold border border-white/10"
                                     >
-                                        <span style={{ color: p.color || '#fff' }}>{p.avatar || '👤'}</span>
+                                        <ThemeLoreBadge theme={theme} index={idx} intensity={intensity} />
                                         <span>{p.name}:</span>
                                         <div className="flex gap-1 ml-1">
                                             <button
@@ -551,8 +553,8 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                 onClick={handleAssignMinorityForfeits}
                                 className="w-full mt-2 py-2 px-3 rounded-lg bg-amber-600/80 hover:bg-amber-600 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow transition-all active:scale-95"
                             >
-                                <span>⚡</span>
-                                <span>Assign Minority Forfeit (+1 Chicken to {minorityPlayers.map(p => p.name).join(', ')})</span>
+                                <span>!</span>
+                                <span>Assign Minority Forfeit (+1 Forfeit to {minorityPlayers.map(p => p.name).join(', ')})</span>
                             </button>
                         )}
                     </div>
@@ -640,7 +642,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     className="theme-panel p-6 sm:p-8 mt-4 text-center space-y-6"
                 >
                     <div className="inline-block p-3 rounded-full bg-red-600 text-white text-3xl shadow-lg mb-1">
-                        🔥
+                        ★
                     </div>
                     <h3 className="theme-text-header text-3xl font-black italic">HOT SEAT COMPLETE!</h3>
 
@@ -689,7 +691,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     animate={{ opacity: 1, scale: 1 }}
                     className="theme-panel p-6 sm:p-8 mt-4 text-center space-y-5"
                 >
-                    <div className="text-4xl">🔥</div>
+                    <div className="text-4xl">▲</div>
                     <h3 className="theme-text-header text-3xl font-black italic">THE HOT SEAT</h3>
                     <p className="text-sm opacity-80 max-w-sm mx-auto leading-relaxed">
                         {activePlayer ? (
@@ -717,7 +719,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                             : 'bg-black/10 dark:bg-white/10 opacity-60 hover:opacity-100'
                                     }`}
                                 >
-                                    {d === 30 ? '⚡ 30s Blitz' : d === 60 ? '🔥 60s Standard' : '🧨 90s Marathon'}
+                                    {d === 30 ? '⚡ 30s Blitz' : d === 60 ? '▲ 60s Standard' : '! 90s Marathon'}
                                 </button>
                             ))}
                         </div>
@@ -803,20 +805,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                 </div>
             )}
 
-            {playersEnabled && activePlayer && (
-                <div className="flex justify-between items-center pb-3 mb-3 border-b border-black/10">
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-black uppercase tracking-wider text-[var(--theme-accent,#d90429)]">
-                            {activePlayer.name}'s Turn
-                        </span>
-                    </div>
-                    {targetPlayer && (
-                        <span className="text-[11px] font-bold opacity-75">
-                            Target: {targetPlayer.avatar || ''} {targetPlayer.name}
-                        </span>
-                    )}
-                </div>
-            )}
+
             <div className="flex justify-between items-center mb-6">
                 <span className="theme-badge px-3 py-1 font-bold italic">{prompt?.type}</span>
                 <span className="theme-text-header text-[10px] opacity-40 italic">ENTRY_{history.length}</span>
@@ -950,7 +939,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             case Theme.ANIMAL_CROSSING:
                 return {
                     className: "border-2 border-[#7EBF8F] bg-[#F7F4E9] text-[#4A7A56] font-['Sniglet'] text-xs px-3.5 py-1 rounded-2xl shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
-                    text: `🍃 ${modeLabel} ⟳`
+                    text: `☘ ${modeLabel} ⟳`
                 };
             case Theme.CYBERPUNK:
                 return {
@@ -977,7 +966,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             case Theme.KIRBY:
                 return {
                     className: "border-2 border-[#FF85B3] bg-[#FFE4EF] text-[#D81B60] font-['Fredoka_One'] text-xs px-3.5 py-1 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
-                    text: `⭐ ${modeLabel} ⟳`
+                    text: `★ ${modeLabel} ⟳`
                 };
             case Theme.POKEMON:
                 return {
@@ -992,7 +981,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             case Theme.SANRIO:
                 return {
                     className: "border-2 border-[#FF8DA1] bg-[#FFE4EC] text-[#D84B6B] font-['Cherry_Bomb_One'] text-xs px-3.5 py-1 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer",
-                    text: `🎀 ${modeLabel} ⟳`
+                    text: `୨୧ ${modeLabel} ⟳`
                 };
             case Theme.FALLOUT:
                 return {
@@ -1074,7 +1063,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
             case Theme.SANRIO:
                 return {
                     className: "border-2 border-[#FF8DA1] bg-[#FFE4EC] text-[#D84B6B] font-['Cherry_Bomb_One'] text-xs px-3 py-0.5 rounded-full shadow-sm font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer",
-                    text: "👑 Awards"
+                    text: "★ Awards"
                 };
             case Theme.CYBERPUNK:
                 return {
@@ -1129,68 +1118,29 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                     exit={{ opacity: 0, x: 20 }}
                     className="h-full flex flex-col"
                 >
-                    {/* Universal Top Bar for Play screen: Themed Minigame Chooser & Themed Countdown Timer */}
-                    <div className="flex flex-col gap-2 mb-2 shrink-0">
-                        <div className="flex flex-wrap justify-between items-center gap-2">
-                            {/* Themed Mode Switcher Button */}
-                            <button
-                                onClick={() => {
-                                    hapticService.light();
-                                    soundService.click();
-                                    setIsMinigameChooserOpen(true);
-                                }}
-                                title="Switch Minigame Mode"
-                                className={getThemedModeButton().className}
-                            >
-                                <span>{getThemedModeButton().text}</span>
-                            </button>
-
-                            <div className="flex items-center gap-2">
-                                {playersEnabled && players.length > 0 && (
-                                    <button
-                                        onClick={() => {
-                                            hapticService.light();
-                                            setIsAwardsModalOpen(true);
-                                        }}
-                                        title="View Party Awards Podium"
-                                        className={getThemedAwardsButton().className}
-                                    >
-                                        <span>{getThemedAwardsButton().text}</span>
-                                    </button>
-                                )}
-
-                                {/* Themed Corner Timer: Only show if not in 60s Hot Seat mode */}
-                                {gameMode !== GameMode.HOT_SEAT && (
-                                    <CountdownTimer
-                                        enabled={timerEnabled}
-                                        duration={timerDuration}
-                                        onToggleEnabled={toggleTimerEnabled}
-                                        onChangeDuration={setTimerDuration}
-                                        promptId={prompt?.id}
-                                        isPromptActive={!!prompt}
-                                        theme={theme}
-                                        intensity={intensity}
-                                    />
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Pass & Play Roster Turn Banner (when active) */}
-                        {playersEnabled && players.length > 0 && (
-                            <PlayerTurnBanner
-                                players={players}
-                                activePlayer={activePlayer}
-                                targetPlayer={targetPlayer}
-                                onNextPlayer={nextPlayer}
-                                onPrevPlayer={prevPlayer}
-                                onIncrementChicken={incrementChicken}
-                                onAddPlayer={addPlayer}
-                                onRemovePlayer={removePlayer}
-                                theme={theme}
-                                intensity={intensity}
-                            />
-                        )}
-                    </div>
+                    {/* Unified Theme-Native HUD Header: Single cohesive unit for Mode, Timer, Awards & Turn */}
+                    <ThemedGameHeader
+                        theme={theme}
+                        intensity={intensity}
+                        gameMode={gameMode}
+                        onOpenModeChooser={() => setIsMinigameChooserOpen(true)}
+                        onOpenAwards={() => setIsAwardsModalOpen(true)}
+                        timerEnabled={timerEnabled}
+                        timerDuration={timerDuration}
+                        onToggleTimer={toggleTimerEnabled}
+                        onChangeTimerDuration={setTimerDuration}
+                        promptId={prompt?.id}
+                        isPromptActive={!!prompt}
+                        playersEnabled={playersEnabled}
+                        players={players}
+                        activePlayer={activePlayer}
+                        targetPlayer={targetPlayer}
+                        onNextPlayer={nextPlayer}
+                        onPrevPlayer={prevPlayer}
+                        onIncrementChicken={incrementChicken}
+                        onAddPlayer={addPlayer}
+                        onRemovePlayer={removePlayer}
+                    />
 
                     {/* Custom Theme PlayScreen is reserved for legacy TOD / NHIE; new modes always use specialized interactive engines */}
                     {themeDef.PlayScreen && (gameMode === GameMode.TRUTH_OR_DARE || gameMode === GameMode.NEVER_HAVE_I_EVER) ? (
@@ -1339,7 +1289,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                         title="Import Deck via QR / Short Code"
                                         className="theme-button px-3 py-1.5 text-xs font-bold"
                                     >
-                                        📥 IMPORT
+                                        [+] IMPORT
                                     </button>
                                     {deckSubTab === 'custom' && (
                                         <button
@@ -1422,7 +1372,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                                             title="Share deck via QR code / Short Code"
                                                             className="theme-button theme-button-alt px-2.5 py-1.5 text-xs font-bold"
                                                         >
-                                                            📤
+                                                        [~] SHARE
                                                         </button>
                                                         <button
                                                             onClick={() => setEditingDeck(deck)}
@@ -1479,7 +1429,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
 
                                                     <div className="flex justify-between items-center pt-2 border-t border-black/10 text-xs">
                                                         <span className="opacity-60 text-[10px] uppercase font-bold tracking-wider">
-                                                            🎴 {pack.prompts.length} CARDS • {pack.gameMode}
+                                                            ◈ {pack.prompts.length} CARDS • {pack.gameMode}
                                                         </span>
 
                                                         <div className="flex items-center gap-1.5">
@@ -1494,14 +1444,14 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                                                 title="Clone an editable copy to My Decks"
                                                                 className="theme-button theme-button-alt px-2.5 py-1.5 text-xs font-bold"
                                                             >
-                                                                📋 CLONE
+                                                        [+] CLONE
                                                             </button>
                                                             <button
                                                                 onClick={() => handleOpenExport(pack)}
                                                                 title="Share this themed pack via QR code"
                                                                 className="theme-button theme-button-alt px-2.5 py-1.5 text-xs font-bold"
                                                             >
-                                                                📤
+                                                            [~] SHARE
                                                             </button>
                                                         </div>
                                                     </div>
@@ -1539,7 +1489,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                         }}
                                         className="text-[10px] uppercase font-bold opacity-50 hover:opacity-90 transition-opacity border border-current/30 px-2 py-1 rounded"
                                     >
-                                        🗑️ Clear
+                                        [X] Clear
                                     </button>
                                 )}
                             </div>
@@ -1550,7 +1500,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                                     history.map((item, i) => (
                                         <div key={i} className="theme-panel p-4 flex gap-4 items-start">
                                             <div className="w-10 h-10 theme-badge shrink-0 flex items-center justify-center text-lg">
-                                                {item.type === 'Truth' ? '?' : item.type === 'Dare' ? '!' : '🎴'}
+                                                {item.type === 'Truth' ? '?' : item.type === 'Dare' ? '!' : '◈'}
                                             </div>
                                             <div>
                                                 <div className="flex justify-between items-center mb-1">
@@ -1584,7 +1534,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         {/* Easy Font Mode Toggle */}
                         <div className="flex justify-between items-center">
                             <div>
-                                <div className="font-bold text-sm">🔤 EASY FONT MODE</div>
+                                <div className="font-bold text-sm">[ EASY FONT MODE ]</div>
                                 <div className="text-[10px] opacity-60">High-legibility typography across all 19 realms</div>
                             </div>
                             <button
@@ -1602,7 +1552,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         {/* Native Haptic Feedback Toggle */}
                         <div className="flex justify-between items-center pt-2 border-t border-black/10">
                             <div>
-                                <div className="font-bold text-sm">📳 HAPTIC FEEDBACK</div>
+                                <div className="font-bold text-sm">[ HAPTIC FEEDBACK ]</div>
                                 <div className="text-[10px] opacity-60">Tactile vibrations on draws, timers & penalties</div>
                             </div>
                             <button
@@ -1623,7 +1573,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         {/* Procedural Sound FX Toggle */}
                         <div className="flex justify-between items-center pt-2 border-t border-black/10">
                             <div>
-                                <div className="font-bold text-sm">🔊 SOUND EFFECTS</div>
+                                <div className="font-bold text-sm">[ SOUND EFFECTS ]</div>
                                 <div className="text-[10px] opacity-60">Procedural audio for card flips, ticks, buzzers & chimes</div>
                             </div>
                             <button
@@ -1689,7 +1639,7 @@ const UnifiedGame: React.FC<UnifiedGameProps> = ({ logic }) => {
                         <div className="space-y-3 pt-2 border-t border-black/10">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <div className="font-bold text-sm">👥 PASS & PLAY ROSTER</div>
+                                    <div className="font-bold text-sm">[ PASS &amp; PLAY ROSTER ]</div>
                                     <div className="text-[10px] opacity-60">Turn tracker & chicken counter ({players.length} players)</div>
                                 </div>
                                 <button

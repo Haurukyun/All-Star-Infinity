@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Player, Theme } from '../types';
 import { soundService } from '../services/soundFx';
 import { hapticService } from '../services/haptics';
+import { ThemeLoreBadge } from './ThemeLoreBadge';
 
 interface PartyAwardsModalProps {
   isOpen: boolean;
@@ -133,9 +134,9 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
       case Theme.POKEMON:
         return { trophy: "●", shield: "■", forfeit: "×", flame: "▲", forfeitText: "runs" };
       case Theme.DANGANRONPA:
-        return { trophy: "★", shield: "◉", forfeit: "💀", flame: "★", forfeitText: "despairs" };
+        return { trophy: "★", shield: "◉", forfeit: "☠", flame: "★", forfeitText: "despairs" };
       default:
-        return { trophy: "★", shield: "🛡", forfeit: "🐔", flame: "🔥", forfeitText: "forfeits" };
+        return { trophy: "★", shield: "◆", forfeit: "×", flame: "▲", forfeitText: "forfeits" };
     }
   };
 
@@ -168,9 +169,12 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
               <div className={`${style.card} flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
                   <div className="text-2xl font-bold">{icons.shield}</div>
-                  <div>
+                  <div className="text-left">
                     <div className="text-[10px] font-black uppercase opacity-60">THE IRON WILL</div>
-                    <div className="font-black text-sm">{ironWill.name}</div>
+                    <div className="font-black text-sm flex items-center gap-1.5">
+                      {theme && <ThemeLoreBadge theme={theme} index={players.findIndex(p => p.id === ironWill.id)} />}
+                      <span>{ironWill.name}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -184,9 +188,12 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
               <div className={`${style.card} flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
                   <div className="text-2xl font-bold">{icons.forfeit}</div>
-                  <div>
+                  <div className="text-left">
                     <div className="text-[10px] font-black uppercase opacity-60">THE BIGGEST CHICKEN</div>
-                    <div className="font-black text-sm">{biggestChicken.name}</div>
+                    <div className="font-black text-sm flex items-center gap-1.5">
+                      {theme && <ThemeLoreBadge theme={theme} index={players.findIndex(p => p.id === biggestChicken.id)} />}
+                      <span>{biggestChicken.name}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -200,9 +207,12 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
               <div className={`${style.card} flex items-center justify-between`}>
                 <div className="flex items-center gap-3">
                   <div className="text-2xl font-bold">{icons.flame}</div>
-                  <div>
+                  <div className="text-left">
                     <div className="text-[10px] font-black uppercase opacity-60">HOT SEAT SPEEDRUNNER</div>
-                    <div className="font-black text-sm">{hotSeatMaster.name}</div>
+                    <div className="font-black text-sm flex items-center gap-1.5">
+                      {theme && <ThemeLoreBadge theme={theme} index={players.findIndex(p => p.id === hotSeatMaster.id)} />}
+                      <span>{hotSeatMaster.name}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -221,7 +231,7 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
               }}
               className={style.btnPrimary}
             >
-              🔄 Keep Playing
+              Keep Playing ⟳
             </button>
             <button
               onClick={() => {
@@ -231,7 +241,7 @@ export const PartyAwardsModal: React.FC<PartyAwardsModalProps> = ({
               }}
               className={style.btnSecondary}
             >
-              🏠 Return to Title
+              Return to Title
             </button>
           </div>
         </motion.div>
